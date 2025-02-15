@@ -1,7 +1,5 @@
-import { DEFAULT_API_ROUTE } from './api.routes';
-
 export const USER_ROUTES = {
-    DEFAULT: `${DEFAULT_API_ROUTE}/users`,
+    DEFAULT: 'users',
     LOGIN: 'login',
     REGISTRATION: 'registration',
     REFRESH: 'refresh',
