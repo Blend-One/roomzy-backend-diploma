@@ -31,11 +31,26 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: |
             ghcr.io/${{ github.repository }}
-      - name: Build and push
+      - name: Build and push to registry
         uses: docker/build-push-action@v6
         with:
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-
-
+  deploying:
+    needs: [publishing]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pulling and rebuilding images on the host machine
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{secrets.SSH_HOST}}
+          username: ${{secrets.SSH_USER}}
+          password: ${{secrets.SSH_PRIVATE_KEY}}
+          script: |
+            cd ${{secrets.SSH_WORKDIR}}
+            docker compose pull backend
+            docker compose up -d --force-recreate postgres
+            docker compose up -d --force-recreate backend
+            
+            

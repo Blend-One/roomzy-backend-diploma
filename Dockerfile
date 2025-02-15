@@ -1,4 +1,4 @@
-FROM node:23-alpine3.20
+FROM node:23-alpine3.20 as build
 
 WORKDIR /usr/src/app
 
@@ -12,4 +12,4 @@ RUN npm run build
 
 EXPOSE 8080
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]
