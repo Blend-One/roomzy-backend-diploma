@@ -50,7 +50,7 @@ jobs:
           script: |
             cd ${{secrets.SSH_WORKDIR}}
             docker compose pull backend
-            docker compose up -d --force-recreate postgres
             docker compose up -d --force-recreate backend
+            docker image prune -f
             
             
