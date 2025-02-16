@@ -7,4 +7,5 @@
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "password" TEXT NOT NULL,
 ALTER COLUMN "firstName" DROP NOT NULL,
+ALTER COLUMN "phone" DROP NOT NULL,
 ALTER COLUMN "secondName" DROP NOT NULL;

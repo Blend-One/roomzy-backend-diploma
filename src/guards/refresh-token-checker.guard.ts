@@ -7,7 +7,7 @@ export class RefreshTokenCheckerGuard implements CanActivate {
     constructor(private readonly tokenService: TokenService) {}
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        return this.tokenService.checkTokenForGuard({
+        return !!this.tokenService.checkTokenForGuard({
             context,
             headerName: 'Refresh-Token',
             validationCallback: this.tokenService.validateRefreshToken,

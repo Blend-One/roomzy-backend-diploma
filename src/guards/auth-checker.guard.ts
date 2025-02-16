@@ -7,7 +7,7 @@ export class AuthCheckerGuard implements CanActivate {
     constructor(private readonly tokenService: TokenService) {}
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        return this.tokenService.checkTokenForGuard({
+        return !!this.tokenService.checkTokenForGuard({
             context,
             headerName: 'Authorization',
             validationCallback: this.tokenService.validateAccessToken,
