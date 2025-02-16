@@ -10,7 +10,7 @@ async function main() {
         await prisma.role.upsert({
             where: { name: role, id: role },
             update: {},
-            create: { name: role },
+            create: { name: role, id: role },
         });
     }
 

@@ -1,5 +1,5 @@
 model Role {
-  id   String @id @default(uuid())
+  id   String @id
   name String @unique
   users User[]
 }
