@@ -1,0 +1,11 @@
+model User {
+  id    String  @id @default(uuid())
+  email String  @unique
+  phone String
+  password String
+  firstName String?
+  secondName String?
+  avatarImageUrl String?
+  roleId String
+  role Role @relation(fields: [roleId], references: [id])
+}
