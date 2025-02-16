@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { AUTH_ERRORS } from '../errors/auth.errors';
 import { UserResponseDto } from '../models/dtos/user-response.dto';
 import { TokenRepository } from '../repositories/token.repository';
+import { REFRESH_TOKEN_HEADER } from '../constants/tokens.constants';
 
 @Injectable()
 export class UserService {
@@ -37,7 +38,7 @@ export class UserService {
 
     public async refresh(request: Request): Promise<UserResponseDto> {
         const userPayload = request.headers['user'];
-        const token = this.tokenService.extractToken(request, 'refresh-token');
+        const token = this.tokenService.extractToken(request, REFRESH_TOKEN_HEADER);
         if (!userPayload) throw new UnauthorizedException(AUTH_ERRORS.UNAUTHORIZED);
         const user = await this.userRepository.findUserById(userPayload.id);
         if (!user) throw new UnauthorizedException(AUTH_ERRORS.USER_NOT_FOUND);
@@ -45,7 +46,7 @@ export class UserService {
     }
 
     public async logout(request: Request) {
-        const token = this.tokenService.extractToken(request, 'refresh-token');
+        const token = this.tokenService.extractToken(request, REFRESH_TOKEN_HEADER);
         try {
             await this.tokenRepository.deletesUserTokenByValue(token);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
