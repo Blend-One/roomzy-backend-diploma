@@ -1,4 +1,5 @@
 import { User } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 export class UserTokenPayloadDto {
     constructor(private user: User) {}
@@ -12,6 +13,7 @@ export class UserTokenPayloadDto {
             firstName: this.user.firstName,
             secondName: this.user.secondName,
             phone: this.user.phone,
+            jwtid: uuidv4(),
         };
     }
 }

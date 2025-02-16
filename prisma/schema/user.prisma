@@ -8,4 +8,5 @@ model User {
   avatarImageUrl String?
   roleId String
   role Role @relation(fields: [roleId], references: [id])
+  tokens Token[]
 }
