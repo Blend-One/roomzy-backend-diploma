@@ -1,11 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import { Role } from '../src/models/enums/role.enum';
+import { roles } from './seed_data/roles';
 
 const prisma = new PrismaClient();
 
 async function main() {
-    const roles = Object.values(Role);
-
     for (const role of roles) {
         await prisma.role.upsert({
             where: { name: role, id: role },
