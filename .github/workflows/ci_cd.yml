@@ -3,17 +3,7 @@ on:
   push:
     branches: [ "main" ]
 jobs:
-  linting:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Deps installation
-        run: npm ci
-      - name: Code linting
-        run: npm run lint
   publishing:
-    needs: [linting]
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx

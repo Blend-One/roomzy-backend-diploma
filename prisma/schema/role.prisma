@@ -1,0 +1,5 @@
+model Role {
+  id   String @id
+  name String @unique
+  users User[]
+}
