@@ -1,0 +1,8 @@
+export enum RoomStatus {
+    OPENED = 'OPENED',
+    RESERVED = 'RESERVED',
+    IN_MODERATION = 'IN_MODERATION',
+    REJECTED = 'REJECTED',
+    RENTED = 'RENTED',
+    ARCHIVED = 'ARCHIVED',
+}
