@@ -1,8 +1,21 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { S3_PROVIDE_TOKEN } from 'modules/s3.module';
+import { Injectable } from '@nestjs/common';
 import { S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class S3Service {
-    constructor(@Inject(S3_PROVIDE_TOKEN) private readonly s3Client: S3Client) {}
+    private s3: S3Client;
+    constructor() {
+        this.s3 = new S3Client({
+            region: process.env.S3_REGION,
+            endpoint: process.env.S3_ENDPOINT,
+            credentials: {
+                accessKeyId: process.env.S3_ACCESS_KEY,
+                secretAccessKey: process.env.S3_SECRET_KEY,
+            },
+        });
+    }
+
+    uploadFile() {}
+
+    deleteFile() {}
 }
