@@ -16,6 +16,7 @@ model Room {
   lon Float
   userRelation User @relation(fields: [userId], references: [id])
   roomStatus RoomStatus @relation(fields: [status], references: [name])
+  priceUnitRelation PriceUnit @relation(fields: [priceUnit], references: [name])
   roomSections RoomSection[]
   roomImages RoomImage[]
   controversialIssues ControversialIssue[]

@@ -1,3 +1,4 @@
 model PriceUnit {
   name String @unique
+  rooms Room[]
 }
