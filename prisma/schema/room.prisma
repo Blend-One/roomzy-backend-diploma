@@ -2,7 +2,6 @@ model Room {
   id   String  @id @default(uuid())
   userId String
   status String
-  rentStatus String
   price Decimal
   priceUnit String
   physControl Boolean
@@ -16,8 +15,7 @@ model Room {
   lat Float
   lon Float
   userRelation User @relation(fields: [userId], references: [id])
-  roomStatusRelation RoomStatus @relation(fields: [status], references: [name])
-  rentStatusRelation RentStatus @relation(fields: [rentStatus], references: [name])
+  roomStatus RoomStatus @relation(fields: [status], references: [name])
   roomSections RoomSection[]
   roomImages RoomImage[]
   controversialIssues ControversialIssue[]

@@ -126,7 +126,6 @@ CREATE TABLE "Room" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "status" TEXT NOT NULL,
-    "rentStatus" TEXT NOT NULL,
     "price" DECIMAL(65,30) NOT NULL,
     "priceUnit" TEXT NOT NULL,
     "physControl" BOOLEAN NOT NULL,
@@ -222,9 +221,6 @@ ALTER TABLE "Room" ADD CONSTRAINT "Room_userId_fkey" FOREIGN KEY ("userId") REFE
 
 -- AddForeignKey
 ALTER TABLE "Room" ADD CONSTRAINT "Room_status_fkey" FOREIGN KEY ("status") REFERENCES "RoomStatus"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Room" ADD CONSTRAINT "Room_rentStatus_fkey" FOREIGN KEY ("rentStatus") REFERENCES "RentStatus"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SectionAttributeValue" ADD CONSTRAINT "SectionAttributeValue_roomSectionId_fkey" FOREIGN KEY ("roomSectionId") REFERENCES "RoomSection"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
