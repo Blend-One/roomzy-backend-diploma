@@ -1,0 +1,5 @@
+model RoomImage {
+  id String @id @unique
+  roomId String
+  room Room @relation(fields: [roomId], references: [id])
+}

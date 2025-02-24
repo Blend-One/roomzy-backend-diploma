@@ -1,0 +1,5 @@
+model RentStatus {
+  name String @unique
+  rents Rent[]
+  rooms Room[]
+}

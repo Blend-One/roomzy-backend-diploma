@@ -1,0 +1,27 @@
+model Room {
+  id   String  @id @default(uuid())
+  userId String
+  status String
+  rentStatus String
+  price Decimal
+  priceUnit String
+  physControl Boolean
+  physControlInstructions String?
+  accessInstructions String?
+  street String
+  district String
+  city String
+  appartment String?
+  isCommercial Boolean
+  lat Float
+  lon Float
+  userRelation User @relation(fields: [userId], references: [id])
+  roomStatusRelation RoomStatus @relation(fields: [status], references: [name])
+  rentStatusRelation RentStatus @relation(fields: [rentStatus], references: [name])
+  roomSections RoomSection[]
+  roomImages RoomImage[]
+  controversialIssues ControversialIssue[]
+  favoriteRooms FavoriteRoom[]
+  reviews Review[]
+  rent Rent[]
+}

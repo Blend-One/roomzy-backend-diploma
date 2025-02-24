@@ -1,0 +1,3 @@
+model PriceUnit {
+  name String @unique
+}

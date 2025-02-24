@@ -1,0 +1,7 @@
+model AttributeRelationship {
+  id String @id @default(uuid())
+  parentAttributeId String
+  childAtttributeId String
+  parentAttribute Attribute @relation("ParentRelation", fields: [parentAttributeId], references: [id])
+  childAttribute Attribute @relation("ChildRelation", fields: [childAtttributeId], references: [id])
+}
