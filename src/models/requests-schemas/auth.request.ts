@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AUTH_ERRORS } from '../../errors/auth.errors';
+import { AUTH_ERRORS } from 'errors/auth.errors';
 
 export const AuthSchema = z
     .object({

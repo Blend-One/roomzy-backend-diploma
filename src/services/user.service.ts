@@ -1,12 +1,12 @@
 import { BadRequestException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserRepository } from 'repositories/user.repository';
 import { TokenService } from './token.service';
-import { AuthRequestDto } from '../models/requests-schemas/auth.request';
+import { AuthRequestDto } from 'models/requests-schemas/auth.request';
 import { AuthService } from './auth.service';
-import { AUTH_ERRORS } from '../errors/auth.errors';
-import { UserResponseDto } from '../models/dtos/user-response.dto';
-import { TokenRepository } from '../repositories/token.repository';
-import { REFRESH_TOKEN_HEADER } from '../constants/tokens.constants';
+import { AUTH_ERRORS } from 'errors/auth.errors';
+import { UserResponseDto } from 'models/dtos/user-response.dto';
+import { TokenRepository } from 'repositories/token.repository';
+import { REFRESH_TOKEN_HEADER } from 'constants/tokens.constants';
 
 @Injectable()
 export class UserService {

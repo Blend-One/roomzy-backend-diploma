@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'services/prisma.service';
-import { AuthRequestDto } from '../models/requests-schemas/auth.request';
-import { Role } from '../models/enums/role.enum';
+import { AuthRequestDto } from 'models/requests-schemas/auth.request';
+import { Role } from 'models/enums/role.enum';
 
 @Injectable()
 export class UserRepository {

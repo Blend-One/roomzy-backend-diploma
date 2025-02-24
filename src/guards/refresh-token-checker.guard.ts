@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { TokenService } from '../services/token.service';
+import { TokenService } from 'services/token.service';
 import { Observable } from 'rxjs';
-import { REFRESH_TOKEN_HEADER } from '../constants/tokens.constants';
+import { REFRESH_TOKEN_HEADER } from 'constants/tokens.constants';
 
 @Injectable()
 export class RefreshTokenCheckerGuard implements CanActivate {
