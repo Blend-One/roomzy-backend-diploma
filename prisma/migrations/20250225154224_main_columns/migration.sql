@@ -85,6 +85,7 @@ CREATE TABLE "Review" (
 CREATE TABLE "RoomImage" (
     "id" TEXT NOT NULL,
     "roomId" TEXT NOT NULL,
+    "hash" TEXT NOT NULL,
 
     CONSTRAINT "RoomImage_pkey" PRIMARY KEY ("id")
 );
@@ -221,6 +222,9 @@ ALTER TABLE "Room" ADD CONSTRAINT "Room_userId_fkey" FOREIGN KEY ("userId") REFE
 
 -- AddForeignKey
 ALTER TABLE "Room" ADD CONSTRAINT "Room_status_fkey" FOREIGN KEY ("status") REFERENCES "RoomStatus"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Room" ADD CONSTRAINT "Room_priceUnit_fkey" FOREIGN KEY ("priceUnit") REFERENCES "PriceUnit"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SectionAttributeValue" ADD CONSTRAINT "SectionAttributeValue_roomSectionId_fkey" FOREIGN KEY ("roomSectionId") REFERENCES "RoomSection"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
