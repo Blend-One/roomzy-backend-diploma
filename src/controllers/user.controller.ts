@@ -29,7 +29,7 @@ export class UserController {
     }
 
     @UseGuards(AuthCheckerGuard, RefreshTokenCheckerGuard)
-    @Get(USER_ROUTES.LOGOUT)
+    @Post(USER_ROUTES.LOGOUT)
     public async logout(@Request() request: Request) {
         return this.userService.logout(request);
     }

@@ -1,0 +1,10 @@
+model ControversialIssue {
+  id String @id @default(uuid())
+  rentId String
+  roomId String
+  imageId String
+  description String
+  date DateTime
+  room Room @relation(fields: [roomId], references: [id])
+  rent Rent @relation(fields: [rentId], references: [id])
+}

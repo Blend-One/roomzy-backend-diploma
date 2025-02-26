@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { compareSync, hashSync } from 'bcrypt';
-import { AUTH_ERRORS } from '../errors/auth.errors';
+import { AUTH_ERRORS } from 'errors/auth.errors';
 
 @Injectable()
 export class AuthService {

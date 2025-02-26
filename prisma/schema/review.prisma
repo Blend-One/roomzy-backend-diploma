@@ -1,0 +1,11 @@
+model Review {
+  id String @id @default(uuid())
+  roomId String
+  userId String
+  rate Float
+  description String
+  date DateTime
+  updatedDate DateTime
+  room Room @relation(fields: [roomId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}

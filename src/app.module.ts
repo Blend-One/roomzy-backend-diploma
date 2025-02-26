@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from 'modules/user.module';
+import UserModule from 'modules/user.module';
+import RoomModule from 'modules/room.module';
+import AttributeModule from 'modules/attribute.module';
+import RendModule from 'modules/rent.module';
 import { JwtModule } from '@nestjs/jwt';
-import * as process from 'node:process';
 
 @Module({
     imports: [
@@ -16,6 +18,9 @@ import * as process from 'node:process';
             signOptions: { expiresIn: process.env.ACCESS_EXPIRES_IN || '30d' },
         }),
         UserModule,
+        RoomModule,
+        AttributeModule,
+        RendModule,
     ],
 })
 export class AppModule {}

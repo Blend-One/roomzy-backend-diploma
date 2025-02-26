@@ -1,0 +1,4 @@
+model RoomStatus {
+  name String @unique
+  rooms Room[]
+}

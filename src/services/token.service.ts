@@ -1,10 +1,10 @@
 import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Token, User } from '@prisma/client';
-import { UserResponseDto } from '../models/dtos/user-response.dto';
-import { UserTokenPayloadDto } from '../models/dtos/user-token-payload.dto';
-import { TokenRepository } from '../repositories/token.repository';
-import { AUTH_ERRORS } from '../errors/auth.errors';
+import { UserResponseDto } from 'models/dtos/user-response.dto';
+import { UserTokenPayloadDto } from 'models/dtos/user-token-payload.dto';
+import { TokenRepository } from 'repositories/token.repository';
+import { AUTH_ERRORS } from 'errors/auth.errors';
 
 @Injectable()
 export class TokenService {

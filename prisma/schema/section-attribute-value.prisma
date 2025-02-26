@@ -1,0 +1,10 @@
+model SectionAttributeValue {
+  id String @id @default(uuid())
+  roomSectionId String
+  roomSectionTypeId String
+  value String
+  attributeTypeId String
+  roomSection RoomSection @relation(fields: [roomSectionId], references: [id])
+  roomSectionType RoomSectionType @relation(fields: [roomSectionTypeId], references: [id])
+  attributeType AttributeType @relation(fields: [attributeTypeId], references: [id])
+}

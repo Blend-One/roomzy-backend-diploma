@@ -1,0 +1,13 @@
+model Rent {
+  id String @id @default(uuid())
+  roomId String
+  userId String
+  rentStatus String
+  issuedDate DateTime
+  dueDate DateTime
+  totalPrice Decimal
+  rStatus RentStatus @relation(fields: [rentStatus], references: [name])
+  controversialIssues ControversialIssue[]
+  room Room @relation(fields: [roomId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}

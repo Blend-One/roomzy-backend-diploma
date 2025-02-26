@@ -9,7 +9,7 @@ export class UserTokenPayloadDto {
             id: this.user.id,
             avatarImageUrl: this.user.avatarImageUrl,
             email: this.user.email,
-            roleId: this.user.roleId,
+            role: this.user.roleId,
             firstName: this.user.firstName,
             secondName: this.user.secondName,
             phone: this.user.phone,

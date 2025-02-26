@@ -9,4 +9,8 @@ model User {
   roleId String
   role Role @relation(fields: [roleId], references: [id])
   tokens Token[]
+  rooms Room[]
+  favoriteRooms FavoriteRoom[]
+  reviews Review[]
+  rents Rent[]
 }
