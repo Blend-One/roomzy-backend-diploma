@@ -1,0 +1,9 @@
+model District {
+  id String @id
+  cityId String
+  fallbackName String
+  kz String?
+  en String?
+  ru String?
+  city City @relation(fields: [cityId], references: [id])
+}
