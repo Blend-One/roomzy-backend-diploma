@@ -1,5 +1,6 @@
 model City {
   id String @unique
+  fallbackName String
   kz String?
   en String?
   ru String?
