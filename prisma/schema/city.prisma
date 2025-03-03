@@ -1,0 +1,7 @@
+model City {
+  id String @unique
+  kz String?
+  en String?
+  ru String?
+  districts District[]
+}
