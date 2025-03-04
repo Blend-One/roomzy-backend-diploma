@@ -9,7 +9,6 @@ import { RefreshTokenCheckerGuard } from '../guards/refresh-token-checker.guard'
 @Controller({ path: USER_ROUTES.DEFAULT })
 export class UserController {
     constructor(private userService: UserService) {}
-
     @UsePipes(new ZodValidationPipe(AuthSchema))
     @Post(USER_ROUTES.LOGIN)
     public async login(@Body() authDto: AuthRequestDto) {

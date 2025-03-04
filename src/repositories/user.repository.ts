@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'services/prisma.service';
 import { AuthRequestDto } from 'models/requests-schemas/auth.request';
 import { Role } from 'models/enums/role.enum';
+import { UserStatus } from '../models/enums/user-status.enum';
 
 @Injectable()
 export class UserRepository {
@@ -19,6 +20,6 @@ export class UserRepository {
 
     public async createUser(userInfo: AuthRequestDto) {
         const { email, password } = userInfo;
-        return this.prisma.user.create({ data: { email, password, roleId: Role.USER } });
+        return this.prisma.user.create({ data: { email, password, roleId: Role.USER, status: UserStatus.ACTIVE } });
     }
 }

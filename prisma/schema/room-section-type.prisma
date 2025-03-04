@@ -1,9 +1,11 @@
 model RoomSectionType {
   id String @id @default(uuid())
   typeName String
-  roomTypeId String
-  roomType RoomType @relation(fields: [roomTypeId], references: [id])
+  fallbackName String
+  ru String?
+  en String?
   roomSections RoomSection[]
   sectionAttributeValues SectionAttributeValue[]
-  attributeTypes AttributeType[]
+  attributeTypeNSectionFields AttributeTypeAndSection[]
+  roomTypeNSectionFields RoomTypeAndSection[]
 }
