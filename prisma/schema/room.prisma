@@ -1,5 +1,6 @@
 model Room {
   id   String  @id @default(uuid())
+  title String
   userId String
   status String
   price Decimal

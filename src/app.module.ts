@@ -5,6 +5,7 @@ import RoomModule from 'modules/room.module';
 import AttributeModule from 'modules/attribute.module';
 import RendModule from 'modules/rent.module';
 import { JwtModule } from '@nestjs/jwt';
+import ImageModule from './modules/image.module';
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { JwtModule } from '@nestjs/jwt';
         RoomModule,
         AttributeModule,
         RendModule,
+        ImageModule,
     ],
 })
 export class AppModule {}

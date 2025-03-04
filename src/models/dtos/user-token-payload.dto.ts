@@ -13,6 +13,7 @@ export class UserTokenPayloadDto {
             firstName: this.user.firstName,
             secondName: this.user.secondName,
             phone: this.user.phone,
+            status: this.user.status,
             jwtid: uuidv4(),
         };
     }

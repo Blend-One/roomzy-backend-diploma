@@ -56,7 +56,12 @@ async function main() {
         upsertDictData({
             data: citiesNDistricts,
             columnName: 'city',
-            getAdditionalParams: field => ({ ru: field.ru, en: field.en, id: field.en.toUpperCase() }),
+            getAdditionalParams: field => ({
+                ru: field.ru,
+                fallbackName: field.ru,
+                en: field.en,
+                id: field.en.toUpperCase(),
+            }),
             overrideDefaultParams: true,
             additionalCallback: async field => {
                 return upsertDictData({
@@ -65,6 +70,7 @@ async function main() {
                     getAdditionalParams: districtField => ({
                         ru: districtField.ru,
                         en: districtField.en,
+                        fallbackName: districtField.ru,
                         id: `${field.en.toUpperCase()}_${districtField.en.toUpperCase()}`,
                         cityId: field.en.toUpperCase(),
                     }),
