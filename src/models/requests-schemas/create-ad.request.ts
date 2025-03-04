@@ -61,22 +61,22 @@ export const CreateRoomSchema = z
         }),
         isCommercial: z.boolean({
             errorMap: () => ({
-                message: ROOM_ERRORS.IS_COMMERCIAL_FLAG_IS_MISSED,
+                message: ROOM_ERRORS.COMMERCIAL_FLAG_IS_MISSED,
             }),
         }),
         lat: z.number({
             errorMap: () => ({
-                message: ROOM_ERRORS.COORDINATES_IS_MISSED,
+                message: ROOM_ERRORS.COORDINATES_ARE_MISSED,
             }),
         }),
         lon: z.number({
             errorMap: () => ({
-                message: ROOM_ERRORS.COORDINATES_IS_MISSED,
+                message: ROOM_ERRORS.COORDINATES_ARE_MISSED,
             }),
         }),
         appartment: z.string().optional(),
         sections: SectionRoomSchema.optional(),
     })
-    .required();
+    .optional();
 
 export type CreateRoomRequestDto = z.infer<typeof CreateRoomSchema>;
