@@ -25,18 +25,16 @@ import { filterFiles } from 'utils/file-filter.utils';
 export class RoomController {
     constructor(private roomService: RoomService) {}
 
-    @UsePipes(new ZodValidationPipe(CreateRoomSchema))
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard(UserStatus.ACTIVE))
     @UseInterceptors(FilesInterceptor(FILE_PROPERTY_NAME))
     @Post(ROOM_ROUTES.CREATE_AD)
     public async createAd(
-        @Req() request: Request,
-        @Body() body: CreateRoomRequestDto,
+        @Body(new ZodValidationPipe(CreateRoomSchema)) body: CreateRoomRequestDto,
         @UploadedFiles()
         images: Array<Express.Multer.File>,
     ) {
         filterFiles(images);
-        return this.roomService.createAd(body);
+        return this.roomService.createAd(body, images);
     }
 
     @Get(ROOM_ROUTES.GET_ADS)

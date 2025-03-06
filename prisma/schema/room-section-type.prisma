@@ -5,7 +5,6 @@ model RoomSectionType {
   ru String?
   en String?
   roomSections RoomSection[]
-  sectionAttributeValues SectionAttributeValue[]
   attributeTypeNSectionFields AttributeTypeAndSection[]
   roomTypeNSectionFields RoomTypeAndSection[]
 }

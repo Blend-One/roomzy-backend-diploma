@@ -1,6 +1,7 @@
 model RoomImage {
   id String @id @unique
   roomId String
-  hash String
+  hash String?
+  name String
   room Room @relation(fields: [roomId], references: [id])
 }

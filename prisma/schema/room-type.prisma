@@ -5,4 +5,5 @@ model RoomType {
   ru String?
   en String?
   roomTypeNSectionFields RoomTypeAndSection[]
+  rooms Room[]
 }

@@ -5,4 +5,5 @@ model City {
   en String?
   ru String?
   districts District[]
+  rooms Room[]
 }

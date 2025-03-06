@@ -6,4 +6,5 @@ model District {
   en String?
   ru String?
   city City @relation(fields: [cityId], references: [id])
+  room Room[]
 }

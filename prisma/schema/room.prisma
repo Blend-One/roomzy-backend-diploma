@@ -9,15 +9,21 @@ model Room {
   physControlInstructions String?
   accessInstructions String?
   street String
-  district String
-  city String
+  districtId String
+  cityId String
   appartment String?
   isCommercial Boolean
+  hasDeposit Boolean
+  square Float
   lat Float
   lon Float
+  roomTypeId String
+  roomType RoomType @relation(fields: [roomTypeId], references: [id])
   userRelation User @relation(fields: [userId], references: [id])
   roomStatus RoomStatus @relation(fields: [status], references: [name])
   priceUnitRelation PriceUnit @relation(fields: [priceUnit], references: [name])
+  city City @relation(fields: [cityId], references: [id])
+  district District @relation(fields: [districtId], references: [id])
   roomSections RoomSection[]
   roomImages RoomImage[]
   controversialIssues ControversialIssue[]
