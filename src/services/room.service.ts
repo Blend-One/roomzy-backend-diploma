@@ -9,7 +9,7 @@ import { S3Service } from './s3.service';
 import { v4 as uuidv4 } from 'uuid';
 import { S3Bucket } from '../models/enums/s3-bucket.enum';
 import { validateSections } from '../utils/validate-sections.utils';
-import { PaginatedFilters } from '../models/dtos/fitlers.dto';
+import { FiltersDto, PaginatedFilters } from '../models/dtos/fitlers.dto';
 import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
 import { Locale } from '../models/enums/locale.enum';
 import { RoomStatus } from '../models/enums/room-status.enum';
@@ -76,9 +76,14 @@ export class RoomService {
         return result;
     }
 
-    public async getAds(filters: PaginatedFilters, locale: Locale) {
-        const { take, skip } = calculatePaginationData(filters.page, filters.limit);
+    public async getAds(filters: FiltersDto, locale: Locale, page: number, limit: number) {
+        const { take, skip } = calculatePaginationData(page, limit);
         return this.roomRepository.getAds(filters, RoomStatus.OPENED, take, skip, locale);
+    }
+
+    public async getPersonalAds(status: RoomStatus, locale: Locale, page: number, limit: number, userId: string) {
+        const { take, skip } = calculatePaginationData(page, limit);
+        return this.roomRepository.getAds(null, status, take, skip, locale, userId);
     }
 
     public async getAd(id: string, locale: Locale) {}

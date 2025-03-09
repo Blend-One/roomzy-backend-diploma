@@ -7,4 +7,5 @@ export const ROOM_ROUTES = {
     CHANGE_STATUS_OF_AD: 'status/:id',
     CHANGE_STATUS_OF_IN_MODERATION_AD: 'in_moderation_ad_status/:id',
     GET_MODERATION_ADS: 'moderation',
+    GET_PERSONAL_ADS: 'personal',
 } satisfies Record<string, string>;

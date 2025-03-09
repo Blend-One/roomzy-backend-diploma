@@ -22,13 +22,14 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { FILE_PROPERTY_NAME } from 'constants/file.constants';
 import { filterFiles } from 'utils/file-filter.utils';
 import { ToJsonPipe } from '../pipes/to-json.pipe';
-import { PaginatedFilters } from '../models/dtos/fitlers.dto';
+import { FiltersDto, PaginatedFilters } from '../models/dtos/fitlers.dto';
 import { getLanguageHeader, getUserHeader } from '../utils/request.utils';
 import { Role } from '../models/enums/role.enum';
 import { RequestStatusDto } from '../models/dtos/room-request-status.dto';
 import { UpdateRoomRequestDto, UpdateRoomSchema } from '../models/requests-schemas/update-ad.request';
 import { Locale } from '../models/enums/locale.enum';
 import { FALLBACK_LANGUAGE } from '../constants/dict.constants';
+import { RoomStatus } from '../models/enums/room-status.enum';
 
 @Controller({ path: ROOM_ROUTES.DEFAULT })
 export class RoomController {
@@ -48,9 +49,27 @@ export class RoomController {
     }
 
     @Get(ROOM_ROUTES.GET_ADS)
-    public async getAds(@Req() request: Request, @Query('filters', ToJsonPipe) filters: PaginatedFilters) {
+    public async getAds(
+        @Req() request: Request,
+        @Query('filters', ToJsonPipe) filters: FiltersDto,
+        @Query('page') page: number,
+        @Query('limit') limit: number,
+    ) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
-        return this.roomService.getAds(filters, locale);
+        return this.roomService.getAds(filters, locale, page, limit);
+    }
+
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
+    @Get(ROOM_ROUTES.GET_PERSONAL_ADS)
+    public async getPersonalAds(
+        @Req() request: Request,
+        @Query('status') status: RoomStatus,
+        @Query('page') page: number,
+        @Query('limit') limit: number,
+    ) {
+        const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
+        const user = getUserHeader(request);
+        return this.roomService.getPersonalAds(status, locale, page, limit, user.id);
     }
 
     @Get(ROOM_ROUTES.GET_AD)

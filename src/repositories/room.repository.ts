@@ -3,7 +3,7 @@ import { PrismaService } from 'services/prisma.service';
 import { CreateRoomRequestDto, SectionRoomSchemaDto } from 'models/requests-schemas/create-ad.request';
 import { RoomStatus } from 'models/enums/room-status.enum';
 import { WithTransactionPrisma } from '../types/transaction-prisma.types';
-import { PaginatedFilters } from '../models/dtos/fitlers.dto';
+import { FiltersDto, PaginatedFilters } from '../models/dtos/fitlers.dto';
 import { Locale } from '../models/enums/locale.enum';
 import { UpdateRoomRequestDto } from '../models/requests-schemas/update-ad.request';
 import { IncludeIdToArray } from '../types/include-id-to-array.types';
@@ -228,34 +228,42 @@ export class RoomRepository {
         });
     }
 
-    public async getAds(filters: PaginatedFilters, status: RoomStatus, take: number, skip: number, locale: Locale) {
+    public async getAds(
+        filters: FiltersDto | null,
+        status: RoomStatus,
+        take: number,
+        skip: number,
+        locale: Locale,
+        userId?: string,
+    ) {
         const query = {
             where: {
-                roomTypeId: filters.roomTypeId,
+                userId,
+                roomTypeId: filters?.roomTypeId,
                 title: {
-                    contains: filters.title,
+                    contains: filters?.title,
                 },
-                hasDeposit: filters.hasDeposit ?? {},
-                priceUnit: filters.priceUnit,
+                hasDeposit: filters?.hasDeposit ?? {},
+                priceUnit: filters?.priceUnit,
                 price: {
-                    gte: filters.priceRange?.min,
-                    lte: filters.priceRange?.max,
+                    gte: filters?.priceRange?.min,
+                    lte: filters?.priceRange?.max,
                 },
-                physControl: filters.physControl ?? {},
-                accessInstructions: filters.accessInstructions
+                physControl: filters?.physControl ?? {},
+                accessInstructions: filters?.accessInstructions
                     ? {
                           not: null,
                       }
                     : {},
                 districtId: {
-                    in: filters.districtIds,
+                    in: filters?.districtIds,
                 },
                 status,
-                cityId: filters.cityId,
-                isCommercial: filters.isCommercial ?? {},
+                cityId: filters?.cityId,
+                isCommercial: filters?.isCommercial ?? {},
                 square: {
-                    gte: filters.square?.min,
-                    lte: filters.square?.max,
+                    gte: filters?.square?.min,
+                    lte: filters?.square?.max,
                 },
             },
             include: {
@@ -281,10 +289,10 @@ export class RoomRepository {
             take,
         };
 
-        if (!!filters.sections?.length) {
+        if (!!filters?.sections?.length) {
             query.where['roomSections'] = {
                 some: {
-                    OR: filters.sections?.map(({ floorNumber, sectionTypeId, values }) => ({
+                    OR: filters?.sections?.map(({ floorNumber, sectionTypeId, values }) => ({
                         floorNumber,
                         roomSectionTypeId: sectionTypeId,
                         sectionAttributeValues: !values
