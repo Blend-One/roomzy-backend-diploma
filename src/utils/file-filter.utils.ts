@@ -24,5 +24,5 @@ export const filterFiles = (files: Express.Multer.File[], areFilesRequired: bool
 
     if (files?.length > MAX_COUNT) throw new UnprocessableEntityException(FILE_ERRORS.TOO_MANY_FILES);
 
-    files.forEach(checkFile);
+    files?.forEach(checkFile);
 };

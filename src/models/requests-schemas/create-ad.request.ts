@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { ROOM_ERRORS } from '../../errors/room.errors';
 import { getZodBooleanValidator, getZodNumberValidator, getZodStringValidator } from '../../utils/zod.utils';
 
-const SectionRoomSchema = z
+export const SectionRoomSchema = z
     .object({
         floorNumber: getZodNumberValidator(ROOM_ERRORS.FLOOR_NUMBER_IS_MISSED),
         roomSectionTypeId: getZodStringValidator(ROOM_ERRORS.SECTION_TYPE_IS_MISSED),

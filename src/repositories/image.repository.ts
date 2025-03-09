@@ -43,7 +43,7 @@ export class ImageRepository {
             data: files.map((file, index) => ({
                 id: imageIds[index],
                 roomId,
-                name: file.filename,
+                name: file.originalname,
             })),
         });
     }

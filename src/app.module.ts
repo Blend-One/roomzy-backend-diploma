@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import UserModule from 'modules/user.module';
 import RoomModule from 'modules/room.module';
 import AttributeModule from 'modules/attribute.module';
-import RendModule from 'modules/rent.module';
+import RentModule from 'modules/rent.module';
 import { JwtModule } from '@nestjs/jwt';
 import ImageModule from './modules/image.module';
 
@@ -21,7 +21,7 @@ import ImageModule from './modules/image.module';
         UserModule,
         RoomModule,
         AttributeModule,
-        RendModule,
+        RentModule,
         ImageModule,
     ],
 })

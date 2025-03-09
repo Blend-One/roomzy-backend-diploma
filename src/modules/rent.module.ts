@@ -6,4 +6,4 @@ import { RentController } from 'controllers/rent.controller';
     controllers: [RentController],
     providers: [],
 })
-export default class RendModule {}
+export default class RentModule {}

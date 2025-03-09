@@ -6,4 +6,5 @@ model SectionAttributeValue {
   characteristicId String
   roomSection RoomSection @relation(fields: [roomSectionId], references: [id])
   characteristic Characteristic @relation(fields: [characteristicId], references: [id])
+  attribute Attribute? @relation(fields: [attributeId], references: [id])
 }

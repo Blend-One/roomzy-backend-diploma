@@ -4,11 +4,12 @@ import {
     Get,
     Patch,
     Post,
+    Query,
+    Param,
     Req,
     UploadedFiles,
     UseGuards,
     UseInterceptors,
-    UsePipes,
 } from '@nestjs/common';
 import { ROOM_ROUTES } from 'routes/room.routes';
 import { AuthCheckerGuard } from 'guards/auth-checker.guard';
@@ -20,43 +21,75 @@ import { UserStatus } from 'models/enums/user-status.enum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FILE_PROPERTY_NAME } from 'constants/file.constants';
 import { filterFiles } from 'utils/file-filter.utils';
+import { ToJsonPipe } from '../pipes/to-json.pipe';
+import { PaginatedFilters } from '../models/dtos/fitlers.dto';
+import { getLanguageHeader, getUserHeader } from '../utils/request.utils';
+import { Role } from '../models/enums/role.enum';
+import { RequestStatusDto } from '../models/dtos/room-request-status.dto';
+import { UpdateRoomRequestDto, UpdateRoomSchema } from '../models/requests-schemas/update-ad.request';
 
 @Controller({ path: ROOM_ROUTES.DEFAULT })
 export class RoomController {
     constructor(private roomService: RoomService) {}
 
-    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard(UserStatus.ACTIVE))
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @UseInterceptors(FilesInterceptor(FILE_PROPERTY_NAME))
     @Post(ROOM_ROUTES.CREATE_AD)
     public async createAd(
         @Body(new ZodValidationPipe(CreateRoomSchema)) body: CreateRoomRequestDto,
         @UploadedFiles()
         images: Array<Express.Multer.File>,
+        @Req() request: Request,
     ) {
         filterFiles(images);
-        return this.roomService.createAd(body, images);
+        return this.roomService.createAd(body as Required<CreateRoomRequestDto>, images, request);
     }
 
     @Get(ROOM_ROUTES.GET_ADS)
-    public async getAds() {
-        return this.roomService.getAds();
+    public async getAds(@Req() request: Request, @Query('filters', ToJsonPipe) filters: PaginatedFilters) {
+        const locale = getLanguageHeader(request);
+        return this.roomService.getAds(filters, locale);
     }
 
-    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard(UserStatus.ACTIVE))
+    @Get(ROOM_ROUTES.GET_AD)
+    public async getAd(@Param('id') id: string, @Req() request: Request) {
+        const locale = getLanguageHeader(request);
+        return this.roomService.getAd(id, locale);
+    }
+
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @Patch(ROOM_ROUTES.CHANGE_STATUS_OF_AD)
-    public async changeAdStatus(@Req() request: Request) {
-        return this.roomService.changeAdStatus();
+    public async changeAdStatus(@Param('id') id: string, @Req() request: Request, @Body() body: RequestStatusDto) {
+        const user = getUserHeader(request);
+        const { status } = body;
+        return this.roomService.changeAdStatus(id, status, user.id);
     }
 
-    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard(UserStatus.ACTIVE))
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
+    @Patch(ROOM_ROUTES.CHANGE_STATUS_OF_IN_MODERATION_AD)
+    public async changeInModerationAdStatus(@Param('id') id: string, @Body() body: RequestStatusDto) {
+        const { status } = body;
+        return this.roomService.changeInModerationAdStatus(id, status);
+    }
+
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Get(ROOM_ROUTES.GET_MODERATION_ADS)
-    public async getAdsInModeration(@Req() request: Request) {
-        return this.roomService.getAdsForModeration();
+    public async getAdsInModeration(@Req() request: Request, @Query('filters', ToJsonPipe) filters: PaginatedFilters) {
+        const locale = getLanguageHeader(request);
+        return this.roomService.getAdsForModeration(filters, locale);
     }
 
-    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard(UserStatus.ACTIVE))
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER, Role.MANAGER], UserStatus.ACTIVE))
+    @UseInterceptors(FilesInterceptor(FILE_PROPERTY_NAME))
     @Patch(ROOM_ROUTES.UPDATE_AD)
-    public async updateAd(@Req() request: Request) {
-        return this.roomService.updateAd();
+    public async updateAd(
+        @Body(new ZodValidationPipe(UpdateRoomSchema)) body: UpdateRoomRequestDto,
+        @UploadedFiles()
+        images: Array<Express.Multer.File>,
+        @Req() request: Request,
+        @Param('id') roomId: string,
+    ) {
+        filterFiles(images, false);
+        return this.roomService.updateAd(body, images, request, roomId);
     }
 }

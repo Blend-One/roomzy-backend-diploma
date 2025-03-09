@@ -1,0 +1,3 @@
+export const FILTERS_ERRORS = {
+    INVALID_FILTERS: 'INVALID_FILTERS',
+};
