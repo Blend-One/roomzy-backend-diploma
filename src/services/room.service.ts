@@ -124,15 +124,16 @@ export class RoomService {
         request: Request,
         roomId: string,
     ) {
-        const { sections, sectionsToDelete, imagesToDelete, ...roomValues } = updateAdDto;
+        if (!Object.keys(updateAdDto).length) throw new BadRequestException(ROOM_ERRORS.NOTHING_TO_UPDATE);
 
-        if (!Object.keys(roomValues).length) throw new BadRequestException(ROOM_ERRORS.NOTHING_TO_UPDATE);
+        const { sections, sectionsToDelete, imagesToDelete, ...roomValues } = updateAdDto;
 
         const { user, compressedImages, transformedSections, imageIds } = await this.prepareDataForAd(
             request,
             images,
             sections,
         );
+
         const parsedImagesToDelete = imagesToDelete ? JSON.parse(imagesToDelete) : [];
         const parsedSectionsToDelete = sectionsToDelete ? JSON.parse(sectionsToDelete) : [];
 
@@ -151,20 +152,22 @@ export class RoomService {
                 sectionsToDelete: parsedSectionsToDelete,
             });
 
-            return { ad };
-            // const imageRecords = await this.imageRepository.bulkCreateImages({
-            //     files: compressedImages,
-            //     imageIds,
-            //     roomId: ad.id,
-            //     transactionPrisma: prisma,
-            // });
-            //
-            // try {
-            //     await this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds);
-            //     return { ad, imageRecords };
-            // } catch (err) {
-            //     throw err;
-            // }
+            const imageRecords = await this.imageRepository.bulkCreateImages({
+                files: compressedImages,
+                imageIds,
+                roomId,
+                transactionPrisma: prisma,
+            });
+
+            try {
+                await Promise.all([
+                    this.s3Service.bulkDelete(S3Bucket.PHOTOS, parsedImagesToDelete),
+                    this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds),
+                ]);
+                return { ad, imageRecords };
+            } catch (err) {
+                throw err;
+            }
         });
 
         return result;

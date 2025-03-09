@@ -27,6 +27,8 @@ import { getLanguageHeader, getUserHeader } from '../utils/request.utils';
 import { Role } from '../models/enums/role.enum';
 import { RequestStatusDto } from '../models/dtos/room-request-status.dto';
 import { UpdateRoomRequestDto, UpdateRoomSchema } from '../models/requests-schemas/update-ad.request';
+import { Locale } from '../models/enums/locale.enum';
+import { FALLBACK_LANGUAGE } from '../constants/dict.constants';
 
 @Controller({ path: ROOM_ROUTES.DEFAULT })
 export class RoomController {
@@ -47,13 +49,13 @@ export class RoomController {
 
     @Get(ROOM_ROUTES.GET_ADS)
     public async getAds(@Req() request: Request, @Query('filters', ToJsonPipe) filters: PaginatedFilters) {
-        const locale = getLanguageHeader(request);
+        const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
         return this.roomService.getAds(filters, locale);
     }
 
     @Get(ROOM_ROUTES.GET_AD)
     public async getAd(@Param('id') id: string, @Req() request: Request) {
-        const locale = getLanguageHeader(request);
+        const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
         return this.roomService.getAd(id, locale);
     }
 
@@ -75,7 +77,7 @@ export class RoomController {
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Get(ROOM_ROUTES.GET_MODERATION_ADS)
     public async getAdsInModeration(@Req() request: Request, @Query('filters', ToJsonPipe) filters: PaginatedFilters) {
-        const locale = getLanguageHeader(request);
+        const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
         return this.roomService.getAdsForModeration(filters, locale);
     }
 

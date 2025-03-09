@@ -21,6 +21,7 @@ export interface FiltersDto {
     roomTypeId: string;
     defaultValues?: Record<string, string>;
     sections: SectionValue[];
+    hasDeposit: boolean;
 }
 
 export type PaginatedFilters = Paginated<FiltersDto>;

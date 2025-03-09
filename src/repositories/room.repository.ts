@@ -100,47 +100,55 @@ export class RoomRepository {
     }
 
     private getSectionAttributeValuesQueryForUpdate(section: InferArrayElement<SectionRoomSchemaDto>) {
-        const characteristicIds = Object.keys(section.sectionAttributeValues);
-        return {
-            upsert: characteristicIds?.map(characteristicId => {
-                const attributeId = section.sectionAttributeValues[characteristicId] as string;
-                return {
-                    where: {
-                        characteristicId,
-                    } as any,
-                    update: {
-                        attribute: {
-                            connect: {
-                                id: attributeId,
-                            },
-                        },
-                        value: attributeId,
-                    },
-                    create: {
-                        characteristic: {
-                            connect: {
-                                id: characteristicId,
-                            },
-                        },
-                        attribute: {
-                            connect: {
-                                id: attributeId,
-                            },
-                        },
-                        value: attributeId,
-                    },
-                };
-            }),
-            deleteMany: {
-                characteristicId: {
-                    notIn: characteristicIds,
-                },
-            },
-        };
+        const characteristicIds = section?.sectionAttributeValues?.length
+            ? Object.keys(section.sectionAttributeValues)
+            : [];
+        /* eslint-disable indent */
+        return !characteristicIds.length
+            ? []
+            : {
+                  sectionAttributeValues: {
+                      upsert: characteristicIds?.map(characteristicId => {
+                          const attributeId = section.sectionAttributeValues[characteristicId] as string;
+                          return {
+                              where: {
+                                  characteristicId,
+                              } as any,
+                              update: {
+                                  attribute: {
+                                      connect: {
+                                          id: attributeId,
+                                      },
+                                  },
+                                  value: attributeId,
+                              },
+                              create: {
+                                  characteristic: {
+                                      connect: {
+                                          id: characteristicId,
+                                      },
+                                  },
+                                  attribute: {
+                                      connect: {
+                                          id: attributeId,
+                                      },
+                                  },
+                                  value: attributeId,
+                              },
+                          };
+                      }),
+                      deleteMany: {
+                          characteristicId: {
+                              notIn: characteristicIds,
+                          },
+                      },
+                  },
+              };
+        /* eslint-enable indent */
     }
 
     private getSectionsQueryForUpdate(sections: IncludeIdToArray<SectionRoomSchemaDto>, sectionsToDelete: string[]) {
-        return {
+        const query = {
             update: sections?.map(section => {
                 return {
                     where: {
@@ -148,21 +156,22 @@ export class RoomRepository {
                     },
                     data: {
                         floorNumber: section.floorNumber,
-                        roomSectionType: {
-                            connect: {
-                                id: section.roomSectionTypeId,
-                            },
-                        },
-                        sectionAttributeValues: this.getSectionAttributeValuesQueryForUpdate(section),
+                        roomSectionTypeId: section.roomSectionTypeId,
+                        ...this.getSectionAttributeValuesQueryForUpdate(section),
                     },
                 };
             }),
-            deleteMany: {
+        };
+
+        if (!!sectionsToDelete.length) {
+            query['deleteMany'] = {
                 id: {
                     in: sectionsToDelete,
                 },
-            },
-        };
+            };
+        }
+
+        return query;
     }
 
     public async updateAd({
@@ -182,23 +191,29 @@ export class RoomRepository {
         imagesToDelete: string[];
     }>) {
         const prismaInstance = transactionPrisma ?? this.prisma;
-        return prismaInstance.room.update({
+
+        const query = {
             where: {
                 userId,
                 id: roomId,
             },
             data: {
                 ...room,
-                roomImages: {
-                    deleteMany: {
-                        id: {
-                            in: imagesToDelete,
-                        },
-                    },
-                },
                 roomSections: this.getSectionsQueryForUpdate(sections, sectionsToDelete),
             },
-        });
+        };
+
+        if (!!imagesToDelete.length) {
+            query.data['roomImages'] = {
+                deleteMany: {
+                    id: {
+                        in: imagesToDelete,
+                    },
+                },
+            };
+        }
+
+        return prismaInstance.room.update(query);
     }
 
     public async getRoomByUserAndRoomIds(roomId: string, userId?: string) {
@@ -214,18 +229,19 @@ export class RoomRepository {
     }
 
     public async getAds(filters: PaginatedFilters, status: RoomStatus, take: number, skip: number, locale: Locale) {
-        return this.prisma.room.findMany({
+        const query = {
             where: {
                 roomTypeId: filters.roomTypeId,
                 title: {
                     contains: filters.title,
                 },
+                hasDeposit: filters.hasDeposit ?? {},
                 priceUnit: filters.priceUnit,
                 price: {
                     gte: filters.priceRange?.min,
                     lte: filters.priceRange?.max,
                 },
-                physControl: filters.physControl,
+                physControl: filters.physControl ?? {},
                 accessInstructions: filters.accessInstructions
                     ? {
                           not: null,
@@ -236,26 +252,10 @@ export class RoomRepository {
                 },
                 status,
                 cityId: filters.cityId,
-                isCommercial: filters.isCommercial,
+                isCommercial: filters.isCommercial ?? {},
                 square: {
                     gte: filters.square?.min,
                     lte: filters.square?.max,
-                },
-                roomSections: {
-                    some: {
-                        OR: filters.sections?.map(({ floorNumber, sectionTypeId, values }) => ({
-                            floorNumber,
-                            roomSectionTypeId: sectionTypeId,
-                            sectionAttributeValues: {
-                                every: {
-                                    OR: Object.entries(values).map(([key, value]) => ({
-                                        attributeId: value,
-                                        characteristicId: key,
-                                    })),
-                                },
-                            },
-                        })),
-                    },
                 },
             },
             include: {
@@ -279,6 +279,28 @@ export class RoomRepository {
             },
             skip,
             take,
-        });
+        };
+
+        if (!!filters.sections?.length) {
+            query.where['roomSections'] = {
+                some: {
+                    OR: filters.sections?.map(({ floorNumber, sectionTypeId, values }) => ({
+                        floorNumber,
+                        roomSectionTypeId: sectionTypeId,
+                        sectionAttributeValues: !values
+                            ? {}
+                            : {
+                                  some: {
+                                      OR: Object.entries(values).map(([key, value]) => ({
+                                          attributeId: value,
+                                          characteristicId: key,
+                                      })),
+                                  },
+                              },
+                    })),
+                },
+            };
+        }
+        return this.prisma.room.findMany(query);
     }
 }

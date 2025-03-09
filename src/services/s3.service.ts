@@ -61,6 +61,10 @@ export class S3Service {
         return this.s3.send(command);
     }
 
+    async bulkDelete(bucketName: S3Bucket, images: string[]) {
+        return Promise.all(images.map(file => this.deleteFile(bucketName, file)));
+    }
+
     async bulkUploadTo(bucketName: S3Bucket, files: Express.Multer.File[], imageIds: string[]) {
         return Promise.all(files.map((file, index) => this.uploadFile(bucketName, file, imageIds[index])));
     }

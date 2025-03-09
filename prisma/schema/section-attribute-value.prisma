@@ -4,7 +4,7 @@ model SectionAttributeValue {
   attributeId String?
   value String
   characteristicId String
-  roomSection RoomSection @relation(fields: [roomSectionId], references: [id])
+  roomSection RoomSection @relation(fields: [roomSectionId], references: [id], onDelete: Cascade)
   characteristic Characteristic @relation(fields: [characteristicId], references: [id])
   attribute Attribute? @relation(fields: [attributeId], references: [id])
 }

@@ -1,4 +1,4 @@
 export enum Locale {
-    RU = 'ru',
-    KZ = 'kz',
+    ru = 'ru',
+    kz = 'kz',
 }
