@@ -1,8 +1,0 @@
-model AttributeType {
-  id String @id @default(uuid())
-  fallbackName String
-  ru String?
-  en String?
-  sectionAttributeValues SectionAttributeValue[]
-  attributeTypeNSectionFields AttributeTypeAndSection[]
-}

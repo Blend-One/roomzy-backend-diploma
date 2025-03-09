@@ -4,30 +4,35 @@ export const roomTypes = [
         fallbackName: 'Квартира',
         ru: 'Квартира',
         en: 'Apartment',
+        kz: 'Пәтер',
     },
     {
         id: 'PRIVATE_HOUSE',
         fallbackName: 'Частный дом',
         ru: 'Частный дом',
         en: 'Private House',
+        kz: 'Жеке үй',
     },
     {
         id: 'STORE',
         fallbackName: 'Магазин',
         ru: 'Магазин',
         en: 'Store',
+        kz: 'Дүкен',
     },
     {
         id: 'RESTAURANT',
         fallbackName: 'Ресторан',
         ru: 'Ресторан',
         en: 'Restaurant',
+        kz: 'Мейрамхана',
     },
     {
         id: 'BAR',
         fallbackName: 'Бар',
         ru: 'Бар',
         en: 'Bar',
+        kz: 'Бар',
     },
 ];
 
@@ -38,6 +43,7 @@ export const sectionTypes = [
         en: 'Bedroom',
         fallbackName: 'Спальня',
         roomTypes: ['APARTMENT', 'PRIVATE_HOUSE'],
+        kz: 'Ұйықтайтын бөлме',
     },
     {
         id: 'LIVING_ROOM',
@@ -45,6 +51,7 @@ export const sectionTypes = [
         en: 'Living Room',
         fallbackName: 'Гостиная',
         roomTypes: ['APARTMENT', 'PRIVATE_HOUSE', 'STORE', 'RESTAURANT', 'BAR'],
+        kz: 'Қонақ бөлмесі',
     },
     {
         id: 'KITCHEN',
@@ -52,6 +59,7 @@ export const sectionTypes = [
         en: 'Kitchen',
         fallbackName: 'Кухня',
         roomTypes: ['APARTMENT', 'PRIVATE_HOUSE', 'RESTAURANT'],
+        kz: 'Ас үй',
     },
     {
         id: 'RESTROOM',
@@ -59,6 +67,7 @@ export const sectionTypes = [
         en: 'Restroom',
         fallbackName: 'С/У',
         roomTypes: ['APARTMENT', 'PRIVATE_HOUSE', 'STORE', 'RESTAURANT', 'BAR'],
+        kz: 'Әжетхана',
     },
     {
         id: 'BALCONY',
@@ -66,6 +75,7 @@ export const sectionTypes = [
         en: 'Balcony',
         fallbackName: 'Балкон',
         roomTypes: ['APARTMENT', 'PRIVATE_HOUSE'],
+        kz: 'Балкон',
     },
     {
         id: 'HALLWAY',
@@ -73,6 +83,7 @@ export const sectionTypes = [
         en: 'Hallway',
         fallbackName: 'Прихожая',
         roomTypes: ['APARTMENT', 'PRIVATE_HOUSE'],
+        kz: 'Кіреберіс',
     },
     {
         id: 'STORAGE',
@@ -80,6 +91,7 @@ export const sectionTypes = [
         en: 'Storage/Closet',
         fallbackName: 'Склад/Кладовка',
         roomTypes: ['APARTMENT', 'PRIVATE_HOUSE', 'STORE', 'RESTAURANT', 'BAR'],
+        kz: 'Сақтау бөлмесі/Кладовка',
     },
     {
         id: 'VERANDA',
@@ -87,6 +99,7 @@ export const sectionTypes = [
         en: 'Veranda',
         fallbackName: 'Веранда',
         roomTypes: ['PRIVATE_HOUSE'],
+        kz: 'Веранда',
     },
     {
         id: 'BASEMENT',
@@ -94,6 +107,7 @@ export const sectionTypes = [
         en: 'Basement',
         fallbackName: 'Подвал',
         roomTypes: ['PRIVATE_HOUSE'],
+        kz: 'Подвал',
     },
     {
         id: 'ATTIC',
@@ -101,6 +115,7 @@ export const sectionTypes = [
         en: 'Attic',
         fallbackName: 'Чердак',
         roomTypes: ['PRIVATE_HOUSE'],
+        kz: 'Шатыр',
     },
     {
         id: 'YARD',
@@ -108,6 +123,7 @@ export const sectionTypes = [
         en: 'Garden/Yard',
         fallbackName: 'Сад/Двор',
         roomTypes: ['PRIVATE_HOUSE'],
+        kz: 'Бақша/Двор',
     },
     {
         id: 'SALES_FLOOR',
@@ -115,6 +131,7 @@ export const sectionTypes = [
         en: 'Sales Floor',
         fallbackName: 'Торговый зал',
         roomTypes: ['STORE'],
+        kz: 'Сауда залы',
     },
     {
         id: 'CASH_REGISTER_FLOOR',
@@ -122,6 +139,7 @@ export const sectionTypes = [
         en: 'Cash Register Area',
         fallbackName: 'Кассовая зона',
         roomTypes: ['STORE'],
+        kz: 'Касса аймағы',
     },
     {
         id: 'RECEPTION',
@@ -129,6 +147,7 @@ export const sectionTypes = [
         en: 'Entrance/Reception',
         fallbackName: 'Прихожая/Рецепция',
         roomTypes: ['STORE', 'RESTAURANT', 'BAR'],
+        kz: 'Кіреберіс/Рецепция',
     },
     {
         id: 'ADVERTISING_SPACES',
@@ -136,6 +155,7 @@ export const sectionTypes = [
         en: 'Advertising Spaces',
         fallbackName: 'Рекламные пространства',
         roomTypes: ['STORE', 'RESTAURANT', 'BAR'],
+        kz: 'Жарнама аймақтары',
     },
     {
         id: 'GUEST_DINING_AREA',
@@ -143,6 +163,7 @@ export const sectionTypes = [
         en: 'Guest Dining Area',
         fallbackName: 'Зал для гостей',
         roomTypes: ['RESTAURANT'],
+        kz: 'Қонақтардың ас ішетін орны',
     },
     {
         id: 'BAR_AREA',
@@ -150,6 +171,7 @@ export const sectionTypes = [
         en: 'Bar Area',
         fallbackName: 'Барная зона',
         roomTypes: ['RESTAURANT', 'BAR'],
+        kz: 'Бар аймағы',
     },
     {
         id: 'WASHING_AREA',
@@ -157,6 +179,7 @@ export const sectionTypes = [
         en: 'Washing Area',
         fallbackName: 'Мойка',
         roomTypes: ['RESTAURANT'],
+        kz: 'Жуу аймағы',
     },
     {
         id: 'MANAGERS_OFFICE',
@@ -164,6 +187,7 @@ export const sectionTypes = [
         en: "Manager's Office",
         fallbackName: 'Кабинет управляющего',
         roomTypes: ['RESTAURANT'],
+        kz: 'Менеджер кабинеті',
     },
     {
         id: 'STAFF_AREA',
@@ -171,6 +195,7 @@ export const sectionTypes = [
         en: 'Staff Area',
         fallbackName: 'Зона для персонала',
         roomTypes: ['RESTAURANT', 'BAR'],
+        kz: 'Персонал аймағы',
     },
     {
         id: 'BAR_COUNTER',
@@ -178,6 +203,7 @@ export const sectionTypes = [
         en: 'Bar Counter',
         fallbackName: 'Барная стойка',
         roomTypes: ['BAR'],
+        kz: 'Бар есептегіш',
     },
     {
         id: 'LOUNGE_AREA',
@@ -185,6 +211,7 @@ export const sectionTypes = [
         en: 'Lounge Area',
         fallbackName: 'Зона для отдыха',
         roomTypes: ['BAR'],
+        kz: 'Демалыс аймағы',
     },
     {
         id: 'DRINK_STORAGE',
@@ -192,5 +219,6 @@ export const sectionTypes = [
         en: 'Drink Storage',
         fallbackName: 'Склад напитков',
         roomTypes: ['BAR'],
+        kz: 'Ішімдіктер қоймасы',
     },
 ];

@@ -1,7 +1,0 @@
-model AttributeTypeAndSection {
-  id String @id @default(uuid())
-  attributeTypeId String
-  sectionTypeId String
-  sectionType RoomSectionType @relation(fields: [sectionTypeId], references: [id])
-  attributeType AttributeType @relation(fields: [attributeTypeId], references: [id])
-}

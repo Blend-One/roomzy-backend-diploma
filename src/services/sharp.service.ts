@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import sharp from 'sharp';
-import { COMPRESS_QUALITY } from '../constants/sharp.constants';
+import * as sharp from 'sharp';
+import { COMPRESS_QUALITY } from 'constants/sharp.constants';
 
 @Injectable()
 export class SharpService {

@@ -1,16 +1,18 @@
 -- CreateTable
-CREATE TABLE "AttributeRelationship" (
+CREATE TABLE "AttributeTypeAndSection" (
     "id" TEXT NOT NULL,
-    "parentAttributeId" TEXT NOT NULL,
-    "childAtttributeId" TEXT NOT NULL,
+    "attributeTypeId" TEXT NOT NULL,
+    "sectionTypeId" TEXT NOT NULL,
 
-    CONSTRAINT "AttributeRelationship_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "AttributeTypeAndSection_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AttributeType" (
     "id" TEXT NOT NULL,
-    "roomSectionTypeId" TEXT NOT NULL,
+    "fallbackName" TEXT NOT NULL,
+    "ru" TEXT,
+    "kz" TEXT,
 
     CONSTRAINT "AttributeType_pkey" PRIMARY KEY ("id")
 );
@@ -19,9 +21,21 @@ CREATE TABLE "AttributeType" (
 CREATE TABLE "Attribute" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "fallbackName" TEXT NOT NULL,
+    "ru" TEXT,
+    "kz" TEXT,
     "attributeTypeId" TEXT NOT NULL,
 
     CONSTRAINT "Attribute_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "City" (
+    "id" TEXT NOT NULL,
+    "fallbackName" TEXT NOT NULL,
+    "kz" TEXT,
+    "en" TEXT,
+    "ru" TEXT
 );
 
 -- CreateTable
@@ -34,6 +48,18 @@ CREATE TABLE "ControversialIssue" (
     "date" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ControversialIssue_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "District" (
+    "id" TEXT NOT NULL,
+    "cityId" TEXT NOT NULL,
+    "fallbackName" TEXT NOT NULL,
+    "kz" TEXT,
+    "en" TEXT,
+    "ru" TEXT,
+
+    CONSTRAINT "District_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -82,10 +108,19 @@ CREATE TABLE "Review" (
 );
 
 -- CreateTable
+CREATE TABLE "Role" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "RoomImage" (
     "id" TEXT NOT NULL,
     "roomId" TEXT NOT NULL,
-    "hash" TEXT NOT NULL,
+    "hash" TEXT,
+    "name" TEXT NOT NULL,
 
     CONSTRAINT "RoomImage_pkey" PRIMARY KEY ("id")
 );
@@ -94,7 +129,9 @@ CREATE TABLE "RoomImage" (
 CREATE TABLE "RoomSectionType" (
     "id" TEXT NOT NULL,
     "typeName" TEXT NOT NULL,
-    "roomTypeId" TEXT NOT NULL,
+    "fallbackName" TEXT NOT NULL,
+    "ru" TEXT,
+    "kz" TEXT,
 
     CONSTRAINT "RoomSectionType_pkey" PRIMARY KEY ("id")
 );
@@ -115,9 +152,21 @@ CREATE TABLE "RoomStatus" (
 );
 
 -- CreateTable
+CREATE TABLE "RoomTypeAndSection" (
+    "id" TEXT NOT NULL,
+    "roomTypeId" TEXT NOT NULL,
+    "sectionTypeId" TEXT NOT NULL,
+
+    CONSTRAINT "RoomTypeAndSection_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "RoomType" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "fallbackName" TEXT NOT NULL,
+    "ru" TEXT,
+    "kz" TEXT,
 
     CONSTRAINT "RoomType_pkey" PRIMARY KEY ("id")
 );
@@ -125,6 +174,7 @@ CREATE TABLE "RoomType" (
 -- CreateTable
 CREATE TABLE "Room" (
     "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "price" DECIMAL(65,30) NOT NULL,
@@ -133,12 +183,15 @@ CREATE TABLE "Room" (
     "physControlInstructions" TEXT,
     "accessInstructions" TEXT,
     "street" TEXT NOT NULL,
-    "district" TEXT NOT NULL,
-    "city" TEXT NOT NULL,
+    "districtId" TEXT NOT NULL,
+    "cityId" TEXT NOT NULL,
     "appartment" TEXT,
     "isCommercial" BOOLEAN NOT NULL,
+    "hasDeposit" BOOLEAN NOT NULL,
+    "square" DOUBLE PRECISION NOT NULL,
     "lat" DOUBLE PRECISION NOT NULL,
     "lon" DOUBLE PRECISION NOT NULL,
+    "roomTypeId" TEXT NOT NULL,
 
     CONSTRAINT "Room_pkey" PRIMARY KEY ("id")
 );
@@ -147,18 +200,47 @@ CREATE TABLE "Room" (
 CREATE TABLE "SectionAttributeValue" (
     "id" TEXT NOT NULL,
     "roomSectionId" TEXT NOT NULL,
-    "roomSectionTypeId" TEXT NOT NULL,
-    "value" TEXT NOT NULL,
+    "attributeId" TEXT NOT NULL,
     "attributeTypeId" TEXT NOT NULL,
 
     CONSTRAINT "SectionAttributeValue_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateTable
+CREATE TABLE "Token" (
+    "id" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "Token_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT,
+    "password" TEXT NOT NULL,
+    "firstName" TEXT,
+    "secondName" TEXT,
+    "avatarImageUrl" TEXT,
+    "status" TEXT NOT NULL,
+    "roleId" TEXT NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "City_id_key" ON "City"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PriceUnit_name_key" ON "PriceUnit"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RentStatus_name_key" ON "RentStatus"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RoomImage_id_key" ON "RoomImage"("id");
@@ -169,20 +251,26 @@ CREATE UNIQUE INDEX "RoomStatus_name_key" ON "RoomStatus"("name");
 -- CreateIndex
 CREATE UNIQUE INDEX "RoomType_name_key" ON "RoomType"("name");
 
--- AddForeignKey
-ALTER TABLE "AttributeRelationship" ADD CONSTRAINT "AttributeRelationship_parentAttributeId_fkey" FOREIGN KEY ("parentAttributeId") REFERENCES "Attribute"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "Token_value_key" ON "Token"("value");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
-ALTER TABLE "AttributeRelationship" ADD CONSTRAINT "AttributeRelationship_childAtttributeId_fkey" FOREIGN KEY ("childAtttributeId") REFERENCES "Attribute"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AttributeTypeAndSection" ADD CONSTRAINT "AttributeTypeAndSection_sectionTypeId_fkey" FOREIGN KEY ("sectionTypeId") REFERENCES "RoomSectionType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AttributeType" ADD CONSTRAINT "AttributeType_roomSectionTypeId_fkey" FOREIGN KEY ("roomSectionTypeId") REFERENCES "RoomSectionType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AttributeTypeAndSection" ADD CONSTRAINT "AttributeTypeAndSection_attributeTypeId_fkey" FOREIGN KEY ("attributeTypeId") REFERENCES "AttributeType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ControversialIssue" ADD CONSTRAINT "ControversialIssue_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ControversialIssue" ADD CONSTRAINT "ControversialIssue_rentId_fkey" FOREIGN KEY ("rentId") REFERENCES "Rent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "District" ADD CONSTRAINT "District_cityId_fkey" FOREIGN KEY ("cityId") REFERENCES "City"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FavoriteRoom" ADD CONSTRAINT "FavoriteRoom_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -209,13 +297,19 @@ ALTER TABLE "Review" ADD CONSTRAINT "Review_userId_fkey" FOREIGN KEY ("userId") 
 ALTER TABLE "RoomImage" ADD CONSTRAINT "RoomImage_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RoomSectionType" ADD CONSTRAINT "RoomSectionType_roomTypeId_fkey" FOREIGN KEY ("roomTypeId") REFERENCES "RoomType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "RoomSection" ADD CONSTRAINT "RoomSection_roomSectionTypeId_fkey" FOREIGN KEY ("roomSectionTypeId") REFERENCES "RoomSectionType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RoomSection" ADD CONSTRAINT "RoomSection_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RoomTypeAndSection" ADD CONSTRAINT "RoomTypeAndSection_sectionTypeId_fkey" FOREIGN KEY ("sectionTypeId") REFERENCES "RoomSectionType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RoomTypeAndSection" ADD CONSTRAINT "RoomTypeAndSection_roomTypeId_fkey" FOREIGN KEY ("roomTypeId") REFERENCES "RoomType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Room" ADD CONSTRAINT "Room_roomTypeId_fkey" FOREIGN KEY ("roomTypeId") REFERENCES "RoomType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Room" ADD CONSTRAINT "Room_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -227,10 +321,19 @@ ALTER TABLE "Room" ADD CONSTRAINT "Room_status_fkey" FOREIGN KEY ("status") REFE
 ALTER TABLE "Room" ADD CONSTRAINT "Room_priceUnit_fkey" FOREIGN KEY ("priceUnit") REFERENCES "PriceUnit"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Room" ADD CONSTRAINT "Room_cityId_fkey" FOREIGN KEY ("cityId") REFERENCES "City"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Room" ADD CONSTRAINT "Room_districtId_fkey" FOREIGN KEY ("districtId") REFERENCES "District"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "SectionAttributeValue" ADD CONSTRAINT "SectionAttributeValue_roomSectionId_fkey" FOREIGN KEY ("roomSectionId") REFERENCES "RoomSection"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SectionAttributeValue" ADD CONSTRAINT "SectionAttributeValue_roomSectionTypeId_fkey" FOREIGN KEY ("roomSectionTypeId") REFERENCES "RoomSectionType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SectionAttributeValue" ADD CONSTRAINT "SectionAttributeValue_attributeTypeId_fkey" FOREIGN KEY ("attributeTypeId") REFERENCES "AttributeType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SectionAttributeValue" ADD CONSTRAINT "SectionAttributeValue_attributeTypeId_fkey" FOREIGN KEY ("attributeTypeId") REFERENCES "AttributeType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

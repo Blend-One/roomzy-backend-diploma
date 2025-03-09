@@ -9,11 +9,16 @@ export const getZodStringValidator = (message: string) => {
 };
 
 export const getZodBooleanValidator = (message: string) => {
-    return z.boolean({
-        errorMap: () => ({
+    return z
+        .string({
+            errorMap: () => ({
+                message,
+            }),
+        })
+        .refine(val => ['true', 'false'].includes(val), {
             message,
-        }),
-    });
+        })
+        .transform(val => val === 'true');
 };
 
 export const getZodNumberValidator = (message: string) => {

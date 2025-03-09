@@ -4,6 +4,8 @@ import { rentStatuses } from './seed_data/rent-statuses.mjs';
 import { priceUnits } from './seed_data/price-units.mjs';
 import { roomStatuses } from './seed_data/room-statuses.mjs';
 import { citiesNDistricts } from './seed_data/cities-n-districts.mjs';
+import { roomTypes, sectionTypes } from './seed_data/room-types.mjs';
+import { roomAttributes, roomCharacteristics } from './seed_data/room-attribute-types.mjs';
 
 const prisma = new PrismaClient();
 
@@ -59,7 +61,7 @@ async function main() {
             getAdditionalParams: field => ({
                 ru: field.ru,
                 fallbackName: field.ru,
-                en: field.en,
+                kz: field.kz,
                 id: field.en.toUpperCase(),
             }),
             overrideDefaultParams: true,
@@ -69,10 +71,91 @@ async function main() {
                     columnName: 'district',
                     getAdditionalParams: districtField => ({
                         ru: districtField.ru,
-                        en: districtField.en,
+                        kz: districtField.kz,
                         fallbackName: districtField.ru,
                         id: `${field.en.toUpperCase()}_${districtField.en.toUpperCase()}`,
                         cityId: field.en.toUpperCase(),
+                    }),
+                    overrideDefaultParams: true,
+                });
+            },
+        }),
+        upsertDictData({
+            data: roomTypes,
+            columnName: 'roomType',
+            getAdditionalParams: field => ({
+                ru: field.ru,
+                fallbackName: field.ru,
+                kz: field.kz,
+                id: field.id,
+            }),
+            overrideDefaultParams: true,
+        }),
+        upsertDictData({
+            data: sectionTypes,
+            columnName: 'roomSectionType',
+            getAdditionalParams: field => ({
+                ru: field.ru,
+                fallbackName: field.ru,
+                kz: field.kz,
+                id: field.id,
+            }),
+            overrideDefaultParams: true,
+            additionalCallback: async field => {
+                return upsertDictData({
+                    data: field.roomTypes,
+                    columnName: 'roomTypeAndSection',
+                    getAdditionalParams: roomTypeField => ({
+                        roomTypeId: roomTypeField,
+                        sectionTypeId: field.id,
+                        id: `${roomTypeField}_${field.id}`,
+                    }),
+                    overrideDefaultParams: true,
+                });
+            },
+        }),
+        upsertDictData({
+            data: roomCharacteristics,
+            columnName: 'characteristic',
+            getAdditionalParams: field => ({
+                ru: field.ru,
+                fallbackName: field.ru,
+                kz: field.kz,
+                id: field.id,
+                type: field.type,
+            }),
+            overrideDefaultParams: true,
+            additionalCallback: async field => {
+                return upsertDictData({
+                    data: field.roomSectionTypes,
+                    columnName: 'characteristicAndSection',
+                    getAdditionalParams: sectionTypeField => ({
+                        characteristicId: field.id,
+                        sectionTypeId: sectionTypeField,
+                        id: `${sectionTypeField}_${field.id}`,
+                    }),
+                    overrideDefaultParams: true,
+                });
+            },
+        }),
+        upsertDictData({
+            data: roomAttributes,
+            columnName: 'attribute',
+            getAdditionalParams: field => ({
+                ru: field.ru,
+                fallbackName: field.ru,
+                kz: field.kz,
+                id: field.id,
+            }),
+            overrideDefaultParams: true,
+            additionalCallback: async field => {
+                return upsertDictData({
+                    data: field.roomCharacteristics,
+                    columnName: 'characteristicAndAttribute',
+                    getAdditionalParams: roomCharacteristicField => ({
+                        characteristicId: roomCharacteristicField,
+                        attributeId: field.id,
+                        id: `${roomCharacteristicField}_${field.id}`,
                     }),
                     overrideDefaultParams: true,
                 });

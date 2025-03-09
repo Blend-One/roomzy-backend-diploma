@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
+import { WithTransactionPrisma } from '../types/transaction-prisma.types';
 
 @Injectable()
 export class ImageRepository {
@@ -27,8 +28,18 @@ export class ImageRepository {
         });
     }
 
-    public async bulkCreateImages(files: Express.Multer.File[], imageIds: string[], roomId: string) {
-        return this.prisma.roomImage.createManyAndReturn({
+    public async bulkCreateImages({
+        files,
+        imageIds,
+        roomId,
+        transactionPrisma,
+    }: WithTransactionPrisma<{
+        files: Express.Multer.File[];
+        imageIds: string[];
+        roomId: string;
+    }>) {
+        const prismaInstance = transactionPrisma ?? this.prisma;
+        return prismaInstance.roomImage.createManyAndReturn({
             data: files.map((file, index) => ({
                 id: imageIds[index],
                 roomId,

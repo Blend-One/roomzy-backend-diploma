@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateRoomRequestDto } from 'models/requests-schemas/create-ad.request';
 import { CommonRepository } from 'repositories/common.repository';
 import { ImageRepository } from 'repositories/image.repository';
@@ -8,6 +8,7 @@ import { SharpService } from './sharp.service';
 import { S3Service } from './s3.service';
 import { v4 as uuidv4 } from 'uuid';
 import { S3Bucket } from '../models/enums/s3-bucket.enum';
+import { validateSections } from '../utils/validate-sections.utils';
 
 @Injectable()
 export class RoomService {
@@ -24,14 +25,32 @@ export class RoomService {
         const { sections, ...roomValues } = createAdDto;
         const compressedImages = await Promise.all(images.map(image => this.sharpService.compress(image)));
         const roomId = uuidv4();
+        const transformedSections = JSON.parse(sections);
+        validateSections(transformedSections);
         const imageIds = compressedImages.map(() => uuidv4());
-        const [ad, _, imageRecords] = await this.commonRepository.createTransaction([
-            this.roomRepository.createAd(roomValues, sections, roomId),
-            this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds),
-            this.imageRepository.bulkCreateImages(compressedImages, imageIds, roomId),
-        ]);
+        const result = await this.commonRepository.createTransactionWithCallback(async prisma => {
+            const ad = await this.roomRepository.createAd({
+                room: roomValues,
+                sections: transformedSections,
+                roomId,
+                transactionPrisma: prisma,
+            });
+            const imageRecords = await this.imageRepository.bulkCreateImages({
+                files: compressedImages,
+                imageIds,
+                roomId,
+                transactionPrisma: prisma,
+            });
 
-        return { ad, imageRecords };
+            try {
+                await this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds);
+                return { ad, imageRecords };
+            } catch (err) {
+                throw err;
+            }
+        });
+
+        return result;
     }
 
     public async getAds() {}
