@@ -9,6 +9,7 @@ import {
 import { CharType } from '../models/enums/char-type.enum';
 import { CommonRepository } from '../repositories/common.repository';
 import { DetailsService } from './details.service';
+import { CharacteristicsRepository } from '../repositories/characteristics.repository';
 
 @Injectable()
 export class CharacteristicsService {
@@ -16,6 +17,7 @@ export class CharacteristicsService {
         private readonly detailsRepository: DetailsRepository,
         private readonly commonRepository: CommonRepository,
         private readonly detailsService: DetailsService,
+        private readonly characteristicsRepository: CharacteristicsRepository,
     ) {}
 
     public async getAllCharacteristics(name: string, page: number, limit: number, locale: Locale) {
@@ -51,6 +53,10 @@ export class CharacteristicsService {
             this.detailsService.obtainParamsForGetQuery('characteristicNAttributeFields', 'attribute', locale),
             'characteristic',
         );
+    }
+
+    public async getDefaultCharacteristicsByRoomTypeId(roomTypeId: string, locale: Locale) {
+        return this.characteristicsRepository.getDefaultCharacteristicsByRoomTypeId(roomTypeId, locale);
     }
 
     public async updateCharacteristic(body: UpdateCharacteristicRequestDto, id: string) {

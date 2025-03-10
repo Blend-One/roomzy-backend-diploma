@@ -11,6 +11,8 @@ import { CommonRepository } from 'repositories/common.repository';
 import { SectionTypesController } from 'controllers/section-types.controller';
 import { SectionTypesService } from '../services/section-types.service';
 import { DetailsService } from '../services/details.service';
+import { RoomTypesService } from '../services/room-types.service';
+import { CharacteristicsRepository } from '../repositories/characteristics.repository';
 
 @Module({
     imports: [],
@@ -25,6 +27,8 @@ import { DetailsService } from '../services/details.service';
         CharacteristicsService,
         CommonRepository,
         DetailsService,
+        RoomTypesService,
+        CharacteristicsRepository,
     ],
 })
 export default class DetailsModule {}

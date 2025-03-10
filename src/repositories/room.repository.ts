@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'services/prisma.service';
 import { CreateRoomRequestDto, SectionRoomSchemaDto } from 'models/requests-schemas/create-ad.request';
 import { RoomStatus } from 'models/enums/room-status.enum';
-import { WithTransactionPrisma } from '../types/transaction-prisma.types';
-import { FiltersDto, PaginatedFilters } from '../models/dtos/fitlers.dto';
-import { Locale } from '../models/enums/locale.enum';
-import { UpdateRoomRequestDto } from '../models/requests-schemas/update-ad.request';
-import { IncludeIdToArray } from '../types/include-id-to-array.types';
-import { InferArrayElement } from '../types/infer-array-element.types';
+import { WithTransactionPrisma } from 'types/transaction-prisma.types';
+import { FiltersDto } from 'models/dtos/fitlers.dto';
+import { Locale } from 'models/enums/locale.enum';
+import { UpdateRoomRequestDto } from 'models/requests-schemas/update-ad.request';
+import { IncludeIdToArray } from 'types/include-id-to-array.types';
+import { InferArrayElement } from 'types/infer-array-element.types';
 
 @Injectable()
 export class RoomRepository {

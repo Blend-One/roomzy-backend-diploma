@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Param, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
 import { IMAGE_ROUTES } from 'routes/image.routes';
 import { AuthCheckerGuard } from 'guards/auth-checker.guard';
 import { S3Service } from 'services/s3.service';

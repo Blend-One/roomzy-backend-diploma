@@ -50,6 +50,12 @@ export class CharacteristicsController {
         return this.characteristicService.getCharacteristic(locale, attributeId);
     }
 
+    @Get(CHARACTERISTICS_ROUTES.GET_DEFAULT_CHARACTERISTICS_BY_ROOM_TYPE)
+    public async getDefaultCharacteristicsByRoomType(@Req() request: Request, @Param('roomTypeId') roomTypeId: string) {
+        const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
+        return this.characteristicService.getDefaultCharacteristicsByRoomTypeId(roomTypeId, locale);
+    }
+
     @Patch(CHARACTERISTICS_ROUTES.UPDATE_CHARACTERISTIC)
     public async updateAttribute(
         @Param('id') attributeId: string,
