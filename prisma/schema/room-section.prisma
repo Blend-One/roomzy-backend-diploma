@@ -3,7 +3,7 @@ model RoomSection {
   floorNumber Int
   roomSectionTypeId String
   roomId String
-  roomSectionType RoomSectionType @relation(fields: [roomSectionTypeId], references: [id])
+  roomSectionType RoomSectionType @relation(fields: [roomSectionTypeId], references: [id], onDelete: Cascade)
   room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
   sectionAttributeValues SectionAttributeValue[]
 }

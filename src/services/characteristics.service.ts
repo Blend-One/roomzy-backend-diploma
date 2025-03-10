@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Locale } from '../models/enums/locale.enum';
 import { DetailsRepository } from '../repositories/details.repository';
+import { Locale } from '../models/enums/locale.enum';
 
 @Injectable()
-export class AttributeService {
+export class CharacteristicsService {
     constructor(private readonly detailsRepository: DetailsRepository) {}
 
-    public async getAllAttributes(name: string, page: number, limit: number, locale: Locale) {}
+    public async getAllCharacteristics(name: string, page: number, limit: number, locale: Locale) {}
 
     public async createAttribute() {}
 

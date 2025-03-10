@@ -72,12 +72,6 @@ export class RoomController {
         return this.roomService.getPersonalAds(status, locale, page, limit, user.id);
     }
 
-    @Get(ROOM_ROUTES.GET_AD)
-    public async getAd(@Param('id') id: string, @Req() request: Request) {
-        const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
-        return this.roomService.getAd(id, locale);
-    }
-
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @Patch(ROOM_ROUTES.CHANGE_STATUS_OF_AD)
     public async changeAdStatus(@Param('id') id: string, @Req() request: Request, @Body() body: RequestStatusDto) {
@@ -95,9 +89,21 @@ export class RoomController {
 
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Get(ROOM_ROUTES.GET_MODERATION_ADS)
-    public async getAdsInModeration(@Req() request: Request, @Query('filters', ToJsonPipe) filters: PaginatedFilters) {
+    public async getAdsInModeration(
+        @Req() request: Request,
+        @Query('filters', ToJsonPipe) filters: FiltersDto,
+        @Query('page') page: number,
+        @Query('limit') limit: number,
+    ) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
-        return this.roomService.getAdsForModeration(filters, locale);
+        return this.roomService.getAdsForModeration(filters, locale, page, limit);
+    }
+
+    @Get(ROOM_ROUTES.GET_AD)
+    public async getAd(@Param('id') id: string, @Req() request: Request) {
+        const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
+        const user = getUserHeader(request);
+        return this.roomService.getAd(id, locale, user?.id ?? null, user?.role ?? null);
     }
 
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER, Role.MANAGER], UserStatus.ACTIVE))

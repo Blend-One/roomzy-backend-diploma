@@ -7,6 +7,7 @@ import { AUTH_ERRORS } from 'errors/auth.errors';
 import { UserResponseDto } from 'models/dtos/user-response.dto';
 import { TokenRepository } from 'repositories/token.repository';
 import { REFRESH_TOKEN_HEADER } from 'constants/tokens.constants';
+import { getUserHeader } from '../utils/request.utils';
 
 @Injectable()
 export class UserService {
@@ -37,7 +38,7 @@ export class UserService {
     }
 
     public async refresh(request: Request): Promise<UserResponseDto> {
-        const userPayload = request.headers['user'];
+        const userPayload = getUserHeader(request);
         const token = this.tokenService.extractToken(request, REFRESH_TOKEN_HEADER);
         if (!userPayload) throw new UnauthorizedException(AUTH_ERRORS.UNAUTHORIZED);
         const user = await this.userRepository.findUserById(userPayload.id);

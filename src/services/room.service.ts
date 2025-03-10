@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomRequestDto } from 'models/requests-schemas/create-ad.request';
 import { CommonRepository } from 'repositories/common.repository';
 import { ImageRepository } from 'repositories/image.repository';
@@ -16,6 +16,8 @@ import { RoomStatus } from '../models/enums/room-status.enum';
 import { AUTH_ERRORS } from '../errors/auth.errors';
 import { UpdateRoomRequestDto } from '../models/requests-schemas/update-ad.request';
 import { ROOM_ERRORS } from '../errors/room.errors';
+import { Role } from '../models/enums/role.enum';
+import { MODERATION_FIELDS } from '../constants/room.constants';
 
 @Injectable()
 export class RoomService {
@@ -27,6 +29,11 @@ export class RoomService {
         private sharpService: SharpService,
         private s3Service: S3Service,
     ) {}
+
+    private checkSwitchingToModerationStatus(files: Express.Multer.File[], queryKeys: string[]) {
+        if (!!files?.length) return true;
+        return !!queryKeys?.length && queryKeys.some(key => MODERATION_FIELDS.includes(key));
+    }
 
     public async prepareDataForAd(request: Request, images: Array<Express.Multer.File>, sections: string) {
         const user = request.headers['user'];
@@ -86,7 +93,13 @@ export class RoomService {
         return this.roomRepository.getAds(null, status, take, skip, locale, userId);
     }
 
-    public async getAd(id: string, locale: Locale) {}
+    public async getAd(id: string, locale: Locale, userId: string | null, userRole: Role | null) {
+        const room = await this.roomRepository.getAd(id, locale);
+        if (!room) throw new NotFoundException(ROOM_ERRORS.ROOM_NOT_FOUND);
+        if (room.status !== RoomStatus.OPENED && room.userId !== userId && userRole !== Role.MANAGER)
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        return room;
+    }
 
     public async changeAdStatus(roomId: string, status: RoomStatus, userId: string) {
         if (![RoomStatus.OPENED, RoomStatus.ARCHIVED].includes(status)) {
@@ -109,7 +122,10 @@ export class RoomService {
 
         const room = await this.roomRepository.getRoomByUserAndRoomIds(roomId);
 
-        if (![RoomStatus.IN_MODERATION, RoomStatus.REJECTED, RoomStatus.OPENED].includes(room.status as RoomStatus)) {
+        if (
+            ![RoomStatus.IN_MODERATION, RoomStatus.REJECTED, RoomStatus.OPENED].includes(room.status as RoomStatus) ||
+            status === room.status
+        ) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
 
@@ -118,8 +134,8 @@ export class RoomService {
         return { message: HttpStatus.OK };
     }
 
-    public async getAdsForModeration(filters: PaginatedFilters, locale: Locale) {
-        const { take, skip } = calculatePaginationData(filters.page, filters.limit);
+    public async getAdsForModeration(filters: FiltersDto, locale: Locale, page: number, limit: number) {
+        const { take, skip } = calculatePaginationData(page, limit);
         return this.roomRepository.getAds(filters, RoomStatus.IN_MODERATION, take, skip, locale);
     }
 
@@ -139,6 +155,11 @@ export class RoomService {
             sections,
         );
 
+        const shouldSwitchToModerationStatus = this.checkSwitchingToModerationStatus(
+            images,
+            Object.keys(updateAdDto ?? {}),
+        );
+
         const parsedImagesToDelete = imagesToDelete ? JSON.parse(imagesToDelete) : [];
         const parsedSectionsToDelete = sectionsToDelete ? JSON.parse(sectionsToDelete) : [];
 
@@ -146,34 +167,40 @@ export class RoomService {
             throw new BadRequestException(ROOM_ERRORS.INCORRECT_SECTIONS_FORMAT);
         }
 
-        const result = await this.commonRepository.createTransactionWithCallback(async prisma => {
-            const ad = await this.roomRepository.updateAd({
-                room: roomValues,
-                sections: transformedSections,
-                transactionPrisma: prisma,
-                userId: user.id,
-                roomId,
-                imagesToDelete: parsedImagesToDelete,
-                sectionsToDelete: parsedSectionsToDelete,
-            });
+        const result = await this.commonRepository
+            .createTransactionWithCallback(async prisma => {
+                const ad = await this.roomRepository.updateAd({
+                    room: roomValues,
+                    sections: transformedSections,
+                    transactionPrisma: prisma,
+                    userId: user.id,
+                    roomId,
+                    imagesToDelete: parsedImagesToDelete,
+                    sectionsToDelete: parsedSectionsToDelete,
+                    shouldSwitchToModerationStatus,
+                });
 
-            const imageRecords = await this.imageRepository.bulkCreateImages({
-                files: compressedImages,
-                imageIds,
-                roomId,
-                transactionPrisma: prisma,
-            });
+                const imageRecords = await this.imageRepository.bulkCreateImages({
+                    files: compressedImages,
+                    imageIds,
+                    roomId,
+                    transactionPrisma: prisma,
+                });
 
-            try {
-                await Promise.all([
-                    this.s3Service.bulkDelete(S3Bucket.PHOTOS, parsedImagesToDelete),
-                    this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds),
-                ]);
-                return { ad, imageRecords };
-            } catch (err) {
-                throw err;
-            }
-        });
+                try {
+                    await Promise.all([
+                        this.s3Service.bulkDelete(S3Bucket.PHOTOS, parsedImagesToDelete),
+                        this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds),
+                    ]);
+                    return { ad, imageRecords };
+                } catch (err) {
+                    throw err;
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                throw new BadRequestException(ROOM_ERRORS.ROOM_NOT_FOUND);
+            });
 
         return result;
     }

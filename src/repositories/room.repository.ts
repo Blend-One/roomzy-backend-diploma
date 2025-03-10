@@ -182,6 +182,7 @@ export class RoomRepository {
         sectionsToDelete,
         imagesToDelete,
         transactionPrisma,
+        shouldSwitchToModerationStatus,
     }: WithTransactionPrisma<{
         roomId: string;
         userId: string;
@@ -189,6 +190,7 @@ export class RoomRepository {
         sections: IncludeIdToArray<SectionRoomSchemaDto>;
         sectionsToDelete: string[];
         imagesToDelete: string[];
+        shouldSwitchToModerationStatus?: boolean;
     }>) {
         const prismaInstance = transactionPrisma ?? this.prisma;
 
@@ -196,12 +198,17 @@ export class RoomRepository {
             where: {
                 userId,
                 id: roomId,
+                status: RoomStatus.OPENED,
             },
             data: {
                 ...room,
                 roomSections: this.getSectionsQueryForUpdate(sections, sectionsToDelete),
             },
         };
+
+        if (shouldSwitchToModerationStatus) {
+            query.data['status'] = RoomStatus.IN_MODERATION;
+        }
 
         if (!!imagesToDelete.length) {
             query.data['roomImages'] = {
@@ -223,6 +230,66 @@ export class RoomRepository {
                 userId,
                 status: {
                     in: [RoomStatus.ARCHIVED, RoomStatus.OPENED, RoomStatus.IN_MODERATION, RoomStatus.REJECTED],
+                },
+            },
+        });
+    }
+
+    public async getAd(roomId: string, locale: Locale) {
+        return this.prisma.room.findUnique({
+            where: {
+                id: roomId,
+            },
+            include: {
+                roomType: {
+                    select: {
+                        [locale]: true,
+                    },
+                },
+                roomSections: {
+                    select: {
+                        floorNumber: true,
+                        id: true,
+                        roomSectionType: {
+                            select: {
+                                id: true,
+                                [locale]: true,
+                            },
+                        },
+                        sectionAttributeValues: {
+                            select: {
+                                id: true,
+                                characteristic: {
+                                    select: {
+                                        id: true,
+                                        [locale]: true,
+                                    },
+                                },
+                                attribute: {
+                                    select: {
+                                        id: true,
+                                        [locale]: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                roomImages: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                district: {
+                    select: {
+                        [locale]: true,
+                    },
+                },
+                city: {
+                    select: {
+                        [locale]: true,
+                    },
                 },
             },
         });
@@ -273,7 +340,6 @@ export class RoomRepository {
                     },
                 },
                 roomImages: true,
-                priceUnitRelation: true,
                 district: {
                     select: {
                         [locale]: true,

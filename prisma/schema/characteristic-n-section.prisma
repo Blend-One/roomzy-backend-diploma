@@ -2,6 +2,6 @@ model CharacteristicAndSection {
   id String @id @default(uuid())
   characteristicId String
   sectionTypeId String
-  sectionType RoomSectionType @relation(fields: [sectionTypeId], references: [id])
-  characteristic Characteristic @relation(fields: [characteristicId], references: [id])
+  sectionType RoomSectionType @relation(fields: [sectionTypeId], references: [id], onDelete: Cascade)
+  characteristic Characteristic @relation(fields: [characteristicId], references: [id], onDelete: Cascade)
 }
