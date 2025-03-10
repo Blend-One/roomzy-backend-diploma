@@ -7,12 +7,14 @@ import {
     CreateSectionTypeRequestDto,
     UpdateSectionTypeRequestDto,
 } from 'models/requests-schemas/create-section-type.request';
+import { DetailsService } from './details.service';
 
 @Injectable()
 export class SectionTypesService {
     constructor(
         private readonly detailsRepository: DetailsRepository,
         private readonly commonRepository: CommonRepository,
+        private readonly detailsService: DetailsService,
     ) {}
 
     public async getAllSectionTypes(name: string, page: number, limit: number, locale: Locale) {
@@ -21,101 +23,63 @@ export class SectionTypesService {
             locale,
             skip,
             take,
-            {
-                [locale]: {
-                    contains: name,
-                },
-            },
+            this.detailsService.getNameFilter(locale, name),
             'roomSectionType',
-            {
-                characteristicNSectionFields: {
-                    select: {
-                        characteristic: {
-                            select: {
-                                id: true,
-                                [locale]: true,
-                            },
-                        },
-                    },
-                },
-            },
+            this.detailsService.obtainParamsForGetQuery('characteristicNSectionFields', 'characteristic', locale),
         );
     }
 
     public async createSectionType(body: CreateSectionTypeRequestDto) {
         const { characteristicIds, ...bodyValues } = body;
-        return this.detailsRepository.createOne(bodyValues, 'roomSectionType', {
-            characteristicNSectionFields: {
-                create: Array.from(new Set(characteristicIds)).map(characteristicId => ({
-                    characteristic: {
-                        connect: {
-                            id: characteristicId,
-                        },
-                    },
-                })),
-            },
-        });
+        return this.detailsRepository.createOne(
+            bodyValues,
+            'roomSectionType',
+            this.detailsService.obtainParamsForCreationQuery(
+                characteristicIds,
+                'characteristicNSectionFields',
+                'characteristic',
+            ),
+        );
     }
 
     public async getSectionType(locale: Locale, id: string) {
         return this.detailsRepository.getOne(
             locale,
             id,
-            {
-                characteristicNSectionFields: {
-                    select: {
-                        id: true,
-                        characteristic: {
-                            select: {
-                                id: true,
-                                [locale]: true,
-                            },
-                        },
-                    },
-                },
-            },
+            this.detailsService.obtainParamsForGetQuery('characteristicNSectionFields', 'characteristic', locale),
             'roomSectionType',
         );
     }
 
     public async updateSectionType(body: UpdateSectionTypeRequestDto, id: string) {
         const { characteristicIds, ...bodyValues } = body;
-        /* eslint-disable indent */
         const result = await this.commonRepository.createTransactionWithCallback(async prisma => {
             if (!!characteristicIds?.length) {
-                await this.detailsRepository.deleteMany({
-                    tableName: 'characteristicAndSection',
-                    transactionPrisma: prisma,
-                    condition: {
-                        sectionTypeId: id,
-                    },
-                });
+                await this.detailsRepository.deleteMany(
+                    this.detailsService.obtainParamsForDeleteRelations(
+                        prisma,
+                        'characteristicAndSection',
+                        'sectionTypeId',
+                        id,
+                    ),
+                );
             }
-            return await this.detailsRepository.updateOne({
-                body: bodyValues,
-                id,
-                tableName: 'roomSectionType',
-                transactionPrisma: prisma,
-                updatedRelations: characteristicIds?.length
-                    ? {
-                          characteristicNSectionFields: {
-                              create: characteristicIds.map(characteristicId => ({
-                                  characteristic: {
-                                      connect: {
-                                          id: characteristicId,
-                                      },
-                                  },
-                              })),
-                          },
-                      }
-                    : {},
-            });
+            return await this.detailsRepository.updateOne(
+                this.detailsService.obtainParamsForUpdate({
+                    body: bodyValues,
+                    id,
+                    tableName: 'roomSectionType',
+                    prisma,
+                    idsForRelation: characteristicIds,
+                    relationField: 'characteristicNSectionFields',
+                    fieldWithinRelation: 'characteristic',
+                }),
+            );
         });
 
         return result;
     }
 
-    /* eslint-enable indent */
     public async deleteSectionType(id: string) {
         return this.detailsRepository.deleteOne(id, 'roomSectionType');
     }

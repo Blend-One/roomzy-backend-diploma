@@ -10,6 +10,7 @@ import { CharacteristicsService } from 'services/characteristics.service';
 import { CommonRepository } from 'repositories/common.repository';
 import { SectionTypesController } from 'controllers/section-types.controller';
 import { SectionTypesService } from '../services/section-types.service';
+import { DetailsService } from '../services/details.service';
 
 @Module({
     imports: [],
@@ -23,6 +24,7 @@ import { SectionTypesService } from '../services/section-types.service';
         TokenRepository,
         CharacteristicsService,
         CommonRepository,
+        DetailsService,
     ],
 })
 export default class DetailsModule {}
