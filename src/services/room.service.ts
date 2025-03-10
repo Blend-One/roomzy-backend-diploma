@@ -198,7 +198,6 @@ export class RoomService {
                 }
             })
             .catch(err => {
-                console.log(err);
                 throw new BadRequestException(ROOM_ERRORS.ROOM_NOT_FOUND);
             });
 

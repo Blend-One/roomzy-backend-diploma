@@ -1,14 +1,28 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../services/prisma.service';
-import { TokenService } from '../services/token.service';
-import { DetailsRepository } from '../repositories/details.repository';
-import { TokenRepository } from '../repositories/token.repository';
-import { AttributesController } from '../controllers/attributes.controller';
-import { AttributeService } from '../services/attribute.service';
+import { PrismaService } from 'services/prisma.service';
+import { TokenService } from 'services/token.service';
+import { DetailsRepository } from 'repositories/details.repository';
+import { TokenRepository } from 'repositories/token.repository';
+import { AttributesController } from 'controllers/attributes.controller';
+import { AttributeService } from 'services/attribute.service';
+import { CharacteristicsController } from 'controllers/characteristics.controller';
+import { CharacteristicsService } from 'services/characteristics.service';
+import { CommonRepository } from 'repositories/common.repository';
+import { SectionTypesController } from 'controllers/section-types.controller';
+import { SectionTypesService } from '../services/section-types.service';
 
 @Module({
     imports: [],
-    controllers: [AttributesController],
-    providers: [PrismaService, TokenService, DetailsRepository, AttributeService, TokenRepository],
+    controllers: [AttributesController, CharacteristicsController, SectionTypesController],
+    providers: [
+        PrismaService,
+        TokenService,
+        SectionTypesService,
+        DetailsRepository,
+        AttributeService,
+        TokenRepository,
+        CharacteristicsService,
+        CommonRepository,
+    ],
 })
 export default class DetailsModule {}

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { detailsRequest } from './details.request';
+import { detailsRequest, detailsRequestForUpdate } from './details.request';
 
 export const CreateSectionTypeSchema = z
     .object({
@@ -9,3 +9,9 @@ export const CreateSectionTypeSchema = z
     .optional();
 
 export type CreateSectionTypeRequestDto = z.infer<typeof CreateSectionTypeSchema>;
+
+export const UpdateSectionTypeSchema = z
+    .object({ ...detailsRequestForUpdate, characteristicIds: z.string().array().optional() })
+    .optional();
+
+export type UpdateSectionTypeRequestDto = z.infer<typeof UpdateSectionTypeSchema>;

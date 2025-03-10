@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { Locale } from '../models/enums/locale.enum';
+import { WithTransactionPrisma } from '../types/transaction-prisma.types';
 
 @Injectable()
 export class DetailsRepository {
@@ -21,8 +22,8 @@ export class DetailsRepository {
             select: {
                 id: true,
                 [locale]: true,
+                ...include,
             },
-            include,
         });
     }
 
@@ -32,19 +33,27 @@ export class DetailsRepository {
                 id,
             },
             select: {
+                id: true,
                 [locale]: true,
+                ...include,
             },
-            include,
         });
     }
 
-    public async updateOne<T extends Record<string, any>>(
-        body: T,
-        id: string,
-        tableName: string,
-        updatedRelations: Record<string, any>,
-    ) {
-        return this.prisma[tableName].update({
+    public async updateOne<T extends Record<string, any>>({
+        body,
+        id,
+        tableName,
+        updatedRelations,
+        transactionPrisma,
+    }: WithTransactionPrisma<{
+        body: T;
+        id: string;
+        tableName: string;
+        updatedRelations: Record<string, any>;
+    }>) {
+        const prismaInstance = transactionPrisma ?? this.prisma;
+        return prismaInstance[tableName].update({
             where: {
                 id,
             },
@@ -63,5 +72,27 @@ export class DetailsRepository {
         });
     }
 
-    public async createOne(body: unknown) {}
+    public async deleteMany({
+        tableName,
+        condition,
+        transactionPrisma,
+    }: WithTransactionPrisma<{ tableName: string; condition: Record<string, any> }>) {
+        const prismaInstance = transactionPrisma ?? this.prisma;
+        return prismaInstance[tableName].deleteMany({
+            where: condition,
+        });
+    }
+
+    public async createOne<T extends Record<string, any>>(
+        body: T,
+        tableName: string,
+        createdRelations: Record<string, any>,
+    ) {
+        return this.prisma[tableName].create({
+            data: {
+                ...body,
+                ...createdRelations,
+            },
+        });
+    }
 }

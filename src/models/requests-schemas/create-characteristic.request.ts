@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { detailsRequest } from './details.request';
+import { detailsRequest, detailsRequestForUpdate } from './details.request';
 
 export const CreateCharacteristicSchema = z
     .object({
@@ -9,3 +9,9 @@ export const CreateCharacteristicSchema = z
     .optional();
 
 export type CreateCharacteristicRequestDto = z.infer<typeof CreateCharacteristicSchema>;
+
+export const UpdateCharacteristicSchema = z
+    .object({ ...detailsRequestForUpdate, attributeIds: z.string().array().optional() })
+    .optional();
+
+export type UpdateCharacteristicRequestDto = z.infer<typeof UpdateCharacteristicSchema>;
