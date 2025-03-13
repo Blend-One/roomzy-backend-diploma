@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Locale } from '../models/enums/locale.enum';
 import { DetailsRepository } from '../repositories/details.repository';
-import {
-    CreateAttributeRequestDto,
-    UpdateAttributeRequestDto,
-} from '../models/requests-schemas/create-attribute.request';
 import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
+import { DetailsRequestSchemaDto, UpdateDetailsRequestSchemaDto } from '../models/requests-schemas/details.request';
 
 @Injectable()
 export class AttributeService {
@@ -27,7 +24,7 @@ export class AttributeService {
         );
     }
 
-    public async createAttribute(body: CreateAttributeRequestDto) {
+    public async createAttribute(body: DetailsRequestSchemaDto) {
         return this.detailsRepository.createOne(body, 'attribute', {});
     }
 
@@ -35,7 +32,7 @@ export class AttributeService {
         return this.detailsRepository.getOne(locale, id, {}, 'attribute');
     }
 
-    public async updateAttribute(body: UpdateAttributeRequestDto, id: string) {
+    public async updateAttribute(body: UpdateDetailsRequestSchemaDto, id: string) {
         return this.detailsRepository.updateOne({ body, id, tableName: 'attribute', updatedRelations: {} });
     }
 

@@ -6,7 +6,10 @@ import { S3Bucket } from 'models/enums/s3-bucket.enum';
 import { Response } from 'express';
 import { setCacheControlHeader } from '../utils/response.utils';
 import { CACHE_IMAGE_CONTROL, CACHE_IMAGE_CONTROL_PRIVATE } from '../constants/response.constants';
+import { ApiTags } from '@nestjs/swagger';
+import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiTags(API_TAGS.IMAGES)
 @Controller(IMAGE_ROUTES.DEFAULT)
 export class ImageController {
     constructor(private s3Service: S3Service) {}

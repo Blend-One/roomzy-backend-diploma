@@ -30,7 +30,10 @@ import { UpdateRoomRequestDto, UpdateRoomSchema } from '../models/requests-schem
 import { Locale } from '../models/enums/locale.enum';
 import { FALLBACK_LANGUAGE } from '../constants/dict.constants';
 import { RoomStatus } from '../models/enums/room-status.enum';
+import { ApiTags } from '@nestjs/swagger';
+import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiTags(API_TAGS.ROOMS)
 @Controller({ path: ROOM_ROUTES.DEFAULT })
 export class RoomController {
     constructor(private roomService: RoomService) {}

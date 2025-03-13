@@ -15,7 +15,10 @@ import {
     UpdateSectionTypeRequestDto,
     UpdateSectionTypeSchema,
 } from '../models/requests-schemas/create-section-type.request';
+import { ApiTags } from '@nestjs/swagger';
+import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiTags(API_TAGS.SECTION_TYPES)
 @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
 @Controller({ path: SECTION_TYPES_ROUTES.DEFAULT })
 export class SectionTypesController {

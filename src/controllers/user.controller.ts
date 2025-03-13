@@ -5,7 +5,10 @@ import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { AuthRequestDto, AuthSchema } from '../models/requests-schemas/auth.request';
 import { AuthCheckerGuard } from '../guards/auth-checker.guard';
 import { RefreshTokenCheckerGuard } from '../guards/refresh-token-checker.guard';
+import { API_TAGS } from '../constants/api-tags.constants';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags(API_TAGS.USERS)
 @Controller({ path: USER_ROUTES.DEFAULT })
 export class UserController {
     constructor(private userService: UserService) {}

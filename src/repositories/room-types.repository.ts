@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../services/prisma.service';
 import { Locale } from '../models/enums/locale.enum';
+import { PrismaService } from '../services/prisma.service';
 import { calculateRelations } from '../utils/calculate-relations.utils';
-import { DEFAULT_SECTION } from '../constants/details.constants';
 
 @Injectable()
-export class CharacteristicsRepository {
+export class RoomTypesRepository {
     constructor(private readonly prisma: PrismaService) {}
 
-    public async getDefaultCharacteristicsByRoomTypeId(roomTypeId: string, locale: Locale) {
+    public async getRoomTypeById(id: string, locale: Locale) {
         const relationsQuery = calculateRelations(
             [
+                {
+                    withId: true,
+                    withLocale: true,
+                    joinedField: 'roomTypeNSectionFields',
+                },
                 {
                     joinedField: 'sectionType',
                 },
@@ -25,25 +29,23 @@ export class CharacteristicsRepository {
                 {
                     withId: true,
                     withLocale: true,
-                    additionalFields: ['type'],
                     joinedField: 'characteristicNAttributeFields',
                 },
                 {
                     joinedField: 'attribute',
                 },
                 {
+                    joinedField: null,
                     withId: true,
                     withLocale: true,
-                    joinedField: null,
                 },
             ],
             locale,
         );
 
-        return this.prisma.roomTypeAndSection.findFirst({
+        return this.prisma.roomType.findUnique({
             where: {
-                roomTypeId,
-                sectionTypeId: DEFAULT_SECTION,
+                id,
             },
             select: relationsQuery,
         });

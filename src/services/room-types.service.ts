@@ -6,6 +6,8 @@ import {
     CreateRoomTypeRequestDto,
     UpdateRoomTypeRequestDto,
 } from '../models/requests-schemas/create-room-type.request';
+import { Locale } from '../models/enums/locale.enum';
+import { RoomTypesRepository } from '../repositories/room-types.repository';
 
 @Injectable()
 export class RoomTypesService {
@@ -13,11 +15,12 @@ export class RoomTypesService {
         private readonly detailsRepository: DetailsRepository,
         private readonly commonRepository: CommonRepository,
         private readonly detailsService: DetailsService,
+        private readonly roomTypesRepository: RoomTypesRepository,
     ) {}
 
-    // public async getRoomTypeWithSectionsAndChars() {
-    //     return this.detailsRepository.getAll();
-    // }
+    public async getRoomTypeWithSectionsAndChars(id: string, locale: Locale) {
+        return this.roomTypesRepository.getRoomTypeById(id, locale);
+    }
 
     public async createRoomType(body: CreateRoomTypeRequestDto) {
         const { sectionIds, ...bodyValues } = body;

@@ -10,12 +10,15 @@ import { ATTRIBUTE_ROUTES } from 'routes/attributes.routes';
 import { AttributeService } from 'services/attribute.service';
 import { ZodValidationPipe } from 'pipes/zod-validation.pipe';
 import {
-    CreateAttributeRequestDto,
-    CreateAttributeSchema,
-    UpdateAttributeRequestDto,
-    UpdateAttributeSchema,
-} from 'models/requests-schemas/create-attribute.request';
+    DetailsRequestSchema,
+    DetailsRequestSchemaDto,
+    UpdateDetailsRequestSchema,
+    UpdateDetailsRequestSchemaDto,
+} from '../models/requests-schemas/details.request';
+import { ApiTags } from '@nestjs/swagger';
+import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiTags(API_TAGS.ATTRIBUTES)
 @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
 @Controller({ path: ATTRIBUTE_ROUTES.DEFAULT })
 export class AttributesController {
@@ -33,7 +36,7 @@ export class AttributesController {
     }
 
     @Post(ATTRIBUTE_ROUTES.CREATE_ATTRIBUTE)
-    public async createAttribute(@Body(new ZodValidationPipe(CreateAttributeSchema)) body: CreateAttributeRequestDto) {
+    public async createAttribute(@Body(new ZodValidationPipe(DetailsRequestSchema)) body: DetailsRequestSchemaDto) {
         return this.attributesService.createAttribute(body);
     }
 
@@ -51,7 +54,7 @@ export class AttributesController {
     @Patch(ATTRIBUTE_ROUTES.UPDATE_ATTRIBUTE)
     public async updateAttribute(
         @Param('id') attributeId: string,
-        @Body(new ZodValidationPipe(UpdateAttributeSchema)) body: UpdateAttributeRequestDto,
+        @Body(new ZodValidationPipe(UpdateDetailsRequestSchema)) body: UpdateDetailsRequestSchemaDto,
     ) {
         return this.attributesService.updateAttribute(body, attributeId);
     }

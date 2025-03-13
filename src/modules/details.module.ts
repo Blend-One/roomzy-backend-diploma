@@ -13,13 +13,24 @@ import { SectionTypesService } from '../services/section-types.service';
 import { DetailsService } from '../services/details.service';
 import { RoomTypesService } from '../services/room-types.service';
 import { CharacteristicsRepository } from '../repositories/characteristics.repository';
+import { RoomTypesController } from '../controllers/room-types.controller';
+import { RoomTypesRepository } from '../repositories/room-types.repository';
+import { DictController } from '../controllers/dict.controller';
+import { DictRepository } from '../repositories/dict.repository';
 
 @Module({
     imports: [],
-    controllers: [AttributesController, CharacteristicsController, SectionTypesController],
+    controllers: [
+        DictController,
+        AttributesController,
+        CharacteristicsController,
+        SectionTypesController,
+        RoomTypesController,
+    ],
     providers: [
         PrismaService,
         TokenService,
+        DictRepository,
         SectionTypesService,
         DetailsRepository,
         AttributeService,
@@ -29,6 +40,8 @@ import { CharacteristicsRepository } from '../repositories/characteristics.repos
         DetailsService,
         RoomTypesService,
         CharacteristicsRepository,
+        RoomTypesService,
+        RoomTypesRepository,
     ],
 })
 export default class DetailsModule {}

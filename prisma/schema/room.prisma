@@ -11,6 +11,7 @@ model Room {
   street String
   districtId String
   cityId String
+  building Float
   appartment String?
   isCommercial Boolean
   hasDeposit Boolean
