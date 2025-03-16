@@ -8,6 +8,7 @@ import {
 } from '../models/requests-schemas/create-room-type.request';
 import { Locale } from '../models/enums/locale.enum';
 import { RoomTypesRepository } from '../repositories/room-types.repository';
+import { transformQueryResult } from '../utils/transform-query-result.utils';
 
 @Injectable()
 export class RoomTypesService {
@@ -19,7 +20,26 @@ export class RoomTypesService {
     ) {}
 
     public async getRoomTypeWithSectionsAndChars(id: string, locale: Locale) {
-        return this.roomTypesRepository.getRoomTypeById(id, locale);
+        const roomType = await this.roomTypesRepository.getRoomTypeById(id, locale);
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    [locale]: 'name',
+                    roomTypeNSectionFields: 'sectionsTypes',
+                    characteristicNSectionFields: 'characteristics',
+                    characteristicNAttributeFields: 'attributes',
+                },
+                objectParsingSequence: [
+                    'sectionsTypes',
+                    'sectionType',
+                    'characteristics',
+                    'characteristic',
+                    'attributes',
+                    'attribute',
+                ],
+            },
+            roomType,
+        );
     }
 
     public async createRoomType(body: CreateRoomTypeRequestDto) {

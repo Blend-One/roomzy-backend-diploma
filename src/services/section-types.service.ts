@@ -8,6 +8,7 @@ import {
     UpdateSectionTypeRequestDto,
 } from 'models/requests-schemas/create-section-type.request';
 import { DetailsService } from './details.service';
+import { transformQueryResult } from '../utils/transform-query-result.utils';
 
 @Injectable()
 export class SectionTypesService {
@@ -19,13 +20,23 @@ export class SectionTypesService {
 
     public async getAllSectionTypes(name: string, page: number, limit: number, locale: Locale) {
         const { skip, take } = calculatePaginationData(page, limit);
-        return this.detailsRepository.getAll(
+        const sectionTypes = await this.detailsRepository.getAll(
             locale,
             skip,
             take,
             this.detailsService.getNameFilter(locale, name),
             'roomSectionType',
             this.detailsService.obtainParamsForGetQuery('characteristicNSectionFields', 'characteristic', locale),
+        );
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    characteristicNSectionFields: 'characteristics',
+                    [locale]: 'name',
+                },
+                objectParsingSequence: ['characteristics', 'characteristic'],
+            },
+            sectionTypes,
         );
     }
 
@@ -43,11 +54,22 @@ export class SectionTypesService {
     }
 
     public async getSectionType(locale: Locale, id: string) {
-        return this.detailsRepository.getOne(
+        const sectionType = await this.detailsRepository.getOne(
             locale,
             id,
             this.detailsService.obtainParamsForGetQuery('characteristicNSectionFields', 'characteristic', locale),
             'roomSectionType',
+        );
+
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    characteristicNSectionFields: 'characteristics',
+                    [locale]: 'name',
+                },
+                objectParsingSequence: ['characteristics', 'characteristic'],
+            },
+            sectionType,
         );
     }
 

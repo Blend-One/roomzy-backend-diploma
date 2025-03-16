@@ -9,14 +9,15 @@ import { CharacteristicsController } from 'controllers/characteristics.controlle
 import { CharacteristicsService } from 'services/characteristics.service';
 import { CommonRepository } from 'repositories/common.repository';
 import { SectionTypesController } from 'controllers/section-types.controller';
-import { SectionTypesService } from '../services/section-types.service';
-import { DetailsService } from '../services/details.service';
-import { RoomTypesService } from '../services/room-types.service';
-import { CharacteristicsRepository } from '../repositories/characteristics.repository';
-import { RoomTypesController } from '../controllers/room-types.controller';
-import { RoomTypesRepository } from '../repositories/room-types.repository';
-import { DictController } from '../controllers/dict.controller';
-import { DictRepository } from '../repositories/dict.repository';
+import { SectionTypesService } from 'services/section-types.service';
+import { DetailsService } from 'services/details.service';
+import { RoomTypesService } from 'services/room-types.service';
+import { CharacteristicsRepository } from 'repositories/characteristics.repository';
+import { RoomTypesController } from 'controllers/room-types.controller';
+import { RoomTypesRepository } from 'repositories/room-types.repository';
+import { DictController } from 'controllers/dict.controller';
+import { DictRepository } from 'repositories/dict.repository';
+import { DictService } from 'services/dict.service';
 
 @Module({
     imports: [],
@@ -42,6 +43,7 @@ import { DictRepository } from '../repositories/dict.repository';
         CharacteristicsRepository,
         RoomTypesService,
         RoomTypesRepository,
+        DictService,
     ],
 })
 export default class DetailsModule {}

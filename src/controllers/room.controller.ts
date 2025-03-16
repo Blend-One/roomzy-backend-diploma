@@ -21,17 +21,17 @@ import { UserStatus } from 'models/enums/user-status.enum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FILE_PROPERTY_NAME } from 'constants/file.constants';
 import { filterFiles } from 'utils/file-filter.utils';
-import { ToJsonPipe } from '../pipes/to-json.pipe';
-import { FiltersDto, PaginatedFilters } from '../models/dtos/fitlers.dto';
-import { getLanguageHeader, getUserHeader } from '../utils/request.utils';
-import { Role } from '../models/enums/role.enum';
-import { RequestStatusDto } from '../models/dtos/room-request-status.dto';
-import { UpdateRoomRequestDto, UpdateRoomSchema } from '../models/requests-schemas/update-ad.request';
-import { Locale } from '../models/enums/locale.enum';
-import { FALLBACK_LANGUAGE } from '../constants/dict.constants';
-import { RoomStatus } from '../models/enums/room-status.enum';
+import { ToJsonPipe } from 'pipes/to-json.pipe';
+import { FiltersDto } from 'models/dtos/fitlers.dto';
+import { getLanguageHeader, getUserHeader } from 'utils/request.utils';
+import { Role } from 'models/enums/role.enum';
+import { RequestStatusDto } from 'models/dtos/room-request-status.dto';
+import { UpdateRoomRequestDto, UpdateRoomSchema } from 'models/requests-schemas/update-ad.request';
+import { Locale } from 'models/enums/locale.enum';
+import { FALLBACK_LANGUAGE } from 'constants/dict.constants';
+import { RoomStatus } from 'models/enums/room-status.enum';
 import { ApiTags } from '@nestjs/swagger';
-import { API_TAGS } from '../constants/api-tags.constants';
+import { API_TAGS } from 'constants/api-tags.constants';
 
 @ApiTags(API_TAGS.ROOMS)
 @Controller({ path: ROOM_ROUTES.DEFAULT })
