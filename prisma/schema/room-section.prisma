@@ -1,6 +1,6 @@
 model RoomSection {
   id String @id @default(uuid())
-  floorNumber Int
+  floorNumber Int?
   roomSectionTypeId String
   roomId String
   roomSectionType RoomSectionType @relation(fields: [roomSectionTypeId], references: [id], onDelete: Cascade)

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, Param, UseGuards, Body, Post, Patch, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthCheckerGuard } from 'guards/auth-checker.guard';
 import { getStatusCheckerGuard } from 'guards/user-status-checker.guard';
 import { Role } from 'models/enums/role.enum';
@@ -52,7 +52,7 @@ export class CharacteristicsController {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
         return this.characteristicService.getCharacteristic(locale, attributeId);
     }
-
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER, Role.USER], UserStatus.ACTIVE))
     @Get(CHARACTERISTICS_ROUTES.GET_DEFAULT_CHARACTERISTICS_BY_ROOM_TYPE)
     public async getDefaultCharacteristicsByRoomType(@Req() request: Request, @Param('roomTypeId') roomTypeId: string) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;

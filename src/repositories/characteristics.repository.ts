@@ -41,7 +41,7 @@ export class CharacteristicsRepository {
         return this.prisma.roomTypeAndSection.findFirst({
             where: {
                 roomTypeId,
-                sectionTypeId: 'BEDROOM',
+                sectionTypeId: `${roomTypeId}_${DEFAULT_SECTION}`,
             },
             select: relationsQuery,
         });

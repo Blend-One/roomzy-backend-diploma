@@ -19,12 +19,18 @@ export const transformQueryResult = (config: TransformQueryConfig, result: Recor
                     delete preliminaryObject[key];
                 }
             });
-        const prop = objectParsingSequence.shift();
-        if (prop) {
-            result[prop] = transformQueryResult(
-                { renamedFields, objectParsingSequence: [...objectParsingSequence] },
-                result[prop],
-            );
+        const keys = !!result ? Object.keys(result) : [];
+        const propFields = objectParsingSequence.filter(propName => keys.includes(propName));
+        if (propFields.length) {
+            propFields.forEach(prop => {
+                result[prop] = transformQueryResult(
+                    {
+                        renamedFields,
+                        objectParsingSequence: objectParsingSequence.filter(propName => !propFields.includes(propName)),
+                    },
+                    result[prop],
+                );
+            });
         }
         return result;
     }

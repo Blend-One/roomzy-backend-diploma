@@ -13,13 +13,39 @@ import { InferArrayElement } from 'types/infer-array-element.types';
 export class RoomRepository {
     constructor(private prisma: PrismaService) {}
 
+    private getQueryForSectionCreation(section: InferArrayElement<SectionRoomSchemaDto>) {
+        return {
+            floorNumber: section.floorNumber,
+            roomSectionType: {
+                connect: {
+                    id: section.roomSectionTypeId,
+                },
+            },
+            sectionAttributeValues: {
+                create: Object.entries(section.sectionAttributeValues).map(([key, value]) => ({
+                    characteristic: {
+                        connect: {
+                            id: key,
+                        },
+                    },
+                    value: value as string,
+                    attribute: {
+                        connect: {
+                            id: value as string,
+                        },
+                    },
+                })),
+            },
+        };
+    }
+
     public async createAd({
         room,
         sections,
         transactionPrisma,
         userId,
     }: WithTransactionPrisma<{
-        room: Omit<Required<CreateRoomRequestDto>, 'sections'>;
+        room: Omit<Required<CreateRoomRequestDto>, 'sections' | 'defaultOptions'>;
         sections: SectionRoomSchemaDto;
         userId: string;
     }>) {
@@ -60,29 +86,7 @@ export class RoomRepository {
                 },
                 physControl: !!room.physControlInstructions,
                 roomSections: {
-                    create: sections.map(section => ({
-                        floorNumber: section.floorNumber,
-                        roomSectionType: {
-                            connect: {
-                                id: section.roomSectionTypeId,
-                            },
-                        },
-                        sectionAttributeValues: {
-                            create: Object.entries(section.sectionAttributeValues).map(([key, value]) => ({
-                                characteristic: {
-                                    connect: {
-                                        id: key,
-                                    },
-                                },
-                                value: value as string,
-                                attribute: {
-                                    connect: {
-                                        id: value as string,
-                                    },
-                                },
-                            })),
-                        },
-                    })),
+                    create: sections.map(section => this.getQueryForSectionCreation(section)),
                 },
             },
         });
@@ -149,16 +153,17 @@ export class RoomRepository {
 
     private getSectionsQueryForUpdate(sections: IncludeIdToArray<SectionRoomSchemaDto>, sectionsToDelete: string[]) {
         const query = {
-            update: sections?.map(section => {
+            upsert: sections?.map(section => {
                 return {
                     where: {
                         id: section.id,
                     },
-                    data: {
+                    update: {
                         floorNumber: section.floorNumber,
                         roomSectionTypeId: section.roomSectionTypeId,
                         ...this.getSectionAttributeValuesQueryForUpdate(section),
                     },
+                    create: this.getQueryForSectionCreation(section),
                 };
             }),
         };
@@ -240,9 +245,15 @@ export class RoomRepository {
             where: {
                 id: roomId,
             },
+            omit: {
+                roomTypeId: true,
+                districtId: true,
+                cityId: true,
+            },
             include: {
                 roomType: {
                     select: {
+                        id: true,
                         [locale]: true,
                     },
                 },
@@ -283,11 +294,13 @@ export class RoomRepository {
                 },
                 district: {
                     select: {
+                        id: true,
                         [locale]: true,
                     },
                 },
                 city: {
                     select: {
+                        id: true,
                         [locale]: true,
                     },
                 },
@@ -333,20 +346,28 @@ export class RoomRepository {
                     lte: filters?.square?.max,
                 },
             },
+            omit: {
+                cityId: true,
+                districtId: true,
+                roomTypeId: true,
+            },
             include: {
                 roomType: {
                     select: {
+                        id: true,
                         [locale]: true,
                     },
                 },
                 roomImages: true,
                 district: {
                     select: {
+                        id: true,
                         [locale]: true,
                     },
                 },
                 city: {
                     select: {
+                        id: true,
                         [locale]: true,
                     },
                 },
