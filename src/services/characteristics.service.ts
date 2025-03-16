@@ -10,6 +10,7 @@ import { CharType } from '../models/enums/char-type.enum';
 import { CommonRepository } from '../repositories/common.repository';
 import { DetailsService } from './details.service';
 import { CharacteristicsRepository } from '../repositories/characteristics.repository';
+import { transformQueryResult } from '../utils/transform-query-result.utils';
 
 @Injectable()
 export class CharacteristicsService {
@@ -22,13 +23,24 @@ export class CharacteristicsService {
 
     public async getAllCharacteristics(name: string, page: number, limit: number, locale: Locale) {
         const { skip, take } = calculatePaginationData(page, limit);
-        return this.detailsRepository.getAll(
+        const characteristics = await this.detailsRepository.getAll(
             locale,
             skip,
             take,
             this.detailsService.getNameFilter(locale, name),
             'characteristic',
             this.detailsService.obtainParamsForGetQuery('characteristicNAttributeFields', 'attribute', locale),
+        );
+
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    characteristicNAttributeFields: 'attributes',
+                    [locale]: 'name',
+                },
+                objectParsingSequence: ['attributes', 'attribute'],
+            },
+            characteristics,
         );
     }
 
@@ -56,7 +68,27 @@ export class CharacteristicsService {
     }
 
     public async getDefaultCharacteristicsByRoomTypeId(roomTypeId: string, locale: Locale) {
-        return this.characteristicsRepository.getDefaultCharacteristicsByRoomTypeId(roomTypeId, locale);
+        const defaultCharacteristics = await this.characteristicsRepository.getDefaultCharacteristicsByRoomTypeId(
+            roomTypeId,
+            locale,
+        );
+
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    characteristicNAttributeFields: 'attributes',
+                    [locale]: 'name',
+                },
+                objectParsingSequence: [
+                    'sectionType',
+                    'characteristicNSectionFields',
+                    'characteristic',
+                    'attributes',
+                    'attribute',
+                ],
+            },
+            defaultCharacteristics,
+        );
     }
 
     public async updateCharacteristic(body: UpdateCharacteristicRequestDto, id: string) {

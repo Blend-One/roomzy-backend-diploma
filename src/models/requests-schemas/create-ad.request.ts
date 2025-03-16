@@ -31,6 +31,7 @@ export const CreateRoomSchema = z
         lon: getZodNumberValidator(ROOM_ERRORS.COORDINATES_ARE_MISSED),
         appartment: z.string().optional(),
         sections: z.string().optional(),
+        defaultOptions: z.string().optional(),
     })
     .optional();
 

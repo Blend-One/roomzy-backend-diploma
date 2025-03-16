@@ -3,6 +3,7 @@ import { Locale } from '../models/enums/locale.enum';
 import { DetailsRepository } from '../repositories/details.repository';
 import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
 import { DetailsRequestSchemaDto, UpdateDetailsRequestSchemaDto } from '../models/requests-schemas/details.request';
+import { transformQueryResult } from '../utils/transform-query-result.utils';
 
 @Injectable()
 export class AttributeService {
@@ -10,7 +11,7 @@ export class AttributeService {
 
     public async getAllAttributes(name: string, page: number, limit: number, locale: Locale) {
         const { skip, take } = calculatePaginationData(page, limit);
-        return this.detailsRepository.getAll(
+        const attributes = await this.detailsRepository.getAll(
             locale,
             skip,
             take,
@@ -22,6 +23,16 @@ export class AttributeService {
             'attribute',
             {},
         );
+
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    [locale]: 'name',
+                },
+                objectParsingSequence: [],
+            },
+            attributes,
+        );
     }
 
     public async createAttribute(body: DetailsRequestSchemaDto) {
@@ -29,7 +40,16 @@ export class AttributeService {
     }
 
     public async getAttribute(locale: Locale, id: string) {
-        return this.detailsRepository.getOne(locale, id, {}, 'attribute');
+        const attribute = await this.detailsRepository.getOne(locale, id, {}, 'attribute');
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    [locale]: 'name',
+                },
+                objectParsingSequence: [],
+            },
+            attribute,
+        );
     }
 
     public async updateAttribute(body: UpdateDetailsRequestSchemaDto, id: string) {

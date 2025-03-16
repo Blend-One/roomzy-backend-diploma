@@ -15,8 +15,6 @@ export class CharacteristicsRepository {
                     joinedField: 'sectionType',
                 },
                 {
-                    withId: true,
-                    withLocale: true,
                     joinedField: 'characteristicNSectionFields',
                 },
                 {
@@ -43,7 +41,7 @@ export class CharacteristicsRepository {
         return this.prisma.roomTypeAndSection.findFirst({
             where: {
                 roomTypeId,
-                sectionTypeId: DEFAULT_SECTION,
+                sectionTypeId: 'BEDROOM',
             },
             select: relationsQuery,
         });

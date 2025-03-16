@@ -21,6 +21,7 @@ export const UpdateRoomSchema = z
         lon: getZodNumberValidator(ROOM_ERRORS.COORDINATES_ARE_MISSED).optional(),
         appartment: z.string().optional(),
         sections: z.string().optional(),
+        defaultOptions: z.string().optional(),
         sectionsToDelete: z.string().optional(),
         imagesToDelete: z.string().optional(),
     })
