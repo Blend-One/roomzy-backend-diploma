@@ -15,9 +15,10 @@ import {
     UpdateRoomTypeSchema,
 } from '../models/requests-schemas/create-room-type.request';
 import { RoomTypesService } from '../services/room-types.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiBearerAuth()
 @ApiTags(API_TAGS.ROOM_TYPES)
 @Controller({ path: ROOM_TYPES_ROUTES.DEFAULT })
 export class RoomTypesController {

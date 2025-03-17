@@ -15,9 +15,10 @@ import {
     UpdateDetailsRequestSchema,
     UpdateDetailsRequestSchemaDto,
 } from '../models/requests-schemas/details.request';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiBearerAuth()
 @ApiTags(API_TAGS.ATTRIBUTES)
 @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
 @Controller({ path: ATTRIBUTE_ROUTES.DEFAULT })

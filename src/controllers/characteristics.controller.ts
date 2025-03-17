@@ -15,9 +15,10 @@ import {
     UpdateCharacteristicSchema,
 } from 'models/requests-schemas/create-characteristic.request';
 import { CharacteristicsService } from 'services/characteristics.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiBearerAuth()
 @ApiTags(API_TAGS.CHARACTERISTICS)
 @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
 @Controller({ path: CHARACTERISTICS_ROUTES.DEFAULT })
