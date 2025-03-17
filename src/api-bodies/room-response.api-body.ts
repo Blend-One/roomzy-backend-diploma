@@ -3,7 +3,7 @@ import { BasicRoomDto } from './basic-room.api-body';
 import { IdWithNameDto } from './id-with-name.api-body';
 import { RoomImageDto } from './room-image.api-body';
 
-export class RoomDto extends BasicRoomDto {
+export class AdResponse extends BasicRoomDto {
     @ApiProperty({
         type: String,
         example: '93203baa-fc7d-4c0e-ab3c-5f2269d2f181',
@@ -20,27 +20,31 @@ export class RoomDto extends BasicRoomDto {
 
     @ApiProperty({
         type: String,
-        example: 'OPENED',
-        description: 'Status of the room.',
+        example: 'APARTMENT',
+        description: 'The type of the room.',
     })
-    status: string;
+    roomTypeId: string;
 
     @ApiProperty({
-        type: Boolean,
-        example: false,
-        description: 'Whether physical control is required for the room.',
+        type: String,
+        example: 'ASTANA',
+        description: 'The ID of the city where the room is located.',
     })
-    physControl: boolean;
+    cityId: string;
 
     @ApiProperty({
-        type: IdWithNameDto,
-        example: {
-            id: 'APARTMENT',
-            name: 'Пәтер',
-        },
-        description: 'Room type information.',
+        type: String,
+        example: 'ASTANA_SARYARKA',
+        description: 'The ID of the district where the room is located.',
     })
-    roomType: IdWithNameDto;
+    districtId: string;
+}
+
+export class RoomResponseDto {
+    @ApiProperty({
+        type: AdResponse,
+    })
+    ad: AdResponse;
 
     @ApiProperty({
         type: [RoomImageDto],
@@ -54,25 +58,5 @@ export class RoomDto extends BasicRoomDto {
         ],
         description: 'List of images associated with the room.',
     })
-    roomImages: IdWithNameDto[];
-
-    @ApiProperty({
-        type: IdWithNameDto,
-        example: {
-            id: 'ALMATY_ALMALINSKY',
-            name: 'Алмалы',
-        },
-        description: 'District information for the room.',
-    })
-    district: IdWithNameDto;
-
-    @ApiProperty({
-        type: IdWithNameDto,
-        example: {
-            id: 'ALMATY',
-            name: 'Алматы',
-        },
-        description: 'City information for the room.',
-    })
-    city: IdWithNameDto;
+    imageRecords: IdWithNameDto[];
 }

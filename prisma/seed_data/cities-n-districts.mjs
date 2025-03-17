@@ -15,7 +15,7 @@ export const citiesNDistricts = [
     {
         ru: 'Астана',
         en: 'Astana',
-        kz: 'Нұр-Сұлтан',
+        kz: 'Астана',
         districts: [
             { ru: 'Алматинский', en: 'Almaty', kz: 'Алматы' },
             { ru: 'Есильский', en: 'Esil', kz: 'Есіл' },

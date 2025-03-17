@@ -8,15 +8,15 @@ import { getLanguageHeader } from 'utils/request.utils';
 import { FALLBACK_LANGUAGE } from 'constants/dict.constants';
 import { ZodValidationPipe } from 'pipes/zod-validation.pipe';
 import { SECTION_TYPES_ROUTES } from 'routes/section-types.routes';
-import { SectionTypesService } from '../services/section-types.service';
+import { SectionTypesService } from 'services/section-types.service';
 import {
     CreateSectionTypeRequestDto,
     CreateSectionTypeSchema,
     UpdateSectionTypeRequestDto,
     UpdateSectionTypeSchema,
-} from '../models/requests-schemas/create-section-type.request';
+} from 'models/requests-schemas/create-section-type.request';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { API_TAGS } from '../constants/api-tags.constants';
+import { API_TAGS } from 'constants/api-tags.constants';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.SECTION_TYPES)
