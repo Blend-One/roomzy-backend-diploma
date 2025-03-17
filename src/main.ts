@@ -2,10 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { SWAGGER_TITLE } from './constants/swagger.constants';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
     app.enableCors({ origin: true, credentials: true });
+
+    app.disable('x-powered-by');
 
     const config = new DocumentBuilder()
         .addGlobalParameters({

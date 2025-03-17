@@ -4,8 +4,8 @@ import { Paginated } from '../../types/paginated.types';
 
 interface SectionValue {
     floorNumber: number;
-    sectionTypeId: string;
-    values: Record<string, string>;
+    roomSectionTypeId: string;
+    sectionAttributeValues: Record<string, string>;
 }
 
 export interface FiltersDto {
