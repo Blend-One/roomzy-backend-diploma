@@ -50,6 +50,7 @@ import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params
 import { FilterParsePipe } from '../pipes/filter-parse.pipe';
 import { FiltersDocsDto } from '../api-bodies/filter.api-body';
 import { StatusDto } from '../api-bodies/status.api-body';
+import { UpdateRoomDto } from '../api-bodies/update-room.api-body';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.ROOMS)
@@ -178,6 +179,8 @@ export class RoomController {
 
     @ApiOperation({ summary: 'Update room' })
     @ApiConsumes(MULTIPART_CONTENT_TYPE)
+    @ApiBody({ type: UpdateRoomDto })
+    @ApiOkResponse({ type: RoomResponseDto })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER, Role.MANAGER], UserStatus.ACTIVE))
     @UseInterceptors(FilesInterceptor(FILE_PROPERTY_NAME))
     @Patch(ROOM_ROUTES.UPDATE_AD)
