@@ -1,0 +1,10 @@
+model Characteristic {
+  id String @id @default(uuid())
+  fallbackName String
+  ru String?
+  kz String?
+  type String
+  sectionAttributeValues SectionAttributeValue[]
+  characteristicNSectionFields CharacteristicAndSection[]
+  characteristicNAttributeFields CharacteristicAndAttribute[]
+}

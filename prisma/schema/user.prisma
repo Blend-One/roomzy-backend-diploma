@@ -6,6 +6,7 @@ model User {
   firstName String?
   secondName String?
   avatarImageUrl String?
+  status String
   roleId String
   role Role @relation(fields: [roleId], references: [id])
   tokens Token[]

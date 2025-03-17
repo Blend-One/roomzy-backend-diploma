@@ -1,7 +1,8 @@
 model Attribute {
   id String @id @default(uuid())
-  name String
-  attributeTypeId String
-  parentAttributeRelationships AttributeRelationship[] @relation("ParentRelation")
-  childAttributeRelationships AttributeRelationship[] @relation("ChildRelation")
+  fallbackName String
+  ru String?
+  kz String?
+  characteristicNAttributeFields CharacteristicAndAttribute[]
+  sectionAttributeValues SectionAttributeValue[]
 }

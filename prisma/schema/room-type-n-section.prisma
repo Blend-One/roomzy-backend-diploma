@@ -1,0 +1,7 @@
+model RoomTypeAndSection {
+  id String @id @default(uuid())
+  roomTypeId String
+  sectionTypeId String
+  sectionType RoomSectionType @relation(fields: [sectionTypeId], references: [id], onDelete: Cascade)
+  roomType RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+}

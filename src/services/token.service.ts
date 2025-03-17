@@ -27,7 +27,7 @@ export class TokenService {
     }
 
     public extractToken(request: Request, headerName: string) {
-        return request.headers[headerName]?.split(' ')[1];
+        return request?.headers[headerName]?.split(' ')[1];
     }
 
     public async refreshTokenForUser(refreshToken: string, user: User) {
@@ -82,13 +82,15 @@ export class TokenService {
         headerName,
         validationCallback,
         shouldSkipCondition,
+        req,
     }: {
-        context: ExecutionContext;
+        context?: ExecutionContext;
+        req?: Request;
         headerName: string;
         validationCallback: (token?: string) => unknown;
         shouldSkipCondition?: boolean;
     }) {
-        const request = context.switchToHttp().getRequest<Request>();
+        const request = context ? context.switchToHttp().getRequest<Request>() : (req ?? ({} as Request));
         const token = this.extractToken(request, headerName.toLowerCase()) as string;
         const result = validationCallback(token);
 

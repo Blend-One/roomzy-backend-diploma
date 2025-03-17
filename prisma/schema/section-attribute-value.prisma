@@ -1,10 +1,10 @@
 model SectionAttributeValue {
   id String @id @default(uuid())
   roomSectionId String
-  roomSectionTypeId String
+  attributeId String?
   value String
-  attributeTypeId String
-  roomSection RoomSection @relation(fields: [roomSectionId], references: [id])
-  roomSectionType RoomSectionType @relation(fields: [roomSectionTypeId], references: [id])
-  attributeType AttributeType @relation(fields: [attributeTypeId], references: [id])
+  characteristicId String
+  roomSection RoomSection @relation(fields: [roomSectionId], references: [id], onDelete: Cascade)
+  characteristic Characteristic @relation(fields: [characteristicId], references: [id], onDelete: Cascade)
+  attribute Attribute? @relation(fields: [attributeId], references: [id], onDelete: Cascade)
 }

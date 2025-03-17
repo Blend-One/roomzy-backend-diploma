@@ -1,5 +1,8 @@
 model RoomType {
   id String @id @default(uuid())
-  name String @unique
-  sectionTypes RoomSectionType[]
+  fallbackName String @unique
+  ru String?
+  kz String?
+  roomTypeNSectionFields RoomTypeAndSection[]
+  rooms Room[]
 }

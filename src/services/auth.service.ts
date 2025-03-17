@@ -8,7 +8,7 @@ export class AuthService {
 
     public async throwExceptionDueToNotValidPassword(hash: string, password: string): Promise<void> {
         const areEqual = compareSync(password, hash);
-        if (!areEqual) throw new BadRequestException(AUTH_ERRORS.PASSWORDS_ARE_NOT_EQUAL);
+        if (!areEqual) throw new BadRequestException(AUTH_ERRORS.INVALID_PASSWORD);
     }
 
     public hashPassword(password: string) {

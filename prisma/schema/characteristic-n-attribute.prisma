@@ -1,0 +1,7 @@
+model CharacteristicAndAttribute {
+  id String @id @default(uuid())
+  characteristicId String
+  attributeId String
+  attribute Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  characteristic Characteristic @relation(fields: [characteristicId], references: [id], onDelete: Cascade)
+}
