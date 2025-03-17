@@ -91,77 +91,80 @@ async function main() {
             }),
             overrideDefaultParams: true,
         }),
-        upsertDictData({
-            data: sectionTypes,
-            columnName: 'roomSectionType',
-            getAdditionalParams: field => ({
-                ru: field.ru,
-                fallbackName: field.ru,
-                kz: field.kz,
-                id: field.id,
-            }),
-            overrideDefaultParams: true,
-            additionalCallback: async field => {
-                return upsertDictData({
-                    data: field.roomTypes,
-                    columnName: 'roomTypeAndSection',
-                    getAdditionalParams: roomTypeField => ({
-                        roomTypeId: roomTypeField,
-                        sectionTypeId: field.id,
-                        id: `${roomTypeField}_${field.id}`,
-                    }),
-                    overrideDefaultParams: true,
-                });
-            },
-        }),
-        upsertDictData({
-            data: roomCharacteristics,
-            columnName: 'characteristic',
-            getAdditionalParams: field => ({
-                ru: field.ru,
-                fallbackName: field.ru,
-                kz: field.kz,
-                id: field.id,
-                type: field.type,
-            }),
-            overrideDefaultParams: true,
-            additionalCallback: async field => {
-                return upsertDictData({
-                    data: field.roomSectionTypes,
-                    columnName: 'characteristicAndSection',
-                    getAdditionalParams: sectionTypeField => ({
-                        characteristicId: field.id,
-                        sectionTypeId: sectionTypeField,
-                        id: `${sectionTypeField}_${field.id}`,
-                    }),
-                    overrideDefaultParams: true,
-                });
-            },
-        }),
-        upsertDictData({
-            data: roomAttributes,
-            columnName: 'attribute',
-            getAdditionalParams: field => ({
-                ru: field.ru,
-                fallbackName: field.ru,
-                kz: field.kz,
-                id: field.id,
-            }),
-            overrideDefaultParams: true,
-            additionalCallback: async field => {
-                return upsertDictData({
-                    data: field.roomCharacteristics,
-                    columnName: 'characteristicAndAttribute',
-                    getAdditionalParams: roomCharacteristicField => ({
-                        characteristicId: roomCharacteristicField,
-                        attributeId: field.id,
-                        id: `${roomCharacteristicField}_${field.id}`,
-                    }),
-                    overrideDefaultParams: true,
-                });
-            },
-        }),
     ]);
+
+    await upsertDictData({
+        data: sectionTypes,
+        columnName: 'roomSectionType',
+        getAdditionalParams: field => ({
+            ru: field.ru,
+            fallbackName: field.ru,
+            kz: field.kz,
+            id: field.id,
+        }),
+        overrideDefaultParams: true,
+        additionalCallback: async field => {
+            return upsertDictData({
+                data: field.roomTypes,
+                columnName: 'roomTypeAndSection',
+                getAdditionalParams: roomTypeField => ({
+                    roomTypeId: roomTypeField,
+                    sectionTypeId: field.id,
+                    id: `${roomTypeField}_${field.id}`,
+                }),
+                overrideDefaultParams: true,
+            });
+        },
+    });
+
+    await upsertDictData({
+        data: roomCharacteristics,
+        columnName: 'characteristic',
+        getAdditionalParams: field => ({
+            ru: field.ru,
+            fallbackName: field.ru,
+            kz: field.kz,
+            id: field.id,
+            type: field.type,
+        }),
+        overrideDefaultParams: true,
+        additionalCallback: async field => {
+            return upsertDictData({
+                data: field.roomSectionTypes,
+                columnName: 'characteristicAndSection',
+                getAdditionalParams: sectionTypeField => ({
+                    characteristicId: field.id,
+                    sectionTypeId: sectionTypeField,
+                    id: `${sectionTypeField}_${field.id}`,
+                }),
+                overrideDefaultParams: true,
+            });
+        },
+    });
+
+    await upsertDictData({
+        data: roomAttributes,
+        columnName: 'attribute',
+        getAdditionalParams: field => ({
+            ru: field.ru,
+            fallbackName: field.ru,
+            kz: field.kz,
+            id: field.id,
+        }),
+        overrideDefaultParams: true,
+        additionalCallback: async field => {
+            return upsertDictData({
+                data: field.roomCharacteristics,
+                columnName: 'characteristicAndAttribute',
+                getAdditionalParams: roomCharacteristicField => ({
+                    characteristicId: roomCharacteristicField,
+                    attributeId: field.id,
+                    id: `${roomCharacteristicField}_${field.id}`,
+                }),
+                overrideDefaultParams: true,
+            });
+        },
+    });
 
     console.info('Data seeded successfully');
 }
