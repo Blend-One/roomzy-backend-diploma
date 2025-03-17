@@ -6,7 +6,7 @@ import { S3Bucket } from 'models/enums/s3-bucket.enum';
 import { Response } from 'express';
 import { setCacheControlHeader } from '../utils/response.utils';
 import { CACHE_IMAGE_CONTROL, CACHE_IMAGE_CONTROL_PRIVATE } from '../constants/response.constants';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 
 @ApiTags(API_TAGS.IMAGES)
@@ -14,6 +14,7 @@ import { API_TAGS } from '../constants/api-tags.constants';
 export class ImageController {
     constructor(private s3Service: S3Service) {}
 
+    @ApiOperation({ summary: 'Get image by id' })
     @Get(IMAGE_ROUTES.GET_ROOM_IMAGE)
     public async getRoomImage(@Param('imageId') imageId: string, @Res() response: Response) {
         const file = await this.s3Service.getFile(S3Bucket.PHOTOS, imageId);
@@ -22,6 +23,7 @@ export class ImageController {
         (file.Body as { pipe: (response: Response) => void }).pipe(response);
     }
 
+    @ApiOperation({ summary: 'Get image from controversial issues bucket by id (authorization is required)' })
     @UseGuards(AuthCheckerGuard)
     @Get(IMAGE_ROUTES.GET_CONTROVERSIAL_ISSUE_IMAGE)
     public async getControversialIssueImage(@Param('imageId') imageId: string, @Res() response: Response) {
