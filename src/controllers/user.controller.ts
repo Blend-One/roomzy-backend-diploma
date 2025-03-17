@@ -3,12 +3,11 @@ import { USER_ROUTES } from 'routes/user.routes';
 import { UserService } from 'services/user.service';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { AuthRequestDto, AuthSchema } from '../models/requests-schemas/auth.request';
-import { AuthCheckerGuard } from '../guards/auth-checker.guard';
 import { RefreshTokenCheckerGuard } from '../guards/refresh-token-checker.guard';
 import { API_TAGS } from '../constants/api-tags.constants';
 import { ApiBody, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthUserDto } from '../api-bodies/user-auth.api-body';
-import { AUTHORIZATION_HEADER, REFRESH_TOKEN_HEADER } from '../constants/tokens.constants';
+import { REFRESH_TOKEN_HEADER } from '../constants/tokens.constants';
 
 @ApiTags(API_TAGS.USERS)
 @Controller({ path: USER_ROUTES.DEFAULT })
@@ -46,15 +45,9 @@ export class UserController {
     @ApiOperation({ summary: 'Logging out with the user' })
     @ApiHeader({
         name: REFRESH_TOKEN_HEADER,
-        description: 'Refresh token for bearer token re-generation',
+        description: 'Refresh token for logging out',
         required: true,
     })
-    @ApiHeader({
-        name: AUTHORIZATION_HEADER,
-        description: 'Bearer token to authenticate the user',
-        required: true,
-    })
-    @UseGuards(AuthCheckerGuard, RefreshTokenCheckerGuard)
     @Post(USER_ROUTES.LOGOUT)
     public async logout(@Request() request: Request) {
         return this.userService.logout(request);

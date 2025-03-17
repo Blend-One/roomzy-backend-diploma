@@ -15,27 +15,38 @@ import {
     UpdateRoomTypeSchema,
 } from '../models/requests-schemas/create-room-type.request';
 import { RoomTypesService } from '../services/room-types.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiBearerAuth()
 @ApiTags(API_TAGS.ROOM_TYPES)
 @Controller({ path: ROOM_TYPES_ROUTES.DEFAULT })
 export class RoomTypesController {
     constructor(private readonly roomTypesService: RoomTypesService) {}
 
-    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER, Role.USER], UserStatus.ACTIVE))
+    @ApiOperation({
+        summary: 'Get room type. Sections and its characteristics with attributes are included.',
+        description:
+            'Required to use this endpoint for getting necessary attributes depending on the specific room type',
+    })
     @Get(ROOM_TYPES_ROUTES.GET_SECTIONS_AND_CHARS_BY_ROOM_TYPE)
     public async getRoomTypeWithSections(@Req() request: Request, @Param('roomTypeId') roomTypeId: string) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
         return this.roomTypesService.getRoomTypeWithSectionsAndChars(roomTypeId, locale);
     }
 
+    @ApiOperation({
+        summary: 'Create room type. Section types should be provided in order',
+    })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Post(ROOM_TYPES_ROUTES.CREATE_ROOM_TYPE)
     public async createRoomType(@Body(new ZodValidationPipe(CreateRoomTypeSchema)) body: CreateRoomTypeRequestDto) {
         return this.roomTypesService.createRoomType(body);
     }
 
+    @ApiOperation({
+        summary: 'Update room type',
+    })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Patch(ROOM_TYPES_ROUTES.UPDATE_ROOM_TYPE)
     public async updateRoomType(

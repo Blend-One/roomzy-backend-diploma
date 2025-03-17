@@ -379,14 +379,14 @@ export class RoomRepository {
         if (!!filters?.sections?.length) {
             query.where['roomSections'] = {
                 some: {
-                    OR: filters?.sections?.map(({ floorNumber, sectionTypeId, values }) => ({
+                    OR: filters?.sections?.map(({ floorNumber, roomSectionTypeId, sectionAttributeValues }) => ({
                         floorNumber,
-                        roomSectionTypeId: sectionTypeId,
-                        sectionAttributeValues: !values
+                        roomSectionTypeId: roomSectionTypeId,
+                        sectionAttributeValues: !sectionAttributeValues
                             ? {}
                             : {
                                   some: {
-                                      OR: Object.entries(values).map(([key, value]) => ({
+                                      OR: Object.entries(sectionAttributeValues).map(([key, value]) => ({
                                           attributeId: value,
                                           characteristicId: key,
                                       })),

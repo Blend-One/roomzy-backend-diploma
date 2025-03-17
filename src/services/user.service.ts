@@ -51,9 +51,7 @@ export class UserService {
         try {
             await this.tokenRepository.deletesUserTokenByValue(token);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error: unknown) {
-            throw new UnauthorizedException(AUTH_ERRORS.UNAUTHORIZED);
-        }
+        } catch (error: unknown) {}
         return { message: HttpStatus.OK };
     }
 }

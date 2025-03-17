@@ -8,22 +8,29 @@ import { getLanguageHeader } from 'utils/request.utils';
 import { FALLBACK_LANGUAGE } from 'constants/dict.constants';
 import { ZodValidationPipe } from 'pipes/zod-validation.pipe';
 import { SECTION_TYPES_ROUTES } from 'routes/section-types.routes';
-import { SectionTypesService } from '../services/section-types.service';
+import { SectionTypesService } from 'services/section-types.service';
 import {
     CreateSectionTypeRequestDto,
     CreateSectionTypeSchema,
     UpdateSectionTypeRequestDto,
     UpdateSectionTypeSchema,
-} from '../models/requests-schemas/create-section-type.request';
-import { ApiTags } from '@nestjs/swagger';
-import { API_TAGS } from '../constants/api-tags.constants';
+} from 'models/requests-schemas/create-section-type.request';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { API_TAGS } from 'constants/api-tags.constants';
+import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
 
+@ApiBearerAuth()
 @ApiTags(API_TAGS.SECTION_TYPES)
 @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
 @Controller({ path: SECTION_TYPES_ROUTES.DEFAULT })
 export class SectionTypesController {
     constructor(private readonly sectionTypeService: SectionTypesService) {}
 
+    @ApiOperation({
+        summary: 'Get section types',
+    })
+    @PaginationQueryParamsDocs()
+    @ApiQuery({ name: 'name', required: false, description: "Name of section's type" })
     @Get(SECTION_TYPES_ROUTES.GET_ALL_SECTION_TYPES)
     public async getAllSectionTypes(
         @Req() request: Request,
@@ -35,6 +42,9 @@ export class SectionTypesController {
         return this.sectionTypeService.getAllSectionTypes(name, page, limit, locale);
     }
 
+    @ApiOperation({
+        summary: 'Create section type. Related characteristics should be provided',
+    })
     @Post(SECTION_TYPES_ROUTES.CREATE_SECTION_TYPE)
     public async createSectionType(
         @Body(new ZodValidationPipe(CreateSectionTypeSchema)) body: CreateSectionTypeRequestDto,
@@ -42,17 +52,26 @@ export class SectionTypesController {
         return this.sectionTypeService.createSectionType(body);
     }
 
+    @ApiOperation({
+        summary: 'Delete section type. Relations with characteristics will be deleted',
+    })
     @Delete(SECTION_TYPES_ROUTES.DELETE_SECTION_TYPE)
     public async deleteSectionTypeById(@Param('id') characteristicId: string) {
         return this.sectionTypeService.deleteSectionType(characteristicId);
     }
 
+    @ApiOperation({
+        summary: 'Get single section type. Characteristics are included',
+    })
     @Get(SECTION_TYPES_ROUTES.GET_SECTION_TYPE)
     public async getSectionTypeById(@Req() request: Request, @Param('id') sectionTypeId: string) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
         return this.sectionTypeService.getSectionType(locale, sectionTypeId);
     }
 
+    @ApiOperation({
+        summary: 'Update section type',
+    })
     @Patch(SECTION_TYPES_ROUTES.UPDATE_SECTION_TYPE)
     public async updateSectionType(
         @Param('id') attributeId: string,

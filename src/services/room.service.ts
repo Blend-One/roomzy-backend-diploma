@@ -2,7 +2,6 @@ import { BadRequestException, ForbiddenException, HttpStatus, Injectable, NotFou
 import { CreateRoomRequestDto } from 'models/requests-schemas/create-ad.request';
 import { CommonRepository } from 'repositories/common.repository';
 import { ImageRepository } from 'repositories/image.repository';
-import { SectionsRepository } from 'repositories/sections.repository';
 import { RoomRepository } from 'repositories/room.repository';
 import { SharpService } from './sharp.service';
 import { S3Service } from './s3.service';
@@ -26,7 +25,6 @@ import { transformQueryResult } from '../utils/transform-query-result.utils';
 export class RoomService {
     constructor(
         private imageRepository: ImageRepository,
-        private sectionsRepository: SectionsRepository,
         private roomRepository: RoomRepository,
         private commonRepository: CommonRepository,
         private sharpService: SharpService,
