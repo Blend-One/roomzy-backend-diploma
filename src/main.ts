@@ -11,7 +11,7 @@ async function bootstrap() {
     app.disable('x-powered-by');
 
     const config = new DocumentBuilder()
-        .addServer(process.env.NODE_ENV === 'production' ? '/api' : '')
+        .addServer(process.env.NODE_ENV === 'PRODUCTION' ? '/api' : '')
         .addGlobalParameters({
             in: 'header',
             required: false,
