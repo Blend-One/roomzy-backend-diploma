@@ -15,8 +15,9 @@ import {
     UpdateSectionTypeRequestDto,
     UpdateSectionTypeSchema,
 } from 'models/requests-schemas/create-section-type.request';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from 'constants/api-tags.constants';
+import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.SECTION_TYPES)
@@ -25,6 +26,8 @@ import { API_TAGS } from 'constants/api-tags.constants';
 export class SectionTypesController {
     constructor(private readonly sectionTypeService: SectionTypesService) {}
 
+    @PaginationQueryParamsDocs()
+    @ApiQuery({ name: 'name', required: false, description: "Name of section's type" })
     @Get(SECTION_TYPES_ROUTES.GET_ALL_SECTION_TYPES)
     public async getAllSectionTypes(
         @Req() request: Request,

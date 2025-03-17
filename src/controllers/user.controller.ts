@@ -45,7 +45,7 @@ export class UserController {
     @ApiOperation({ summary: 'Logging out with the user' })
     @ApiHeader({
         name: REFRESH_TOKEN_HEADER,
-        description: 'Refresh token for bearer token re-generation',
+        description: 'Refresh token for logging out',
         required: true,
     })
     @Post(USER_ROUTES.LOGOUT)

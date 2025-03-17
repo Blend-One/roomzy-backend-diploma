@@ -15,8 +15,9 @@ import {
     UpdateCharacteristicSchema,
 } from 'models/requests-schemas/create-characteristic.request';
 import { CharacteristicsService } from 'services/characteristics.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
+import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.CHARACTERISTICS)
@@ -26,6 +27,8 @@ export class CharacteristicsController {
     constructor(private readonly characteristicService: CharacteristicsService) {}
 
     @Get(CHARACTERISTICS_ROUTES.GET_ALL_CHARACTERISTICS)
+    @PaginationQueryParamsDocs()
+    @ApiQuery({ name: 'name', required: false, description: 'Name of characteristic' })
     public async getAllAttributes(
         @Req() request: Request,
         @Query('name') name: string,

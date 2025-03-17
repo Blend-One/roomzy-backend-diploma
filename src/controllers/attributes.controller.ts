@@ -15,8 +15,9 @@ import {
     UpdateDetailsRequestSchema,
     UpdateDetailsRequestSchemaDto,
 } from '../models/requests-schemas/details.request';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
+import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.ATTRIBUTES)
@@ -26,6 +27,8 @@ export class AttributesController {
     constructor(private readonly attributesService: AttributeService) {}
 
     @Get(ATTRIBUTE_ROUTES.GET_ALL_ATTRIBUTES)
+    @PaginationQueryParamsDocs()
+    @ApiQuery({ name: 'name', required: false, description: 'Name of attribute' })
     public async getAllAttributes(
         @Req() request: Request,
         @Query('name') name: string,

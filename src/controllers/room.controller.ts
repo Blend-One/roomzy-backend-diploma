@@ -37,6 +37,7 @@ import {
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiQuery,
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
@@ -46,6 +47,7 @@ import { CreateRoomDto } from '../api-bodies/create-room.api-body';
 import { RoomDto } from '../api-bodies/room.api-body';
 import { RoomResponseDto } from '../api-bodies/room-response.api-body';
 import { RoomWithSectionsDto } from '../api-bodies/room-with-sections.api-body';
+import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.ROOMS)
@@ -70,7 +72,9 @@ export class RoomController {
         return this.roomService.createAd(body as Required<CreateRoomRequestDto>, images, request);
     }
 
+    @PaginationQueryParamsDocs()
     @ApiOperation({ summary: 'Get rooms' })
+    @ApiQuery({ name: 'filters', required: false, description: 'Filters' })
     @ApiOkResponse({ type: [RoomDto] })
     @Get(ROOM_ROUTES.GET_ADS)
     public async getAds(
@@ -84,6 +88,8 @@ export class RoomController {
     }
 
     @ApiOperation({ summary: 'Get personal rooms' })
+    @PaginationQueryParamsDocs()
+    @ApiQuery({ name: 'status', required: false, description: 'Room status' })
     @ApiOkResponse({ type: [RoomDto] })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @Get(ROOM_ROUTES.GET_PERSONAL_ADS)
@@ -116,6 +122,8 @@ export class RoomController {
     }
 
     @ApiOperation({ summary: 'Get room in moderation status' })
+    @PaginationQueryParamsDocs()
+    @ApiQuery({ name: 'filters', required: false, description: 'Filters' })
     @ApiOkResponse({ type: [RoomDto] })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Get(ROOM_ROUTES.GET_MODERATION_ADS)
