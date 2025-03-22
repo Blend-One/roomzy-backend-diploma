@@ -74,54 +74,64 @@ export class RoomService {
             sections,
             defaultOptions,
         );
-        const result = await this.commonRepository.createTransactionWithCallback(async prisma => {
-            const ad = await this.roomRepository.createAd({
-                room: roomValues,
-                sections: transformedSections,
-                transactionPrisma: prisma,
-                userId: user.id,
-            });
+        const result = await this.commonRepository
+            .createTransactionWithCallback(async prisma => {
+                const ad = await this.roomRepository.createAd({
+                    room: roomValues,
+                    sections: transformedSections,
+                    transactionPrisma: prisma,
+                    userId: user.id,
+                });
 
-            const imageRecords = await this.imageRepository.bulkCreateImages({
-                files: compressedImages,
-                imageIds,
-                roomId: ad.id,
-                transactionPrisma: prisma,
-            });
+                const imageRecords = await this.imageRepository.bulkCreateImages({
+                    files: compressedImages,
+                    imageIds,
+                    roomId: ad.id,
+                    transactionPrisma: prisma,
+                });
 
-            try {
-                await this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds);
-                return { ad, imageRecords };
-            } catch (err) {
-                throw err;
-            }
-        });
+                try {
+                    await this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds);
+                    return { ad, imageRecords };
+                } catch (err) {
+                    throw err;
+                }
+            })
+            .catch(err => {
+                throw new BadRequestException(err?.meta?.cause ?? ROOM_ERRORS.ERROR_WITH_EXTERNAL_RESOURCE);
+            });
 
         return result;
     }
 
     public async getAds(filters: FiltersDto, locale: Locale, page: number, limit: number) {
         const { take, skip } = calculatePaginationData(page, limit);
-        const ads = await this.roomRepository.getAds(filters, RoomStatus.OPENED, take, skip, locale);
-        return transformQueryResult(
-            {
-                renamedFields: { [locale]: 'name' },
-                objectParsingSequence: ['roomType', 'city', 'district'],
-            },
-            ads,
-        );
+        const [ads, count] = await this.roomRepository.getAds(filters, RoomStatus.OPENED, take, skip, locale);
+        return {
+            ads: transformQueryResult(
+                {
+                    renamedFields: { [locale]: 'name' },
+                    objectParsingSequence: ['roomType', 'city', 'district'],
+                },
+                ads,
+            ),
+            count,
+        };
     }
 
     public async getPersonalAds(status: RoomStatus, locale: Locale, page: number, limit: number, userId: string) {
         const { take, skip } = calculatePaginationData(page, limit);
-        const ads = await this.roomRepository.getAds(null, status, take, skip, locale, userId);
-        return transformQueryResult(
-            {
-                renamedFields: { [locale]: 'name' },
-                objectParsingSequence: ['roomType', 'city', 'district'],
-            },
-            ads,
-        );
+        const [ads, count] = await this.roomRepository.getAds(null, status, take, skip, locale, userId);
+        return {
+            ads: transformQueryResult(
+                {
+                    renamedFields: { [locale]: 'name' },
+                    objectParsingSequence: ['roomType', 'city', 'district'],
+                },
+                ads,
+            ),
+            count,
+        };
     }
 
     public async getAd(id: string, locale: Locale, userId: string | null, userRole: Role | null) {
@@ -184,14 +194,17 @@ export class RoomService {
 
     public async getAdsForModeration(filters: FiltersDto, locale: Locale, page: number, limit: number) {
         const { take, skip } = calculatePaginationData(page, limit);
-        const ads = await this.roomRepository.getAds(filters, RoomStatus.IN_MODERATION, take, skip, locale);
-        return transformQueryResult(
-            {
-                renamedFields: { [locale]: 'name' },
-                objectParsingSequence: ['roomType', 'city', 'district'],
-            },
-            ads,
-        );
+        const [ads, count] = await this.roomRepository.getAds(filters, RoomStatus.IN_MODERATION, take, skip, locale);
+        return {
+            ads: transformQueryResult(
+                {
+                    renamedFields: { [locale]: 'name' },
+                    objectParsingSequence: ['roomType', 'city', 'district'],
+                },
+                ads,
+            ),
+            count,
+        };
     }
 
     public async updateAd(
@@ -258,7 +271,7 @@ export class RoomService {
                 }
             })
             .catch(err => {
-                throw new BadRequestException(ROOM_ERRORS.ROOM_NOT_FOUND);
+                throw new BadRequestException(err?.meta?.cause ?? ROOM_ERRORS.ROOM_NOT_FOUND);
             });
 
         return result;

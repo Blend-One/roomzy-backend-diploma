@@ -2,7 +2,7 @@ import { RoomDto } from './room.api-body';
 import { ApiProperty } from '@nestjs/swagger';
 import { IdWithNameDto } from './id-with-name.api-body';
 
-class CharacteristicWithAttribute {
+class SectionCharAttributeValueDto {
     @ApiProperty({
         type: String,
         example: '3237b5e9-efb2-497c-a759-bee0e4b5d379',
@@ -49,10 +49,10 @@ class RoomSectionDto {
     roomSectionType: IdWithNameDto;
 
     @ApiProperty({
-        type: [CharacteristicWithAttribute],
+        type: [SectionCharAttributeValueDto],
         description: 'Characteristics with attribute values',
     })
-    sectionAttributeValues: CharacteristicWithAttribute[];
+    sectionAttributeValues: SectionCharAttributeValueDto[];
 }
 
 export class RoomWithSectionsDto extends RoomDto {

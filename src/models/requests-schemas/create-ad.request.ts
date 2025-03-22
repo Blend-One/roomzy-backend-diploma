@@ -23,7 +23,7 @@ export const CreateRoomSchema = z
         accessInstructions: z.string().optional(),
         street: getZodStringValidator(ROOM_ERRORS.ADDRESS_IS_MISSED),
         cityId: getZodStringValidator(ROOM_ERRORS.ADDRESS_IS_MISSED),
-        building: getZodNumberValidator(ROOM_ERRORS.ADDRESS_IS_MISSED),
+        building: getZodStringValidator(ROOM_ERRORS.ADDRESS_IS_MISSED),
         districtId: getZodStringValidator(ROOM_ERRORS.ADDRESS_IS_MISSED),
         hasDeposit: getZodBooleanValidator(ROOM_ERRORS.DEPOSIT_FLAG_IS_MISSED),
         isCommercial: getZodBooleanValidator(ROOM_ERRORS.COMMERCIAL_FLAG_IS_MISSED),

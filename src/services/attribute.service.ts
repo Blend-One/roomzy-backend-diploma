@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Locale } from '../models/enums/locale.enum';
 import { DetailsRepository } from '../repositories/details.repository';
 import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
@@ -11,7 +11,7 @@ export class AttributeService {
 
     public async getAllAttributes(name: string, page: number, limit: number, locale: Locale) {
         const { skip, take } = calculatePaginationData(page, limit);
-        const attributes = await this.detailsRepository.getAll(
+        const [attributes, count] = await this.detailsRepository.getAll(
             locale,
             skip,
             take,
@@ -24,19 +24,24 @@ export class AttributeService {
             {},
         );
 
-        return transformQueryResult(
-            {
-                renamedFields: {
-                    [locale]: 'name',
+        return {
+            attributes: transformQueryResult(
+                {
+                    renamedFields: {
+                        [locale]: 'name',
+                    },
+                    objectParsingSequence: [],
                 },
-                objectParsingSequence: [],
-            },
-            attributes,
-        );
+                attributes,
+            ),
+            count,
+        };
     }
 
     public async createAttribute(body: DetailsRequestSchemaDto) {
-        return this.detailsRepository.createOne(body, 'attribute', {});
+        return this.detailsRepository.createOne(body, 'attribute', {}).catch(err => {
+            throw new BadRequestException(err?.meta?.cause);
+        });
     }
 
     public async getAttribute(locale: Locale, id: string) {
@@ -53,10 +58,16 @@ export class AttributeService {
     }
 
     public async updateAttribute(body: UpdateDetailsRequestSchemaDto, id: string) {
-        return this.detailsRepository.updateOne({ body, id, tableName: 'attribute', updatedRelations: {} });
+        return this.detailsRepository
+            .updateOne({ body, id, tableName: 'attribute', updatedRelations: {} })
+            .catch(err => {
+                throw new BadRequestException(err?.meta?.cause);
+            });
     }
 
     public async deleteAttribute(id: string) {
-        return this.detailsRepository.deleteOne(id, 'attribute');
+        return this.detailsRepository.deleteOne(id, 'attribute').catch(err => {
+            throw new BadRequestException(err?.meta?.cause);
+        });
     }
 }

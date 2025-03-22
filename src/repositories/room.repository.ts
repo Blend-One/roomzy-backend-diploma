@@ -396,6 +396,6 @@ export class RoomRepository {
                 },
             };
         }
-        return this.prisma.room.findMany(query);
+        return Promise.all([this.prisma.room.findMany(query), this.prisma.room.count({ where: query.where })]);
     }
 }
