@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, Param, UseGuards, Body, Post, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Query, Req, Param, UseGuards, Body, Post, Patch, Delete, Res } from '@nestjs/common';
 import { AuthCheckerGuard } from 'guards/auth-checker.guard';
 import { getStatusCheckerGuard } from 'guards/user-status-checker.guard';
 import { Role } from 'models/enums/role.enum';
@@ -15,14 +15,36 @@ import {
     UpdateRoomTypeSchema,
 } from '../models/requests-schemas/create-room-type.request';
 import { RoomTypesService } from '../services/room-types.service';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
+import { setXTotalCountHeader } from '../utils/response.utils';
+import { Response } from 'express';
+import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.ROOM_TYPES)
 @Controller({ path: ROOM_TYPES_ROUTES.DEFAULT })
 export class RoomTypesController {
     constructor(private readonly roomTypesService: RoomTypesService) {}
+
+    @ApiOperation({
+        summary: 'Get types of room',
+    })
+    @PaginationQueryParamsDocs()
+    @ApiQuery({ name: 'name', required: false, description: 'Name of characteristic' })
+    @Get(ROOM_TYPES_ROUTES.GET_ROOM_TYPES)
+    public async getRoomTypes(
+        @Req() request: Request,
+        @Res() response: Response,
+        @Query('name') name: string,
+        @Query('page') page: number,
+        @Query('limit') limit: number,
+    ) {
+        const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
+        const { roomTypes, count } = await this.roomTypesService.getAllRoomTypes(name, page, limit, locale);
+        setXTotalCountHeader(response, count);
+        response.json(roomTypes);
+    }
 
     @ApiOperation({
         summary: 'Get room type. Sections and its characteristics with attributes are included.',

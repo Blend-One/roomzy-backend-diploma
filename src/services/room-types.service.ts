@@ -9,6 +9,7 @@ import {
 import { Locale } from '../models/enums/locale.enum';
 import { RoomTypesRepository } from '../repositories/room-types.repository';
 import { transformQueryResult } from '../utils/transform-query-result.utils';
+import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
 
 @Injectable()
 export class RoomTypesService {
@@ -18,6 +19,30 @@ export class RoomTypesService {
         private readonly detailsService: DetailsService,
         private readonly roomTypesRepository: RoomTypesRepository,
     ) {}
+
+    public async getAllRoomTypes(name: string, page: number, limit: number, locale: Locale) {
+        const { skip, take } = calculatePaginationData(page, limit);
+        const [roomTypes, count] = await this.detailsRepository.getAll(
+            locale,
+            skip,
+            take,
+            this.detailsService.getNameFilter(locale, name),
+            'roomType',
+            {},
+        );
+        return {
+            roomTypes: transformQueryResult(
+                {
+                    renamedFields: {
+                        [locale]: 'name',
+                    },
+                    objectParsingSequence: [],
+                },
+                roomTypes,
+            ),
+            count,
+        };
+    }
 
     public async getRoomTypeWithSectionsAndChars(id: string, locale: Locale) {
         const roomType = await this.roomTypesRepository.getRoomTypeById(id, locale);
