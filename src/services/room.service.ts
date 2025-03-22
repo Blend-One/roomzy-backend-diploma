@@ -74,28 +74,32 @@ export class RoomService {
             sections,
             defaultOptions,
         );
-        const result = await this.commonRepository.createTransactionWithCallback(async prisma => {
-            const ad = await this.roomRepository.createAd({
-                room: roomValues,
-                sections: transformedSections,
-                transactionPrisma: prisma,
-                userId: user.id,
-            });
+        const result = await this.commonRepository
+            .createTransactionWithCallback(async prisma => {
+                const ad = await this.roomRepository.createAd({
+                    room: roomValues,
+                    sections: transformedSections,
+                    transactionPrisma: prisma,
+                    userId: user.id,
+                });
 
-            const imageRecords = await this.imageRepository.bulkCreateImages({
-                files: compressedImages,
-                imageIds,
-                roomId: ad.id,
-                transactionPrisma: prisma,
-            });
+                const imageRecords = await this.imageRepository.bulkCreateImages({
+                    files: compressedImages,
+                    imageIds,
+                    roomId: ad.id,
+                    transactionPrisma: prisma,
+                });
 
-            try {
-                await this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds);
-                return { ad, imageRecords };
-            } catch (err) {
-                throw err;
-            }
-        });
+                try {
+                    await this.s3Service.bulkUploadTo(S3Bucket.PHOTOS, compressedImages, imageIds);
+                    return { ad, imageRecords };
+                } catch (err) {
+                    throw err;
+                }
+            })
+            .catch(err => {
+                throw new BadRequestException(err?.meta?.cause ?? ROOM_ERRORS.ERROR_WITH_EXTERNAL_RESOURCE);
+            });
 
         return result;
     }
