@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthCheckerGuard } from 'guards/auth-checker.guard';
 import { getStatusCheckerGuard } from 'guards/user-status-checker.guard';
 import { Role } from 'models/enums/role.enum';
@@ -18,6 +18,8 @@ import { CharacteristicsService } from 'services/characteristics.service';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
+import { Response } from 'express';
+import { setXTotalCountHeader } from '../utils/response.utils';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.CHARACTERISTICS)
@@ -32,12 +34,20 @@ export class CharacteristicsController {
     @ApiQuery({ name: 'name', required: false, description: 'Name of characteristic' })
     public async getAllAttributes(
         @Req() request: Request,
+        @Res() response: Response,
         @Query('name') name: string,
         @Query('page') page: number,
         @Query('limit') limit: number,
     ) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
-        return this.characteristicService.getAllCharacteristics(name, page, limit, locale);
+        const { characteristics, count } = await this.characteristicService.getAllCharacteristics(
+            name,
+            page,
+            limit,
+            locale,
+        );
+        setXTotalCountHeader(response, count);
+        response.json(characteristics);
     }
 
     @ApiOperation({ summary: 'Create characteristic' })

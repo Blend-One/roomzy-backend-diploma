@@ -15,16 +15,19 @@ export class DetailsRepository {
         tableName: string,
         include: Record<string, any>,
     ) {
-        return this.prisma[tableName].findMany({
-            skip,
-            take,
-            where: filters,
-            select: {
-                id: true,
-                [locale]: true,
-                ...include,
-            },
-        });
+        return Promise.all([
+            this.prisma[tableName].findMany({
+                skip,
+                take,
+                where: filters,
+                select: {
+                    id: true,
+                    [locale]: true,
+                    ...include,
+                },
+            }),
+            this.prisma[tableName].count({ where: filters }),
+        ]);
     }
 
     public async getOne(locale: Locale, id: string, include: Record<string, any>, tableName: string) {

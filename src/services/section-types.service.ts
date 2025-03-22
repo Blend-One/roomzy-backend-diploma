@@ -20,7 +20,7 @@ export class SectionTypesService {
 
     public async getAllSectionTypes(name: string, page: number, limit: number, locale: Locale) {
         const { skip, take } = calculatePaginationData(page, limit);
-        const sectionTypes = await this.detailsRepository.getAll(
+        const [sectionTypes, count] = await this.detailsRepository.getAll(
             locale,
             skip,
             take,
@@ -28,16 +28,19 @@ export class SectionTypesService {
             'roomSectionType',
             this.detailsService.obtainParamsForGetQuery('characteristicNSectionFields', 'characteristic', locale),
         );
-        return transformQueryResult(
-            {
-                renamedFields: {
-                    characteristicNSectionFields: 'characteristics',
-                    [locale]: 'name',
+        return {
+            sectionTypes: transformQueryResult(
+                {
+                    renamedFields: {
+                        characteristicNSectionFields: 'characteristics',
+                        [locale]: 'name',
+                    },
+                    objectParsingSequence: ['characteristics', 'characteristic'],
                 },
-                objectParsingSequence: ['characteristics', 'characteristic'],
-            },
-            sectionTypes,
-        );
+                sectionTypes,
+            ),
+            count,
+        };
     }
 
     public async createSectionType(body: CreateSectionTypeRequestDto) {

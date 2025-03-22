@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, Param, UseGuards, Body, Post, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Query, Req, Param, UseGuards, Body, Post, Patch, Delete, Res } from '@nestjs/common';
 import { AuthCheckerGuard } from 'guards/auth-checker.guard';
 import { getStatusCheckerGuard } from 'guards/user-status-checker.guard';
 import { Role } from 'models/enums/role.enum';
@@ -18,6 +18,8 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from 'constants/api-tags.constants';
 import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
+import { Response } from 'express';
+import { setXTotalCountHeader } from '../utils/response.utils';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.SECTION_TYPES)
@@ -34,12 +36,15 @@ export class SectionTypesController {
     @Get(SECTION_TYPES_ROUTES.GET_ALL_SECTION_TYPES)
     public async getAllSectionTypes(
         @Req() request: Request,
+        @Res() response: Response,
         @Query('name') name: string,
         @Query('page') page: number,
         @Query('limit') limit: number,
     ) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
-        return this.sectionTypeService.getAllSectionTypes(name, page, limit, locale);
+        const { sectionTypes, count } = await this.sectionTypeService.getAllSectionTypes(name, page, limit, locale);
+        setXTotalCountHeader(response, count);
+        response.json(sectionTypes);
     }
 
     @ApiOperation({

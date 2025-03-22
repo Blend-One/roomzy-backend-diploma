@@ -23,7 +23,7 @@ export class CharacteristicsService {
 
     public async getAllCharacteristics(name: string, page: number, limit: number, locale: Locale) {
         const { skip, take } = calculatePaginationData(page, limit);
-        const characteristics = await this.detailsRepository.getAll(
+        const [characteristics, count] = await this.detailsRepository.getAll(
             locale,
             skip,
             take,
@@ -32,16 +32,19 @@ export class CharacteristicsService {
             this.detailsService.obtainParamsForGetQuery('characteristicNAttributeFields', 'attribute', locale),
         );
 
-        return transformQueryResult(
-            {
-                renamedFields: {
-                    characteristicNAttributeFields: 'attributes',
-                    [locale]: 'name',
+        return {
+            characteristics: transformQueryResult(
+                {
+                    renamedFields: {
+                        characteristicNAttributeFields: 'attributes',
+                        [locale]: 'name',
+                    },
+                    objectParsingSequence: ['attributes', 'attribute'],
                 },
-                objectParsingSequence: ['attributes', 'attribute'],
-            },
-            characteristics,
-        );
+                characteristics,
+            ),
+            count,
+        };
     }
 
     public async createCharacteristic(body: CreateCharacteristicRequestDto) {

@@ -11,7 +11,7 @@ export class AttributeService {
 
     public async getAllAttributes(name: string, page: number, limit: number, locale: Locale) {
         const { skip, take } = calculatePaginationData(page, limit);
-        const attributes = await this.detailsRepository.getAll(
+        const [attributes, count] = await this.detailsRepository.getAll(
             locale,
             skip,
             take,
@@ -24,15 +24,18 @@ export class AttributeService {
             {},
         );
 
-        return transformQueryResult(
-            {
-                renamedFields: {
-                    [locale]: 'name',
+        return {
+            attributes: transformQueryResult(
+                {
+                    renamedFields: {
+                        [locale]: 'name',
+                    },
+                    objectParsingSequence: [],
                 },
-                objectParsingSequence: [],
-            },
-            attributes,
-        );
+                attributes,
+            ),
+            count,
+        };
     }
 
     public async createAttribute(body: DetailsRequestSchemaDto) {
