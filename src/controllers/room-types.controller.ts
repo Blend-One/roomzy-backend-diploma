@@ -15,12 +15,25 @@ import {
     UpdateRoomTypeSchema,
 } from '../models/requests-schemas/create-room-type.request';
 import { RoomTypesService } from '../services/room-types.service';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiQuery,
+    ApiTags,
+} from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 import { setXTotalCountHeader } from '../utils/response.utils';
 import { Response } from 'express';
 import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
-import { IdWithNameDto } from '../api-bodies/id-with-name.api-body';
+import { DetailsResponseDto } from '../api-bodies/create-details.api-body';
+import {
+    CreateRoomTypeDetailsDto,
+    PatchRoomTypeDetailsDto,
+    RoomTypeWithSectionTypesDto,
+} from '../api-bodies/create-room-type-detail.api-body';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.ROOM_TYPES)
@@ -33,7 +46,7 @@ export class RoomTypesController {
     })
     @PaginationQueryParamsDocs()
     @ApiQuery({ name: 'name', required: false, description: "Name of room's type" })
-    @ApiOkResponse({ type: [IdWithNameDto] })
+    @ApiOkResponse({ type: [RoomTypeWithSectionTypesDto] })
     @Get(ROOM_TYPES_ROUTES.GET_ROOM_TYPES)
     public async getRoomTypes(
         @Req() request: Request,
@@ -62,6 +75,8 @@ export class RoomTypesController {
     @ApiOperation({
         summary: 'Create room type. Section types should be provided in order',
     })
+    @ApiBody({ type: CreateRoomTypeDetailsDto })
+    @ApiCreatedResponse({ type: DetailsResponseDto })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Post(ROOM_TYPES_ROUTES.CREATE_ROOM_TYPE)
     public async createRoomType(@Body(new ZodValidationPipe(CreateRoomTypeSchema)) body: CreateRoomTypeRequestDto) {
@@ -69,8 +84,19 @@ export class RoomTypesController {
     }
 
     @ApiOperation({
+        summary: 'Delete room type. Relations with section types will be deleted',
+    })
+    @ApiOkResponse({ type: DetailsResponseDto })
+    @Delete(ROOM_TYPES_ROUTES.DELETE_ROOM_TYPE)
+    public async deleteRoomTypeById(@Param('id') roomTypeId: string) {
+        return this.roomTypesService.deleteRoomType(roomTypeId);
+    }
+
+    @ApiOperation({
         summary: 'Update room type',
     })
+    @ApiOkResponse({ type: DetailsResponseDto })
+    @ApiBody({ type: PatchRoomTypeDetailsDto })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Patch(ROOM_TYPES_ROUTES.UPDATE_ROOM_TYPE)
     public async updateRoomType(

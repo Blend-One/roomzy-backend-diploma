@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DetailsRepository } from 'repositories/details.repository';
 import { CommonRepository } from 'repositories/common.repository';
 import { DetailsService } from './details.service';
@@ -51,12 +51,12 @@ export class RoomTypesService {
             {
                 renamedFields: {
                     [locale]: 'name',
-                    roomTypeNSectionFields: 'sectionsTypes',
+                    roomTypeNSectionFields: 'sectionTypes',
                     characteristicNSectionFields: 'characteristics',
                     characteristicNAttributeFields: 'attributes',
                 },
                 objectParsingSequence: [
-                    'sectionsTypes',
+                    'sectionTypes',
                     'sectionType',
                     'characteristics',
                     'characteristic',
@@ -104,5 +104,11 @@ export class RoomTypesService {
         });
 
         return result;
+    }
+
+    public async deleteRoomType(id: string) {
+        return this.detailsRepository.deleteOne(id, 'roomType').catch(err => {
+            throw new BadRequestException(err?.meta?.cause);
+        });
     }
 }

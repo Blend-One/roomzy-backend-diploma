@@ -4,4 +4,5 @@ export const ROOM_TYPES_ROUTES = {
     CREATE_ROOM_TYPE: '',
     UPDATE_ROOM_TYPE: ':id',
     GET_ROOM_TYPES: '',
+    DELETE_ROOM_TYPE: ':id',
 } satisfies Record<string, string>;
