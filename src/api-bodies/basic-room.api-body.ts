@@ -45,11 +45,11 @@ export class BasicRoomDto {
     street: string;
 
     @ApiProperty({
-        type: Number,
+        type: String,
         example: 12,
-        description: 'Building number of the room.',
+        description: 'Building of the room.',
     })
-    building: number;
+    building: string;
 
     @ApiProperty({
         type: String,

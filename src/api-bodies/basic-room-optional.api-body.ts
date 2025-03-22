@@ -51,12 +51,12 @@ export class BasicRoomOptionalDto extends BasicRoomDto {
     street: string;
 
     @ApiProperty({
-        type: Number,
+        type: String,
         example: 12,
         required: false,
-        description: 'Building number of the room.',
+        description: 'Building of the room.',
     })
-    building: number;
+    building: string;
 
     @ApiProperty({
         type: String,
