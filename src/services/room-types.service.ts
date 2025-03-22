@@ -28,15 +28,16 @@ export class RoomTypesService {
             take,
             this.detailsService.getNameFilter(locale, name),
             'roomType',
-            {},
+            this.detailsService.obtainParamsForGetQuery('roomTypeNSectionFields', 'sectionType', locale),
         );
         return {
             roomTypes: transformQueryResult(
                 {
                     renamedFields: {
                         [locale]: 'name',
+                        roomTypeNSectionFields: 'sectionTypes',
                     },
-                    objectParsingSequence: [],
+                    objectParsingSequence: ['sectionTypes', 'sectionType'],
                 },
                 roomTypes,
             ),

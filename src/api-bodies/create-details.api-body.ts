@@ -32,7 +32,7 @@ export class DetailsResponseDto extends CreateDetailsDto {
     id: string;
 }
 
-export class CreateDetailsOptionalDto {
+export class PatchDetailsDto {
     @ApiProperty({
         type: String,
         example: 'Плитка',

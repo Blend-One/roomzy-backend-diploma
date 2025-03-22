@@ -16,7 +16,6 @@ export class DetailsService {
         return {
             [relation]: {
                 select: {
-                    id: true,
                     [field]: {
                         select: {
                             id: true,

@@ -15,11 +15,12 @@ import {
     UpdateRoomTypeSchema,
 } from '../models/requests-schemas/create-room-type.request';
 import { RoomTypesService } from '../services/room-types.service';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 import { setXTotalCountHeader } from '../utils/response.utils';
 import { Response } from 'express';
 import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
+import { IdWithNameDto } from '../api-bodies/id-with-name.api-body';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.ROOM_TYPES)
@@ -28,10 +29,11 @@ export class RoomTypesController {
     constructor(private readonly roomTypesService: RoomTypesService) {}
 
     @ApiOperation({
-        summary: 'Get types of room',
+        summary: 'Get types of room. Section types are included',
     })
     @PaginationQueryParamsDocs()
-    @ApiQuery({ name: 'name', required: false, description: 'Name of characteristic' })
+    @ApiQuery({ name: 'name', required: false, description: "Name of room's type" })
+    @ApiOkResponse({ type: [IdWithNameDto] })
     @Get(ROOM_TYPES_ROUTES.GET_ROOM_TYPES)
     public async getRoomTypes(
         @Req() request: Request,

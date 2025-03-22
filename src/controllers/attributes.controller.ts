@@ -28,7 +28,7 @@ import { API_TAGS } from '../constants/api-tags.constants';
 import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
 import { Response } from 'express';
 import { setXTotalCountHeader } from '../utils/response.utils';
-import { CreateDetailsDto, CreateDetailsOptionalDto, DetailsResponseDto } from '../api-bodies/create-details.api-body';
+import { CreateDetailsDto, PatchDetailsDto, DetailsResponseDto } from '../api-bodies/create-details.api-body';
 import { IdWithNameDto } from '../api-bodies/id-with-name.api-body';
 
 @ApiBearerAuth()
@@ -43,6 +43,7 @@ export class AttributesController {
     })
     @Get(ATTRIBUTE_ROUTES.GET_ALL_ATTRIBUTES)
     @PaginationQueryParamsDocs()
+    @ApiOkResponse({ type: [IdWithNameDto] })
     @ApiQuery({ name: 'name', required: false, description: 'Name of attribute' })
     public async getAllAttributes(
         @Req() request: Request,
@@ -89,7 +90,7 @@ export class AttributesController {
     @ApiOperation({
         summary: 'Update attribute',
     })
-    @ApiBody({ type: CreateDetailsOptionalDto })
+    @ApiBody({ type: PatchDetailsDto })
     @ApiOkResponse({ type: DetailsResponseDto })
     @Patch(ATTRIBUTE_ROUTES.UPDATE_ATTRIBUTE)
     public async updateAttribute(

@@ -62,11 +62,21 @@ export class CharacteristicsService {
     }
 
     public async getCharacteristic(locale: Locale, id: string) {
-        return this.detailsRepository.getOne(
+        const characteristic = await this.detailsRepository.getOne(
             locale,
             id,
             this.detailsService.obtainParamsForGetQuery('characteristicNAttributeFields', 'attribute', locale),
             'characteristic',
+        );
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    [locale]: 'name',
+                    characteristicNAttributeFields: 'attributes',
+                },
+                objectParsingSequence: ['attributes', 'attribute'],
+            },
+            characteristic,
         );
     }
 
