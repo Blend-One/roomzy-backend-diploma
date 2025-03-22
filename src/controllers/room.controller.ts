@@ -10,6 +10,7 @@ import {
     UploadedFiles,
     UseGuards,
     UseInterceptors,
+    Res,
 } from '@nestjs/common';
 import { ROOM_ROUTES } from 'routes/room.routes';
 import { AuthCheckerGuard } from 'guards/auth-checker.guard';
@@ -21,7 +22,6 @@ import { UserStatus } from 'models/enums/user-status.enum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FILE_PROPERTY_NAME } from 'constants/file.constants';
 import { filterFiles } from 'utils/file-filter.utils';
-import { ToJsonPipe } from 'pipes/to-json.pipe';
 import { FiltersDto } from 'models/dtos/fitlers.dto';
 import { getLanguageHeader, getUserHeader } from 'utils/request.utils';
 import { Role } from 'models/enums/role.enum';
@@ -51,6 +51,8 @@ import { FilterParsePipe } from '../pipes/filter-parse.pipe';
 import { FiltersDocsDto } from '../api-bodies/filter.api-body';
 import { StatusDto } from '../api-bodies/status.api-body';
 import { UpdateRoomDto } from '../api-bodies/update-room.api-body';
+import { setXTotalCountHeader } from '../utils/response.utils';
+import { Response } from 'express';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.ROOMS)
@@ -92,11 +94,14 @@ export class RoomController {
     public async getAds(
         @Req() request: Request,
         @Query(FilterParsePipe) params: FiltersDto,
+        @Res() response: Response,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
-        return this.roomService.getAds(params, locale, page, limit);
+        const { ads, count } = await this.roomService.getAds(params, locale, page, limit);
+        setXTotalCountHeader(response, count);
+        response.json(ads);
     }
 
     @ApiOperation({ summary: 'Get personal rooms' })
@@ -108,12 +113,15 @@ export class RoomController {
     public async getPersonalAds(
         @Req() request: Request,
         @Query('status') status: RoomStatus,
+        @Res() response: Response,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
         const user = getUserHeader(request);
-        return this.roomService.getPersonalAds(status, locale, page, limit, user.id);
+        const { ads, count } = await this.roomService.getPersonalAds(status, locale, page, limit, user.id);
+        setXTotalCountHeader(response, count);
+        response.json(ads);
     }
 
     @ApiOperation({
@@ -160,12 +168,15 @@ export class RoomController {
     @Get(ROOM_ROUTES.GET_MODERATION_ADS)
     public async getAdsInModeration(
         @Req() request: Request,
+        @Res() response: Response,
         @Query(FilterParsePipe) filters: FiltersDto,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
-        return this.roomService.getAdsForModeration(filters, locale, page, limit);
+        const { ads, count } = await this.roomService.getAdsForModeration(filters, locale, page, limit);
+        setXTotalCountHeader(response, count);
+        response.json(ads);
     }
 
     @ApiOperation({ summary: 'Get single room' })

@@ -102,26 +102,32 @@ export class RoomService {
 
     public async getAds(filters: FiltersDto, locale: Locale, page: number, limit: number) {
         const { take, skip } = calculatePaginationData(page, limit);
-        const ads = await this.roomRepository.getAds(filters, RoomStatus.OPENED, take, skip, locale);
-        return transformQueryResult(
-            {
-                renamedFields: { [locale]: 'name' },
-                objectParsingSequence: ['roomType', 'city', 'district'],
-            },
-            ads,
-        );
+        const [ads, count] = await this.roomRepository.getAds(filters, RoomStatus.OPENED, take, skip, locale);
+        return {
+            ads: transformQueryResult(
+                {
+                    renamedFields: { [locale]: 'name' },
+                    objectParsingSequence: ['roomType', 'city', 'district'],
+                },
+                ads,
+            ),
+            count,
+        };
     }
 
     public async getPersonalAds(status: RoomStatus, locale: Locale, page: number, limit: number, userId: string) {
         const { take, skip } = calculatePaginationData(page, limit);
-        const ads = await this.roomRepository.getAds(null, status, take, skip, locale, userId);
-        return transformQueryResult(
-            {
-                renamedFields: { [locale]: 'name' },
-                objectParsingSequence: ['roomType', 'city', 'district'],
-            },
-            ads,
-        );
+        const [ads, count] = await this.roomRepository.getAds(null, status, take, skip, locale, userId);
+        return {
+            ads: transformQueryResult(
+                {
+                    renamedFields: { [locale]: 'name' },
+                    objectParsingSequence: ['roomType', 'city', 'district'],
+                },
+                ads,
+            ),
+            count,
+        };
     }
 
     public async getAd(id: string, locale: Locale, userId: string | null, userRole: Role | null) {
@@ -184,14 +190,17 @@ export class RoomService {
 
     public async getAdsForModeration(filters: FiltersDto, locale: Locale, page: number, limit: number) {
         const { take, skip } = calculatePaginationData(page, limit);
-        const ads = await this.roomRepository.getAds(filters, RoomStatus.IN_MODERATION, take, skip, locale);
-        return transformQueryResult(
-            {
-                renamedFields: { [locale]: 'name' },
-                objectParsingSequence: ['roomType', 'city', 'district'],
-            },
-            ads,
-        );
+        const [ads, count] = await this.roomRepository.getAds(filters, RoomStatus.IN_MODERATION, take, skip, locale);
+        return {
+            ads: transformQueryResult(
+                {
+                    renamedFields: { [locale]: 'name' },
+                    objectParsingSequence: ['roomType', 'city', 'district'],
+                },
+                ads,
+            ),
+            count,
+        };
     }
 
     public async updateAd(
