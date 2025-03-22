@@ -271,7 +271,7 @@ export class RoomService {
                 }
             })
             .catch(err => {
-                throw new BadRequestException(ROOM_ERRORS.ROOM_NOT_FOUND);
+                throw new BadRequestException(err?.meta?.cause ?? ROOM_ERRORS.ROOM_NOT_FOUND);
             });
 
         return result;
