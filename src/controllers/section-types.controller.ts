@@ -15,11 +15,25 @@ import {
     UpdateSectionTypeRequestDto,
     UpdateSectionTypeSchema,
 } from 'models/requests-schemas/create-section-type.request';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiQuery,
+    ApiTags,
+} from '@nestjs/swagger';
 import { API_TAGS } from 'constants/api-tags.constants';
 import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
 import { Response } from 'express';
 import { setXTotalCountHeader } from '../utils/response.utils';
+import {
+    CreateSectionTypeDetailsDto,
+    PatchSectionTypeDetailsDto,
+    SectionTypeWithCharsDto,
+} from '../api-bodies/create-section-types-details.api-body';
+import { DetailsResponseDto } from '../api-bodies/create-details.api-body';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.SECTION_TYPES)
@@ -34,6 +48,7 @@ export class SectionTypesController {
     @PaginationQueryParamsDocs()
     @ApiQuery({ name: 'name', required: false, description: "Name of section's type" })
     @Get(SECTION_TYPES_ROUTES.GET_ALL_SECTION_TYPES)
+    @ApiOkResponse({ type: [SectionTypeWithCharsDto] })
     public async getAllSectionTypes(
         @Req() request: Request,
         @Res() response: Response,
@@ -50,6 +65,8 @@ export class SectionTypesController {
     @ApiOperation({
         summary: 'Create section type. Related characteristics should be provided',
     })
+    @ApiBody({ type: CreateSectionTypeDetailsDto })
+    @ApiCreatedResponse({ type: DetailsResponseDto })
     @Post(SECTION_TYPES_ROUTES.CREATE_SECTION_TYPE)
     public async createSectionType(
         @Body(new ZodValidationPipe(CreateSectionTypeSchema)) body: CreateSectionTypeRequestDto,
@@ -60,6 +77,7 @@ export class SectionTypesController {
     @ApiOperation({
         summary: 'Delete section type. Relations with characteristics will be deleted',
     })
+    @ApiOkResponse({ type: DetailsResponseDto })
     @Delete(SECTION_TYPES_ROUTES.DELETE_SECTION_TYPE)
     public async deleteSectionTypeById(@Param('id') characteristicId: string) {
         return this.sectionTypeService.deleteSectionType(characteristicId);
@@ -77,6 +95,8 @@ export class SectionTypesController {
     @ApiOperation({
         summary: 'Update section type',
     })
+    @ApiOkResponse({ type: DetailsResponseDto })
+    @ApiBody({ type: PatchSectionTypeDetailsDto })
     @Patch(SECTION_TYPES_ROUTES.UPDATE_SECTION_TYPE)
     public async updateSectionType(
         @Param('id') attributeId: string,

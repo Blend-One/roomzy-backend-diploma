@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DetailsRepository } from 'repositories/details.repository';
 import { Locale } from 'models/enums/locale.enum';
 import { calculatePaginationData } from 'utils/calculate-pagination-data.utils';
@@ -45,15 +45,19 @@ export class SectionTypesService {
 
     public async createSectionType(body: CreateSectionTypeRequestDto) {
         const { characteristicIds, ...bodyValues } = body;
-        return this.detailsRepository.createOne(
-            bodyValues,
-            'roomSectionType',
-            this.detailsService.obtainParamsForCreationQuery(
-                characteristicIds,
-                'characteristicNSectionFields',
-                'characteristic',
-            ),
-        );
+        return this.detailsRepository
+            .createOne(
+                bodyValues,
+                'roomSectionType',
+                this.detailsService.obtainParamsForCreationQuery(
+                    characteristicIds,
+                    'characteristicNSectionFields',
+                    'characteristic',
+                ),
+            )
+            .catch(err => {
+                throw new BadRequestException(err?.meta?.cause);
+            });
     }
 
     public async getSectionType(locale: Locale, id: string) {
@@ -78,34 +82,40 @@ export class SectionTypesService {
 
     public async updateSectionType(body: UpdateSectionTypeRequestDto, id: string) {
         const { characteristicIds, ...bodyValues } = body;
-        const result = await this.commonRepository.createTransactionWithCallback(async prisma => {
-            if (!!characteristicIds?.length) {
-                await this.detailsRepository.deleteMany(
-                    this.detailsService.obtainParamsForDeleteRelations(
-                        prisma,
-                        'characteristicAndSection',
-                        'sectionTypeId',
+        const result = await this.commonRepository
+            .createTransactionWithCallback(async prisma => {
+                if (!!characteristicIds?.length) {
+                    await this.detailsRepository.deleteMany(
+                        this.detailsService.obtainParamsForDeleteRelations(
+                            prisma,
+                            'characteristicAndSection',
+                            'sectionTypeId',
+                            id,
+                        ),
+                    );
+                }
+                return await this.detailsRepository.updateOne(
+                    this.detailsService.obtainParamsForUpdate({
+                        body: bodyValues,
                         id,
-                    ),
+                        tableName: 'roomSectionType',
+                        prisma,
+                        idsForRelation: characteristicIds,
+                        relationField: 'characteristicNSectionFields',
+                        fieldWithinRelation: 'characteristic',
+                    }),
                 );
-            }
-            return await this.detailsRepository.updateOne(
-                this.detailsService.obtainParamsForUpdate({
-                    body: bodyValues,
-                    id,
-                    tableName: 'roomSectionType',
-                    prisma,
-                    idsForRelation: characteristicIds,
-                    relationField: 'characteristicNSectionFields',
-                    fieldWithinRelation: 'characteristic',
-                }),
-            );
-        });
+            })
+            .catch(err => {
+                throw new BadRequestException(err?.meta?.cause);
+            });
 
         return result;
     }
 
     public async deleteSectionType(id: string) {
-        return this.detailsRepository.deleteOne(id, 'roomSectionType');
+        return this.detailsRepository.deleteOne(id, 'roomSectionType').catch(err => {
+            throw new BadRequestException(err?.meta?.cause);
+        });
     }
 }
