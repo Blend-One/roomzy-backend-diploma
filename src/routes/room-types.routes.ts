@@ -3,4 +3,6 @@ export const ROOM_TYPES_ROUTES = {
     GET_SECTIONS_AND_CHARS_BY_ROOM_TYPE: ':roomTypeId',
     CREATE_ROOM_TYPE: '',
     UPDATE_ROOM_TYPE: ':id',
+    GET_ROOM_TYPES: '',
+    DELETE_ROOM_TYPE: ':id',
 } satisfies Record<string, string>;

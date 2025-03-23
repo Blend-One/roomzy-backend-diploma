@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DetailsRepository } from '../repositories/details.repository';
 import { Locale } from '../models/enums/locale.enum';
 import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
@@ -23,7 +23,7 @@ export class CharacteristicsService {
 
     public async getAllCharacteristics(name: string, page: number, limit: number, locale: Locale) {
         const { skip, take } = calculatePaginationData(page, limit);
-        const characteristics = await this.detailsRepository.getAll(
+        const [characteristics, count] = await this.detailsRepository.getAll(
             locale,
             skip,
             take,
@@ -32,38 +32,55 @@ export class CharacteristicsService {
             this.detailsService.obtainParamsForGetQuery('characteristicNAttributeFields', 'attribute', locale),
         );
 
-        return transformQueryResult(
-            {
-                renamedFields: {
-                    characteristicNAttributeFields: 'attributes',
-                    [locale]: 'name',
+        return {
+            characteristics: transformQueryResult(
+                {
+                    renamedFields: {
+                        characteristicNAttributeFields: 'attributes',
+                        [locale]: 'name',
+                    },
+                    objectParsingSequence: ['attributes', 'attribute'],
                 },
-                objectParsingSequence: ['attributes', 'attribute'],
-            },
-            characteristics,
-        );
+                characteristics,
+            ),
+            count,
+        };
     }
 
     public async createCharacteristic(body: CreateCharacteristicRequestDto) {
         const { attributeIds, ...bodyValues } = body;
-        return this.detailsRepository.createOne(
-            bodyValues,
-            'characteristic',
-            this.detailsService.obtainParamsForCreationQuery(
-                attributeIds,
-                'characteristicNAttributeFields',
-                'attribute',
-                { type: CharType.OPTIONS },
-            ),
-        );
+        return this.detailsRepository
+            .createOne(
+                bodyValues,
+                'characteristic',
+                this.detailsService.obtainParamsForCreationQuery(
+                    attributeIds,
+                    'characteristicNAttributeFields',
+                    'attribute',
+                    { type: CharType.OPTIONS },
+                ),
+            )
+            .catch(err => {
+                throw new BadRequestException(err?.meta?.cause);
+            });
     }
 
     public async getCharacteristic(locale: Locale, id: string) {
-        return this.detailsRepository.getOne(
+        const characteristic = await this.detailsRepository.getOne(
             locale,
             id,
             this.detailsService.obtainParamsForGetQuery('characteristicNAttributeFields', 'attribute', locale),
             'characteristic',
+        );
+        return transformQueryResult(
+            {
+                renamedFields: {
+                    [locale]: 'name',
+                    characteristicNAttributeFields: 'attributes',
+                },
+                objectParsingSequence: ['attributes', 'attribute'],
+            },
+            characteristic,
         );
     }
 
@@ -93,34 +110,40 @@ export class CharacteristicsService {
 
     public async updateCharacteristic(body: UpdateCharacteristicRequestDto, id: string) {
         const { attributeIds, ...bodyValues } = body;
-        const result = await this.commonRepository.createTransactionWithCallback(async prisma => {
-            if (!!attributeIds?.length) {
-                await this.detailsRepository.deleteMany(
-                    this.detailsService.obtainParamsForDeleteRelations(
-                        prisma,
-                        'characteristicAndAttribute',
-                        'characteristicId',
+        const result = await this.commonRepository
+            .createTransactionWithCallback(async prisma => {
+                if (!!attributeIds?.length) {
+                    await this.detailsRepository.deleteMany(
+                        this.detailsService.obtainParamsForDeleteRelations(
+                            prisma,
+                            'characteristicAndAttribute',
+                            'characteristicId',
+                            id,
+                        ),
+                    );
+                }
+                return await this.detailsRepository.updateOne(
+                    this.detailsService.obtainParamsForUpdate({
+                        body: bodyValues,
                         id,
-                    ),
+                        tableName: 'characteristic',
+                        prisma,
+                        relationField: 'characteristicNAttributeFields',
+                        fieldWithinRelation: 'attribute',
+                        idsForRelation: attributeIds,
+                    }),
                 );
-            }
-            return await this.detailsRepository.updateOne(
-                this.detailsService.obtainParamsForUpdate({
-                    body: bodyValues,
-                    id,
-                    tableName: 'characteristic',
-                    prisma,
-                    relationField: 'characteristicNAttributeFields',
-                    fieldWithinRelation: 'attribute',
-                    idsForRelation: attributeIds,
-                }),
-            );
-        });
+            })
+            .catch(err => {
+                throw new BadRequestException(err?.meta?.cause);
+            });
 
         return result;
     }
 
     public async deleteCharacteristic(id: string) {
-        return this.detailsRepository.deleteOne(id, 'characteristic');
+        return this.detailsRepository.deleteOne(id, 'characteristic').catch(err => {
+            throw new BadRequestException(err?.meta?.cause);
+        });
     }
 }

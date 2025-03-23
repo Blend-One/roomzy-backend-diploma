@@ -29,7 +29,6 @@ export class RoomTypesRepository {
                 {
                     withId: true,
                     withLocale: true,
-                    additionalFields: ['type'],
                     joinedField: 'characteristicNAttributeFields',
                 },
                 {

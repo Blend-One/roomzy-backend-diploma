@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { detailsRequest, detailsRequestForUpdate } from './details.request';
+import { getZodStringValidator } from '../../utils/zod.utils';
+import { DETAILS_ERRORS } from '../../errors/details.errors';
 
 export const CreateSectionTypeSchema = z
     .object({
         ...detailsRequest,
-        characteristicIds: z.string().array(),
+        characteristicIds: getZodStringValidator(DETAILS_ERRORS.IDS_ARE_REQUIRED).array(),
     })
     .optional();
 

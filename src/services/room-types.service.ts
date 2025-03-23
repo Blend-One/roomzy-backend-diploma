@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DetailsRepository } from 'repositories/details.repository';
 import { CommonRepository } from 'repositories/common.repository';
 import { DetailsService } from './details.service';
@@ -9,6 +9,7 @@ import {
 import { Locale } from '../models/enums/locale.enum';
 import { RoomTypesRepository } from '../repositories/room-types.repository';
 import { transformQueryResult } from '../utils/transform-query-result.utils';
+import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
 
 @Injectable()
 export class RoomTypesService {
@@ -19,18 +20,43 @@ export class RoomTypesService {
         private readonly roomTypesRepository: RoomTypesRepository,
     ) {}
 
+    public async getAllRoomTypes(name: string, page: number, limit: number, locale: Locale) {
+        const { skip, take } = calculatePaginationData(page, limit);
+        const [roomTypes, count] = await this.detailsRepository.getAll(
+            locale,
+            skip,
+            take,
+            this.detailsService.getNameFilter(locale, name),
+            'roomType',
+            this.detailsService.obtainParamsForGetQuery('roomTypeNSectionFields', 'sectionType', locale),
+        );
+        return {
+            roomTypes: transformQueryResult(
+                {
+                    renamedFields: {
+                        [locale]: 'name',
+                        roomTypeNSectionFields: 'sectionTypes',
+                    },
+                    objectParsingSequence: ['sectionTypes', 'sectionType'],
+                },
+                roomTypes,
+            ),
+            count,
+        };
+    }
+
     public async getRoomTypeWithSectionsAndChars(id: string, locale: Locale) {
         const roomType = await this.roomTypesRepository.getRoomTypeById(id, locale);
         return transformQueryResult(
             {
                 renamedFields: {
                     [locale]: 'name',
-                    roomTypeNSectionFields: 'sectionsTypes',
+                    roomTypeNSectionFields: 'sectionTypes',
                     characteristicNSectionFields: 'characteristics',
                     characteristicNAttributeFields: 'attributes',
                 },
                 objectParsingSequence: [
-                    'sectionsTypes',
+                    'sectionTypes',
                     'sectionType',
                     'characteristics',
                     'characteristic',
@@ -78,5 +104,11 @@ export class RoomTypesService {
         });
 
         return result;
+    }
+
+    public async deleteRoomType(id: string) {
+        return this.detailsRepository.deleteOne(id, 'roomType').catch(err => {
+            throw new BadRequestException(err?.meta?.cause);
+        });
     }
 }
