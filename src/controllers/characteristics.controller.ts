@@ -37,7 +37,6 @@ import {
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.CHARACTERISTICS)
-@UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
 @Controller({ path: CHARACTERISTICS_ROUTES.DEFAULT })
 export class CharacteristicsController {
     constructor(private readonly characteristicService: CharacteristicsService) {}
@@ -65,6 +64,7 @@ export class CharacteristicsController {
         response.json(characteristics);
     }
 
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @ApiOperation({ summary: 'Create characteristic' })
     @Post(CHARACTERISTICS_ROUTES.CREATE_CHARACTERISTIC)
     @ApiCreatedResponse({ type: CharResponseDto })
@@ -80,6 +80,7 @@ export class CharacteristicsController {
             'Delete characteristic, if characteristic is deleted, relations with attributes will be deleted as well',
     })
     @ApiOkResponse({ type: CharResponseDto })
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Delete(CHARACTERISTICS_ROUTES.DELETE_CHARACTERISTIC)
     public async deleteAttributeById(@Param('id') characteristicId: string) {
         return this.characteristicService.deleteCharacteristic(characteristicId);
@@ -98,7 +99,6 @@ export class CharacteristicsController {
     @ApiOperation({
         summary: 'Get default characteristics by roomTypeId (Seems like it is excessive a bit, will be deleted)',
     })
-    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER, Role.USER], UserStatus.ACTIVE))
     @Get(CHARACTERISTICS_ROUTES.GET_DEFAULT_CHARACTERISTICS_BY_ROOM_TYPE)
     public async getDefaultCharacteristicsByRoomType(@Req() request: Request, @Param('roomTypeId') roomTypeId: string) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
@@ -108,6 +108,7 @@ export class CharacteristicsController {
     @ApiOperation({
         summary: 'Update characteristic',
     })
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @ApiBody({ type: PatchCharDetailsDto })
     @ApiOkResponse({ type: CharResponseDto })
     @Patch(CHARACTERISTICS_ROUTES.UPDATE_CHARACTERISTIC)
