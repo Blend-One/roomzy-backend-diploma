@@ -37,7 +37,6 @@ import { DetailsResponseDto } from '../api-bodies/create-details.api-body';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.SECTION_TYPES)
-@UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
 @Controller({ path: SECTION_TYPES_ROUTES.DEFAULT })
 export class SectionTypesController {
     constructor(private readonly sectionTypeService: SectionTypesService) {}
@@ -62,6 +61,7 @@ export class SectionTypesController {
         response.json(sectionTypes);
     }
 
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @ApiOperation({
         summary: 'Create section type. Related characteristics should be provided',
     })
@@ -74,6 +74,7 @@ export class SectionTypesController {
         return this.sectionTypeService.createSectionType(body);
     }
 
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @ApiOperation({
         summary: 'Delete section type. Relations with characteristics will be deleted',
     })
@@ -92,6 +93,7 @@ export class SectionTypesController {
         return this.sectionTypeService.getSectionType(locale, sectionTypeId);
     }
 
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @ApiOperation({
         summary: 'Update section type',
     })

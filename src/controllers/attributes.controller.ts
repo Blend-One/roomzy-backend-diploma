@@ -33,7 +33,6 @@ import { IdWithNameDto } from '../api-bodies/id-with-name.api-body';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.ATTRIBUTES)
-@UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
 @Controller({ path: ATTRIBUTE_ROUTES.DEFAULT })
 export class AttributesController {
     constructor(private readonly attributesService: AttributeService) {}
@@ -58,6 +57,7 @@ export class AttributesController {
         response.json(attributes);
     }
 
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @ApiOperation({
         summary: 'Create attribute',
     })
@@ -68,6 +68,7 @@ export class AttributesController {
         return this.attributesService.createAttribute(body);
     }
 
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @ApiOperation({
         summary: 'Delete attribute',
     })
@@ -87,6 +88,7 @@ export class AttributesController {
         return this.attributesService.getAttribute(locale, attributeId);
     }
 
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @ApiOperation({
         summary: 'Update attribute',
     })
