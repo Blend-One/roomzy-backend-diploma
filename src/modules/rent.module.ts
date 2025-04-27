@@ -6,10 +6,12 @@ import { TokenRepository } from '../repositories/token.repository';
 import { PrismaService } from '../services/prisma.service';
 import { RoomRepository } from '../repositories/room.repository';
 import RentRepository from '../repositories/rent.repository';
+import { ControversialIssuesController } from '../controllers/controversial_issues.controller';
+import MailModule from './mail.module';
 
 @Module({
-    imports: [],
-    controllers: [RentController],
+    imports: [MailModule],
+    controllers: [RentController, ControversialIssuesController],
     providers: [RentService, TokenService, TokenRepository, PrismaService, RoomRepository, RentRepository],
 })
 export default class RentModule {}

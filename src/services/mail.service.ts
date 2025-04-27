@@ -20,7 +20,7 @@ export default class MailService {
         });
     }
 
-    sendEmail({ emailTo, text, html, subject }: SendMail): Promise<void> {
+    public async sendEmail({ emailTo, text, html, subject }: SendMail): Promise<void> {
         return this.transporter.sendMail({
             from: String(process.env.EMAIL_SERVER),
             to: emailTo,

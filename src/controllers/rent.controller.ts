@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { RENT_ROUTES } from 'routes/rent.routes';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { CreateRentSchema, CreateRentSchemaDto } from '../models/requests-schemas/rent.request';
@@ -9,6 +9,7 @@ import { Role } from '../models/enums/role.enum';
 import { UserStatus } from '../models/enums/user-status.enum';
 import { getUserHeader } from '../utils/request.utils';
 import { RentStatus } from '../models/enums/rent-status.enum';
+import { InstructionsType } from '../models/enums/instructions-type.enum';
 
 @Controller({ path: RENT_ROUTES.DEFAULT })
 export class RentController {
@@ -47,5 +48,38 @@ export class RentController {
     ) {
         const user = getUserHeader(request);
         return this.rentService.getRentsByRoomForLandlord(roomId, status, user.id, page, limit);
+    }
+
+    @Patch(RENT_ROUTES.CHANGE_RENT_STATUS_FOR_LANDLORD)
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
+    public async changeRentStatusForLandLord(
+        @Req() request: Request,
+        @Param('rentId') rentId: string,
+        @Body() body: { status: RentStatus },
+    ) {
+        const user = getUserHeader(request);
+        return this.rentService.changeStatusForLandlord(user.id, rentId, body.status);
+    }
+
+    @Patch(RENT_ROUTES.CHANGE_RENT_STATUS_FOR_RENTER)
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
+    public async changeRentStatusForRenter(
+        @Req() request: Request,
+        @Param('rentId') rentId: string,
+        @Body() body: { status: RentStatus },
+    ) {
+        const user = getUserHeader(request);
+        return this.rentService.changeStatusForRenter(user.id, rentId, body.status);
+    }
+
+    @Get(RENT_ROUTES.GET_INSTRUCTIONS)
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
+    public async getInstructions(
+        @Req() request: Request,
+        @Param('rentId') rentId: string,
+        @Param('type') instructionsType: InstructionsType,
+    ) {
+        const user = getUserHeader(request);
+        return this.rentService.getInstructions(rentId, user.id, instructionsType);
     }
 }

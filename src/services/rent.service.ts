@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateRentSchemaDto } from '../models/requests-schemas/rent.request';
 import { getTotalPrice } from '../utils/price.utils';
 import { PriceUnit } from '../models/enums/price-unit.enum';
@@ -9,6 +9,8 @@ import { ROOM_ERRORS } from '../errors/room.errors';
 import RentRepository from '../repositories/rent.repository';
 import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
 import { RentStatus } from '../models/enums/rent-status.enum';
+import { AUTH_ERRORS } from '../errors/auth.errors';
+import { InstructionsType } from '../models/enums/instructions-type.enum';
 
 @Injectable({})
 export default class RentService {
@@ -65,5 +67,70 @@ export default class RentService {
         }
         const { take, skip } = calculatePaginationData(page, limit);
         return this.rentRepository.getRentsByRoomId(roomId, status, take, skip);
+    }
+
+    async changeStatusForLandlord(userId: string, rentId: string, status: RentStatus) {
+        const foundRent = await this.rentRepository.getRentById(rentId);
+        if (foundRent.room.userId !== userId) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+
+        const availableStatuses: Record<RentStatus, RentStatus[]> = {
+            [RentStatus.OPENED]: [RentStatus.PENDING, RentStatus.REJECTED],
+            [RentStatus.PAID]: [],
+            [RentStatus.REJECTED]: [],
+            [RentStatus.PENDING]: [RentStatus.CLOSED],
+            [RentStatus.CLOSED]: [],
+        };
+
+        if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+        return this.rentRepository.changeRentStatus(rentId, status);
+    }
+
+    async changeStatusForRenter(userId: string, rentId: string, status: RentStatus) {
+        const foundRent = await this.rentRepository.getRentById(rentId);
+        if (foundRent.userId !== userId) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+
+        const availableStatuses: Record<RentStatus, RentStatus[]> = {
+            [RentStatus.OPENED]: [RentStatus.CLOSED],
+            [RentStatus.PAID]: [],
+            [RentStatus.REJECTED]: [],
+            [RentStatus.PENDING]: [RentStatus.CLOSED],
+            [RentStatus.CLOSED]: [],
+        };
+
+        if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+
+        return this.rentRepository.changeRentStatus(rentId, status);
+    }
+
+    async getInstructions(rentId: string, userId: string, instructionsType: InstructionsType) {
+        const foundRent = await this.rentRepository.getRentById(rentId);
+
+        if (foundRent.room.userId !== userId && foundRent.userId !== userId) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+
+        const statusMapper = {
+            [RentStatus.PENDING]: [InstructionsType.PHYS_CONTROL],
+            [RentStatus.PAID]: [InstructionsType.PHYS_CONTROL, InstructionsType.ACCESS],
+        };
+
+        if (!statusMapper[foundRent.rentStatus]?.includes(instructionsType)) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+
+        const instructionsTypeMapper: Record<InstructionsType, string> = {
+            [InstructionsType.PHYS_CONTROL]: 'physControlInstructions',
+            [InstructionsType.ACCESS]: 'accessInstructions',
+        };
+
+        return { instructions: foundRent.room[instructionsTypeMapper[instructionsType]] ?? null };
     }
 }

@@ -97,9 +97,29 @@ export default class RentRepository {
                 },
                 rStatus: {
                     connect: {
-                        name: RentStatus.PENDING,
+                        name: RentStatus.OPENED,
                     },
                 },
+            },
+        });
+    }
+
+    public async getRentById(rentId: string) {
+        return this.prisma.rent.findUnique({
+            where: {
+                id: rentId,
+            },
+            include: {
+                room: true,
+            },
+        });
+    }
+
+    public async changeRentStatus(rentId: string, status: RentStatus) {
+        return this.prisma.rent.update({
+            where: { id: rentId },
+            data: {
+                rentStatus: status,
             },
         });
     }
