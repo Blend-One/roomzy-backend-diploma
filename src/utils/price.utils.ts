@@ -22,5 +22,5 @@ export const getTotalPrice = ({ isDeposit, price, dueDate, priceUnit, issuedDate
 
     const totalPrice = depositPrice;
     const dateDiff = dueFormattedDate.diff(issuedFormattedDate, priceUnitMapper[priceUnit]);
-    return totalPrice + totalPrice * dateDiff;
+    return Number((totalPrice + totalPrice * dateDiff).toFixed(4));
 };

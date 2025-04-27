@@ -7,6 +7,8 @@ import { RENT_ERRORS } from '../errors/rent.errors';
 import { RoomRepository } from '../repositories/room.repository';
 import { ROOM_ERRORS } from '../errors/room.errors';
 import RentRepository from '../repositories/rent.repository';
+import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
+import { RentStatus } from '../models/enums/rent-status.enum';
 
 @Injectable({})
 export default class RentService {
@@ -51,7 +53,17 @@ export default class RentService {
         });
     }
 
-    async getPersonalRents() {}
+    async getPersonalRents(userId: string, status: RentStatus, page: number, limit: number) {
+        const { take, skip } = calculatePaginationData(page, limit);
+        return this.rentRepository.getRentsByUserId(userId, status, take, skip);
+    }
 
-    async getRentsByRoom() {}
+    async getRentsByRoomForLandlord(roomId: string, status: RentStatus, userId: string, page: number, limit: number) {
+        const room = await this.roomRepository.getActiveAdForRentCreation(roomId);
+        if (!room || room.userId !== userId) {
+            throw new BadRequestException(ROOM_ERRORS.ROOM_NOT_FOUND);
+        }
+        const { take, skip } = calculatePaginationData(page, limit);
+        return this.rentRepository.getRentsByRoomId(roomId, status, take, skip);
+    }
 }
