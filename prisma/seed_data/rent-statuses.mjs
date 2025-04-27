@@ -1,1 +1,1 @@
-export const rentStatuses = ['OPENED', 'PENDING', 'PAID', 'REJECTED'];
+export const rentStatuses = ['OPENED', 'PENDING', 'PAID', 'REJECTED', 'CLOSED'];
