@@ -44,7 +44,7 @@ export default class RentService {
         const totalPrice = getTotalPrice({
             issuedDate: body.issuedDate,
             dueDate: body.dueDate,
-            isDeposit: true,
+            isDeposit: room.hasDeposit,
             price: room.price.toNumber(),
             priceUnit: room.priceUnit as PriceUnit,
         });
