@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { CreateRentSchemaDto } from '../models/requests-schemas/rent.request';
 import { getTotalPrice } from '../utils/price.utils';
 import { PriceUnit } from '../models/enums/price-unit.enum';
@@ -11,12 +11,15 @@ import { calculatePaginationData } from '../utils/calculate-pagination-data.util
 import { RentStatus } from '../models/enums/rent-status.enum';
 import { AUTH_ERRORS } from '../errors/auth.errors';
 import { InstructionsType } from '../models/enums/instructions-type.enum';
+import { PAYMENT_PROVIDER_KEY } from '../payment/payment.module';
+import { PaymentProvider } from '../payment/interfaces/payment.interfaces';
 
 @Injectable({})
 export default class RentService {
     constructor(
         private roomRepository: RoomRepository,
         private rentRepository: RentRepository,
+        @Inject(PAYMENT_PROVIDER_KEY) private provider: PaymentProvider,
     ) {}
 
     async createRent(body: CreateRentSchemaDto, userId: string) {
@@ -132,5 +135,19 @@ export default class RentService {
         };
 
         return { instructions: foundRent.room[instructionsTypeMapper[instructionsType]] ?? null };
+    }
+
+    async createCheckoutSession(rentId: string, userId: string) {
+        const foundRent = await this.rentRepository.getRentById(rentId);
+        if (foundRent.rentStatus !== RentStatus.PENDING && foundRent.userId !== userId) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+        const sessionUrl = await this.provider.createPaymentSession({
+            userId,
+            amount: foundRent.totalPrice.toNumber(),
+            productName: foundRent.room.title,
+        });
+
+        return { sessionUrl };
     }
 }

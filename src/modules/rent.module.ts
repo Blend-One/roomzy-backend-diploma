@@ -8,9 +8,10 @@ import { RoomRepository } from '../repositories/room.repository';
 import RentRepository from '../repositories/rent.repository';
 import { ControversialIssuesController } from '../controllers/controversial_issues.controller';
 import MailModule from './mail.module';
+import PaymentModule from '../payment/payment.module';
 
 @Module({
-    imports: [MailModule],
+    imports: [MailModule, PaymentModule],
     controllers: [RentController, ControversialIssuesController],
     providers: [RentService, TokenService, TokenRepository, PrismaService, RoomRepository, RentRepository],
 })

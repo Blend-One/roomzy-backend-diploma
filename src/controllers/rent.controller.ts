@@ -82,4 +82,11 @@ export class RentController {
         const user = getUserHeader(request);
         return this.rentService.getInstructions(rentId, user.id, instructionsType);
     }
+
+    @Post(RENT_ROUTES.CREATE_CHECKOUT_SESSION)
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
+    public async createCheckoutSession(@Req() request: Request, @Body() body: { rentId: string }) {
+        const user = getUserHeader(request);
+        return this.rentService.createCheckoutSession(body.rentId, user.id);
+    }
 }
