@@ -92,8 +92,13 @@ export class RoomRepository {
         });
     }
 
-    public async changeAdStatus(roomId: string, status: RoomStatus) {
-        return this.prisma.room.update({
+    public async changeAdStatus(
+        roomId: string,
+        status: RoomStatus,
+        transactionPrisma?: WithTransactionPrisma<object>['transactionPrisma'],
+    ) {
+        const prismaInstance = transactionPrisma ?? this.prisma;
+        return prismaInstance.room.update({
             where: {
                 id: roomId,
             },

@@ -13,7 +13,6 @@ import { AUTH_ERRORS } from '../errors/auth.errors';
 import { InstructionsType } from '../models/enums/instructions-type.enum';
 import { PAYMENT_PROVIDER_KEY } from '../payment/payment.module';
 import { PaymentProvider } from '../payment/interfaces/payment.interfaces';
-import { RoomStatus } from '../models/enums/room-status.enum';
 
 @Injectable({})
 export default class RentService {
@@ -86,6 +85,7 @@ export default class RentService {
             [RentStatus.PENDING]: [RentStatus.CLOSED],
             [RentStatus.CLOSED]: [],
             [RentStatus.ISSUES_ON_CHECK]: [],
+            [RentStatus.ISSUES_REJECTED]: [],
         };
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
@@ -108,6 +108,7 @@ export default class RentService {
             [RentStatus.PENDING]: [RentStatus.CLOSED],
             [RentStatus.CLOSED]: [],
             [RentStatus.ISSUES_ON_CHECK]: [],
+            [RentStatus.ISSUES_REJECTED]: [],
         };
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {

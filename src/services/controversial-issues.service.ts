@@ -97,10 +97,13 @@ export class ControversialIssuesService {
 
         if (status === RentStatus.ISSUES_REJECTED) {
             await this.commonRepository.createTransactionWithCallback(async prisma => {
-                await this.controversialIssuesRepository.deleteControversialIssues({
-                    transactionPrisma: prisma,
-                    rentId,
-                });
+                await Promise.all([
+                    this.controversialIssuesRepository.deleteControversialIssues({
+                        transactionPrisma: prisma,
+                        rentId,
+                    }),
+                    this.rentRepository.changeRentStatus({ rentId, status, transactionPrisma: prisma }),
+                ]);
 
                 try {
                     await this.s3Service.bulkDelete(
@@ -112,7 +115,12 @@ export class ControversialIssuesService {
                 }
             });
         } else if (status === RentStatus.PAID) {
-            await this.roomRepository.changeAdStatus(foundRent.roomId, RoomStatus.RENTED);
+            await this.commonRepository.createTransactionWithCallback(async prisma => {
+                await Promise.all([
+                    this.roomRepository.changeAdStatus(foundRent.roomId, RoomStatus.RENTED, prisma),
+                    this.rentRepository.changeRentStatus({ rentId, status, transactionPrisma: prisma }),
+                ]);
+            });
         } else {
             throw new BadRequestException(RENT_ERRORS.INVALID_STATUS);
         }
