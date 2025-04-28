@@ -6,6 +6,7 @@ model Rent {
   issuedDate DateTime
   dueDate DateTime
   totalPrice Decimal
+  paymentDate DateTime?
   rStatus RentStatus @relation(fields: [rentStatus], references: [name])
   controversialIssues ControversialIssue[]
   room Room @relation(fields: [roomId], references: [id])

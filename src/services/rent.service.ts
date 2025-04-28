@@ -13,6 +13,7 @@ import { AUTH_ERRORS } from '../errors/auth.errors';
 import { InstructionsType } from '../models/enums/instructions-type.enum';
 import { PAYMENT_PROVIDER_KEY } from '../payment/payment.module';
 import { PaymentProvider } from '../payment/interfaces/payment.interfaces';
+import { RoomStatus } from '../models/enums/room-status.enum';
 
 @Injectable({})
 export default class RentService {
@@ -84,12 +85,14 @@ export default class RentService {
             [RentStatus.REJECTED]: [],
             [RentStatus.PENDING]: [RentStatus.CLOSED],
             [RentStatus.CLOSED]: [],
+            [RentStatus.ISSUES_ON_CHECK]: [],
         };
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
-        return this.rentRepository.changeRentStatus(rentId, status);
+
+        return this.rentRepository.changeRentStatus({ rentId, status });
     }
 
     async changeStatusForRenter(userId: string, rentId: string, status: RentStatus) {
@@ -104,13 +107,14 @@ export default class RentService {
             [RentStatus.REJECTED]: [],
             [RentStatus.PENDING]: [RentStatus.CLOSED],
             [RentStatus.CLOSED]: [],
+            [RentStatus.ISSUES_ON_CHECK]: [],
         };
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
 
-        return this.rentRepository.changeRentStatus(rentId, status);
+        return this.rentRepository.changeRentStatus({ rentId, status });
     }
 
     async getInstructions(rentId: string, userId: string, instructionsType: InstructionsType) {

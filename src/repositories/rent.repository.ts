@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { RentStatus } from '../models/enums/rent-status.enum';
+import { WithTransactionPrisma } from '../types/transaction-prisma.types';
 
 @Injectable()
 export default class RentRepository {
@@ -115,8 +116,13 @@ export default class RentRepository {
         });
     }
 
-    public async changeRentStatus(rentId: string, status: RentStatus) {
-        return this.prisma.rent.update({
+    public async changeRentStatus({
+        transactionPrisma,
+        rentId,
+        status,
+    }: WithTransactionPrisma<{ rentId: string; status: RentStatus }>) {
+        const prismaInstance = transactionPrisma ?? this.prisma;
+        return prismaInstance.rent.update({
             where: { id: rentId },
             data: {
                 rentStatus: status,
