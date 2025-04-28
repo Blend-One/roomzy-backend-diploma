@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Param, Post, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    Patch,
+    Post,
+    Query,
+    Req,
+    UploadedFiles,
+    UseGuards,
+    UseInterceptors,
+} from '@nestjs/common';
 import { CONTROVERSIAL_ISSUES_ROUTES } from '../routes/controversial-issues.routes';
 import { AuthCheckerGuard } from '../guards/auth-checker.guard';
 import { getStatusCheckerGuard } from '../guards/user-status-checker.guard';
@@ -14,6 +26,7 @@ import {
     ControversialIssueSchema,
 } from '../models/requests-schemas/controversial-issues.request';
 import { ControversialIssuesService } from '../services/controversial-issues.service';
+import { RentStatus } from '../models/enums/rent-status.enum';
 
 @Controller({ path: CONTROVERSIAL_ISSUES_ROUTES.DEFAULT })
 export class ControversialIssuesController {
@@ -35,19 +48,27 @@ export class ControversialIssuesController {
 
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @Get(CONTROVERSIAL_ISSUES_ROUTES.GET_BY_RENT_ID)
-    public async getIssuesByRentId(@Req() request: Request) {
+    public async getIssuesByRentId(@Req() request: Request, @Param('rentId') rentId: string) {
         const user = getUserHeader(request);
+        return this.controversialIssuesService.getControversialIssuesByRentId(user.id, rentId);
     }
 
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @Get(CONTROVERSIAL_ISSUES_ROUTES.GET_BY_ROOM_ID)
-    public async getIssuesByRoomId(@Req() request: Request) {
+    public async getIssuesByRoomId(@Req() request: Request, @Param('roomId') roomId: string) {
         const user = getUserHeader(request);
+        return this.controversialIssuesService.getControversialIssuesByRoomId(user.id, roomId);
     }
 
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Get(CONTROVERSIAL_ISSUES_ROUTES.GET_FOR_MODERATION)
-    public async getIssuesForModeration(@Req() request: Request) {
-        const user = getUserHeader(request);
+    public async getIssuesForModeration(@Query('page') page?: number, @Query('limit') limit?: number) {
+        return this.controversialIssuesService.getControversialIssuesForModeration(page, limit);
+    }
+
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
+    @Patch(CONTROVERSIAL_ISSUES_ROUTES.CHANGE_STATUS_FOR_MODERATION)
+    public async changeStatusForModeration(@Body() body: { status: RentStatus }, @Param('rentId') rentId: string) {
+        return this.controversialIssuesService.changeStatusForControversialIssues(rentId, body.status);
     }
 }

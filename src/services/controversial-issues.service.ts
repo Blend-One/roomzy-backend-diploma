@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { ControversialIssuesRepository } from '../repositories/controversial-issues.repository';
 import RentRepository from '../repositories/rent.repository';
 import { RoomRepository } from '../repositories/room.repository';
@@ -11,6 +11,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { CommonRepository } from '../repositories/common.repository';
 import { S3Bucket } from '../models/enums/s3-bucket.enum';
 import { ROOM_ERRORS } from '../errors/room.errors';
+import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
+import { RoomStatus } from '../models/enums/room-status.enum';
 
 @Injectable()
 export class ControversialIssuesService {
@@ -34,7 +36,7 @@ export class ControversialIssuesService {
             throw new BadRequestException(RENT_ERRORS.RENT_NOT_FOUND);
         }
 
-        if (foundRent.rentStatus !== RentStatus.PAID) {
+        if (foundRent.rentStatus !== RentStatus.PAID && foundRent.rentStatus !== RentStatus.ISSUES_REJECTED) {
             throw new BadRequestException(RENT_ERRORS.INVALID_RENT);
         }
 
@@ -74,11 +76,46 @@ export class ControversialIssuesService {
         });
     }
 
-    public async getControversialIssuesByRentId(userId: string, rentId: string) {}
+    public async getControversialIssuesByRentId(userId: string, rentId: string) {
+        return this.controversialIssuesRepository.getControversialIssuesByRentId(rentId, userId);
+    }
 
-    public async getControversialIssuesByRoomId(userId: string, roomId: string) {}
+    public async getControversialIssuesByRoomId(userId: string, roomId: string) {
+        return this.controversialIssuesRepository.getControversialIssuesByRoomId(roomId, userId);
+    }
 
-    public async getControversialIssuesForModeration() {}
+    public async getControversialIssuesForModeration(page: number, limit: number) {
+        const { take, skip } = calculatePaginationData(page, limit);
+        return this.controversialIssuesRepository.getControversialIssuesForModeration(take, skip);
+    }
 
-    public async changeStatusForControversialIssues() {}
+    public async changeStatusForControversialIssues(rentId: string, status: RentStatus) {
+        const foundRent = await this.rentRepository.getRentById(rentId);
+        if (foundRent.rentStatus !== RentStatus.ISSUES_ON_CHECK) {
+            throw new BadRequestException(RENT_ERRORS.INVALID_RENT);
+        }
+
+        if (status === RentStatus.ISSUES_REJECTED) {
+            await this.commonRepository.createTransactionWithCallback(async prisma => {
+                await this.controversialIssuesRepository.deleteControversialIssues({
+                    transactionPrisma: prisma,
+                    rentId,
+                });
+
+                try {
+                    await this.s3Service.bulkDelete(
+                        S3Bucket.CONFLICTS,
+                        foundRent.controversialIssues.map(issue => issue.imageId),
+                    );
+                } catch (err) {
+                    throw new BadRequestException(err?.meta?.cause ?? ROOM_ERRORS.ERROR_WITH_EXTERNAL_RESOURCE);
+                }
+            });
+        } else if (status === RentStatus.PAID) {
+            await this.roomRepository.changeAdStatus(foundRent.roomId, RoomStatus.RENTED);
+        } else {
+            throw new BadRequestException(RENT_ERRORS.INVALID_STATUS);
+        }
+        return { status: HttpStatus.OK };
+    }
 }

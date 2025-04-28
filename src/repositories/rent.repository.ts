@@ -111,6 +111,7 @@ export default class RentRepository {
                 id: rentId,
             },
             include: {
+                controversialIssues: true,
                 room: true,
             },
         });

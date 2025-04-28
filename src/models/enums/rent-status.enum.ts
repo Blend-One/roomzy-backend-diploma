@@ -5,4 +5,5 @@ export enum RentStatus {
     REJECTED = 'REJECTED',
     CLOSED = 'CLOSED',
     ISSUES_ON_CHECK = 'ISSUES_ON_CHECK',
+    ISSUES_REJECTED = 'ISSUES_REJECTED',
 }
