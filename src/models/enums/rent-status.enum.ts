@@ -3,4 +3,5 @@ export enum RentStatus {
     PENDING = 'PENDING',
     PAID = 'PAID',
     REJECTED = 'REJECTED',
+    CLOSED = 'CLOSED',
 }

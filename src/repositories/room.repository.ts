@@ -240,6 +240,15 @@ export class RoomRepository {
         });
     }
 
+    public async getActiveAdForRentCreation(roomId: string) {
+        return this.prisma.room.findUnique({
+            where: {
+                id: roomId,
+                status: RoomStatus.OPENED,
+            },
+        });
+    }
+
     public async getAd(roomId: string, locale: Locale) {
         return this.prisma.room.findUnique({
             where: {
