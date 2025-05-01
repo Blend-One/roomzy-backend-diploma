@@ -251,6 +251,11 @@ export class RoomRepository {
                 id: roomId,
                 status: RoomStatus.OPENED,
             },
+            include: {
+                userRelation: {
+                    select: { email: true },
+                },
+            },
         });
     }
 

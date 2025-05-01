@@ -9,7 +9,7 @@ export default class MailService {
 
     constructor() {
         this.transporter = createTransport({
-            secure: true,
+            secure: false,
             service: 'gmail',
             port: Number(process.env.EMAIL_PORT),
             host: String(process.env.EMAIL_SERVER),
@@ -20,13 +20,13 @@ export default class MailService {
         });
     }
 
-    public async sendEmail({ emailTo, text, html, subject }: SendMail): Promise<void> {
+    public async sendEmail({ emailTo, html, subject }: SendMail): Promise<void> {
         return this.transporter.sendMail({
-            from: String(process.env.EMAIL_SERVER),
+            from: process.env.EMAIL_USER,
             to: emailTo,
             subject,
-            html: html ?? '',
-            text: text ?? '',
+            text: html,
+            html: html,
         });
     }
 }

@@ -1,4 +1,4 @@
 export interface PaymentProvider {
-    createPaymentSession(data: { amount: number; userId: string; productName: string }): Promise<string>;
-    handleWebhook(body: Buffer, signature: string): Promise<void>;
+    createPaymentSession(data: { amount: number; rentId: string; productName: string }): Promise<string>;
+    handleWebhook(req: Request): Promise<any>;
 }

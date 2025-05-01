@@ -10,6 +10,9 @@ export default class RentRepository {
     public async checkExistingRent(roomId: string, userId: string) {
         return this.prisma.rent.findFirst({
             where: {
+                rentStatus: {
+                    not: RentStatus.CLOSED,
+                },
                 roomId,
                 userId,
             },
@@ -105,6 +108,17 @@ export default class RentRepository {
         });
     }
 
+    public async getRendByIdWithoutControversialIssues(rentId: string) {
+        return this.prisma.rent.findUnique({
+            where: {
+                id: rentId,
+                controversialIssues: {
+                    none: {},
+                },
+            },
+        });
+    }
+
     public async getRentById(rentId: string) {
         return this.prisma.rent.findUnique({
             where: {
@@ -112,7 +126,20 @@ export default class RentRepository {
             },
             include: {
                 controversialIssues: true,
-                room: true,
+                room: {
+                    include: {
+                        userRelation: {
+                            select: {
+                                email: true,
+                            },
+                        },
+                    },
+                },
+                user: {
+                    select: {
+                        email: true,
+                    },
+                },
             },
         });
     }

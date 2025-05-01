@@ -13,6 +13,9 @@ import { S3Bucket } from '../models/enums/s3-bucket.enum';
 import { ROOM_ERRORS } from '../errors/room.errors';
 import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
 import { RoomStatus } from '../models/enums/room-status.enum';
+import { controversialIssuesFromRenterMail } from '../mail-content/rents.mail-content';
+import { mailTemplate } from '../templates/mail.templates';
+import MailService from './mail.service';
 
 @Injectable()
 export class ControversialIssuesService {
@@ -23,6 +26,7 @@ export class ControversialIssuesService {
         private commonRepository: CommonRepository,
         private s3Service: S3Service,
         private sharpService: SharpService,
+        private mailService: MailService,
     ) {}
 
     public async createControversialIssues(
@@ -31,7 +35,7 @@ export class ControversialIssuesService {
         userId: string,
         rentId: string,
     ) {
-        const foundRent = await this.rentRepository.getRentById(rentId);
+        const foundRent = await this.rentRepository.getRendByIdWithoutControversialIssues(rentId);
         if (!foundRent || foundRent.userId !== userId) {
             throw new BadRequestException(RENT_ERRORS.RENT_NOT_FOUND);
         }
@@ -120,6 +124,17 @@ export class ControversialIssuesService {
                     this.roomRepository.changeAdStatus(foundRent.roomId, RoomStatus.RENTED, prisma),
                     this.rentRepository.changeRentStatus({ rentId, status, transactionPrisma: prisma }),
                 ]);
+            });
+
+            const { title, description } = controversialIssuesFromRenterMail(
+                foundRent.user.email,
+                foundRent.room.title,
+            );
+
+            this.mailService.sendEmail({
+                subject: title,
+                html: mailTemplate(title, description),
+                emailTo: foundRent.room.userRelation.email,
             });
         } else {
             throw new BadRequestException(RENT_ERRORS.INVALID_STATUS);

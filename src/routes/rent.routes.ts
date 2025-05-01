@@ -6,5 +6,6 @@ export const RENT_ROUTES = {
     GET_PERSONAL_RENTS: 'personal',
     GET_RENTS_BY_ROOM: ':roomId',
     GET_INSTRUCTIONS: ':rentId/instructions/:type',
-    CREATE_CHECKOUT_SESSION: 'create_checkout',
+    CREATE_CHECKOUT_SESSION: 'create_checkout/:rentId',
+    HANDLE_WEBHOOK: 'payment_webhook',
 } satisfies Record<string, string>;

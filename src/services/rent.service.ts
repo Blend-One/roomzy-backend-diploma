@@ -13,16 +13,25 @@ import { AUTH_ERRORS } from '../errors/auth.errors';
 import { InstructionsType } from '../models/enums/instructions-type.enum';
 import { PAYMENT_PROVIDER_KEY } from '../payment/payment.module';
 import { PaymentProvider } from '../payment/interfaces/payment.interfaces';
+import MailService from './mail.service';
+import {
+    newRentForLandlordMail,
+    rentIsApprovedMail,
+    rentIsRejectedMail,
+    rentWasRejectedByRenterForLandlordMail,
+} from '../mail-content/rents.mail-content';
+import { mailTemplate } from '../templates/mail.templates';
 
 @Injectable({})
 export default class RentService {
     constructor(
         private roomRepository: RoomRepository,
         private rentRepository: RentRepository,
+        private mailService: MailService,
         @Inject(PAYMENT_PROVIDER_KEY) private provider: PaymentProvider,
     ) {}
 
-    async createRent(body: CreateRentSchemaDto, userId: string) {
+    async createRent(body: CreateRentSchemaDto, userId: string, userEmail: string) {
         const { roomId, issuedDate, dueDate } = body;
 
         const room = await this.roomRepository.getActiveAdForRentCreation(roomId);
@@ -47,6 +56,14 @@ export default class RentService {
             isDeposit: room.hasDeposit,
             price: room.price.toNumber(),
             priceUnit: room.priceUnit as PriceUnit,
+        });
+
+        const { title, description } = newRentForLandlordMail(userEmail, room.title);
+
+        this.mailService.sendEmail({
+            subject: title,
+            html: mailTemplate(title, description),
+            emailTo: room.userRelation.email,
         });
 
         return this.rentRepository.createRent({
@@ -92,6 +109,19 @@ export default class RentService {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
 
+        let mailContent: { title: string; description: string };
+        if (status === RentStatus.PENDING) {
+            mailContent = rentIsApprovedMail(foundRent.room.title);
+        } else {
+            mailContent = rentIsRejectedMail(foundRent.room.title);
+        }
+
+        this.mailService.sendEmail({
+            subject: mailContent.title,
+            html: mailTemplate(mailContent.title, mailContent.description),
+            emailTo: foundRent.user.email,
+        });
+
         return this.rentRepository.changeRentStatus({ rentId, status });
     }
 
@@ -113,6 +143,18 @@ export default class RentService {
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+
+        if (foundRent.rentStatus === RentStatus.PENDING) {
+            const { title, description } = rentWasRejectedByRenterForLandlordMail(
+                foundRent.user.email,
+                foundRent.room.title,
+            );
+            this.mailService.sendEmail({
+                subject: title,
+                html: mailTemplate(title, description),
+                emailTo: foundRent.room.userRelation.email,
+            });
         }
 
         return this.rentRepository.changeRentStatus({ rentId, status });
@@ -143,12 +185,13 @@ export default class RentService {
     }
 
     async createCheckoutSession(rentId: string, userId: string) {
-        const foundRent = await this.rentRepository.getRentById(rentId);
-        if (foundRent.rentStatus !== RentStatus.PENDING && foundRent.userId !== userId) {
+        const foundRent = await this.rentRepository.getRentById(rentId ?? '');
+        if (!foundRent || foundRent.rentStatus !== RentStatus.PENDING || foundRent.userId !== userId) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
+
         const sessionUrl = await this.provider.createPaymentSession({
-            userId,
+            rentId: foundRent.id,
             amount: foundRent.totalPrice.toNumber(),
             productName: foundRent.room.title,
         });

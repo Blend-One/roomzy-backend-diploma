@@ -1,4 +1,17 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Inject,
+    Param,
+    Patch,
+    Post,
+    Query,
+    RawBody,
+    RawBodyRequest,
+    Req,
+    UseGuards,
+} from '@nestjs/common';
 import { RENT_ROUTES } from 'routes/rent.routes';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { CreateRentSchema, CreateRentSchemaDto } from '../models/requests-schemas/rent.request';
@@ -10,10 +23,15 @@ import { UserStatus } from '../models/enums/user-status.enum';
 import { getUserHeader } from '../utils/request.utils';
 import { RentStatus } from '../models/enums/rent-status.enum';
 import { InstructionsType } from '../models/enums/instructions-type.enum';
+import { PAYMENT_PROVIDER_KEY } from '../payment/payment.module';
+import { PaymentProvider } from '../payment/interfaces/payment.interfaces';
 
 @Controller({ path: RENT_ROUTES.DEFAULT })
 export class RentController {
-    constructor(private rentService: RentService) {}
+    constructor(
+        private rentService: RentService,
+        @Inject(PAYMENT_PROVIDER_KEY) private paymentProvider: PaymentProvider,
+    ) {}
 
     @Post(RENT_ROUTES.CREATE)
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
@@ -22,7 +40,7 @@ export class RentController {
         @Req() request: Request,
     ) {
         const user = getUserHeader(request);
-        return this.rentService.createRent(body, user.id);
+        return this.rentService.createRent(body, user.id, user.email);
     }
 
     @Get(RENT_ROUTES.GET_PERSONAL_RENTS)
@@ -85,8 +103,14 @@ export class RentController {
 
     @Post(RENT_ROUTES.CREATE_CHECKOUT_SESSION)
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
-    public async createCheckoutSession(@Req() request: Request, @Body() body: { rentId: string }) {
+    public async createCheckoutSession(@Req() request: Request, @Param('rentId') rentId: string) {
         const user = getUserHeader(request);
-        return this.rentService.createCheckoutSession(body.rentId, user.id);
+        return this.rentService.createCheckoutSession(rentId, user.id);
+    }
+
+    @Post(RENT_ROUTES.HANDLE_WEBHOOK)
+    public async handlePaymentWebhook(@Req() req: RawBodyRequest<Request>) {
+        console.log('AAA');
+        await this.paymentProvider.handleWebhook(req);
     }
 }
