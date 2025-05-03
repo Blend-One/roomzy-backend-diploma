@@ -14,12 +14,14 @@ import { ControversialIssuesRepository } from '../repositories/controversial-iss
 import S3Module from './s3.module';
 import { CommonRepository } from '../repositories/common.repository';
 import { SharpService } from '../services/sharp.service';
+import DocumentsRepository from '../repositories/documents.repository';
 
 @Module({
     imports: [MailModule, PaymentModule, S3Module],
     controllers: [RentController, ControversialIssuesController],
     providers: [
         RentService,
+        DocumentsRepository,
         TokenService,
         TokenRepository,
         SharpService,

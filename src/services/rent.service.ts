@@ -21,6 +21,7 @@ import {
     rentWasRejectedByRenterForLandlordMail,
 } from '../mail-content/rents.mail-content';
 import { mailTemplate } from '../templates/mail.templates';
+import DocumentsRepository from '../repositories/documents.repository';
 
 @Injectable({})
 export default class RentService {
@@ -28,6 +29,7 @@ export default class RentService {
         private roomRepository: RoomRepository,
         private rentRepository: RentRepository,
         private mailService: MailService,
+        private documentsRepository: DocumentsRepository,
         @Inject(PAYMENT_PROVIDER_KEY) private provider: PaymentProvider,
     ) {}
 
@@ -112,6 +114,7 @@ export default class RentService {
         let mailContent: { title: string; description: string };
         if (status === RentStatus.PENDING) {
             mailContent = rentIsApprovedMail(foundRent.room.title);
+            this.documentsRepository.createDocument(foundRent);
         } else {
             mailContent = rentIsRejectedMail(foundRent.room.title);
         }

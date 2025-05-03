@@ -133,6 +133,11 @@ export default class RentRepository {
                                 email: true,
                             },
                         },
+                        roomType: {
+                            select: {
+                                ru: true,
+                            },
+                        },
                     },
                 },
                 user: {

@@ -11,4 +11,5 @@ model Rent {
   controversialIssues ControversialIssue[]
   room Room @relation(fields: [roomId], references: [id])
   user User @relation(fields: [userId], references: [id])
+  document Document?
 }
