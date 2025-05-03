@@ -176,7 +176,8 @@ export default class RentService {
         }
 
         const statusMapper = {
-            [RentStatus.PENDING]: [InstructionsType.PHYS_CONTROL],
+            [RentStatus.IN_SINGING_PROCESS]: [InstructionsType.PHYS_CONTROL],
+            [RentStatus.PENDING]: [InstructionsType.PHYS_CONTROL, InstructionsType.ACCESS],
             [RentStatus.PAID]: [InstructionsType.PHYS_CONTROL, InstructionsType.ACCESS],
         };
 

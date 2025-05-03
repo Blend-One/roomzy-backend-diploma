@@ -27,7 +27,10 @@ import {
 } from '../models/requests-schemas/controversial-issues.request';
 import { ControversialIssuesService } from '../services/controversial-issues.service';
 import { RentStatus } from '../models/enums/rent-status.enum';
+import { ApiTags } from '@nestjs/swagger';
+import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiTags(API_TAGS.CONTROVERSIAL_ISSUES)
 @Controller({ path: CONTROVERSIAL_ISSUES_ROUTES.DEFAULT })
 export class ControversialIssuesController {
     constructor(private controversialIssuesService: ControversialIssuesService) {}

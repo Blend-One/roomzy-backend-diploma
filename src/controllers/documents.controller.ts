@@ -9,7 +9,10 @@ import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { DocumentSignRequest, DocumentSignRequestDto } from '../models/requests-schemas/document.request';
 import { getUserHeader } from '../utils/request.utils';
 import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
+import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiTags(API_TAGS.DOCUMENTS)
 @Controller({
     path: DOCUMENTS_ROUTES.DEFAULT,
 })

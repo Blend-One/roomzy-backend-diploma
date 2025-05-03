@@ -24,7 +24,10 @@ import { RentStatus } from '../models/enums/rent-status.enum';
 import { InstructionsType } from '../models/enums/instructions-type.enum';
 import { PAYMENT_PROVIDER_KEY } from '../payment/payment.module';
 import { PaymentProvider } from '../payment/interfaces/payment.interfaces';
+import { ApiTags } from '@nestjs/swagger';
+import { API_TAGS } from '../constants/api-tags.constants';
 
+@ApiTags(API_TAGS.RENTS)
 @Controller({ path: RENT_ROUTES.DEFAULT })
 export class RentController {
     constructor(
