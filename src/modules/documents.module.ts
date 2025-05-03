@@ -6,9 +6,20 @@ import DocumentsRepository from '../repositories/documents.repository';
 import { TokenService } from '../services/token.service';
 import { NcaNodeService } from '../services/nca-node.service';
 import { TokenRepository } from '../repositories/token.repository';
+import { RoomRepository } from '../repositories/room.repository';
+import RentRepository from '../repositories/rent.repository';
 
 @Module({
     controllers: [DocumentsController],
-    providers: [DocumentsService, PrismaService, DocumentsRepository, TokenService, NcaNodeService, TokenRepository],
+    providers: [
+        DocumentsService,
+        PrismaService,
+        RoomRepository,
+        RentRepository,
+        DocumentsRepository,
+        TokenService,
+        NcaNodeService,
+        TokenRepository,
+    ],
 })
 export default class DocumentsModule {}

@@ -6,6 +6,9 @@ import { RoomRepository } from '../../repositories/room.repository';
 import RentRepository from '../../repositories/rent.repository';
 import { RentStatus } from '../../models/enums/rent-status.enum';
 import { RoomStatus } from '../../models/enums/room-status.enum';
+import MailService from '../../services/mail.service';
+import { rentIsSuccessfulMail } from '../../mail-content/rents.mail-content';
+import { mailTemplate } from '../../templates/mail.templates';
 
 const COEFFICIENT = 100;
 
@@ -14,6 +17,7 @@ export class StripeProvider implements PaymentProvider {
     constructor(
         private roomRepository: RoomRepository,
         private rentRepository: RentRepository,
+        private mailService: MailService,
     ) {}
 
     private stripe = new Stripe(process.env.PAYMENT_PROVIDER_STRIPE_KEY);
@@ -55,10 +59,11 @@ export class StripeProvider implements PaymentProvider {
         if (event.type === 'checkout.session.completed') {
             const rentId = session.client_reference_id;
             const rent = await this.rentRepository.getRentById(rentId);
-            await Promise.all([
-                this.rentRepository.changeRentStatus({ rentId, status: RentStatus.PAID }),
-                this.roomRepository.changeAdStatus(rent.roomId, RoomStatus.RESERVED),
-            ]);
+            await this.rentRepository.changeRentStatus({ rentId, status: RentStatus.PAID });
+            const { title, description } = rentIsSuccessfulMail(rent.room.title);
+            [rent.user.email, rent.room.userRelation.email].forEach(emailTo => {
+                this.mailService.sendEmail({ emailTo, html: mailTemplate(title, description), subject: title });
+            });
         }
     }
 }

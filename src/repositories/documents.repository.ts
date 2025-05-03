@@ -5,6 +5,7 @@ import { DocumentStatus } from '../models/enums/document-status.enum';
 import * as dayjs from 'dayjs';
 import { v4 } from 'uuid';
 import { documentXMLTemplate, DocumentTemplateProps } from '../templates/document.template';
+import { xmlToBase64 } from '../utils/document.utils';
 
 @Injectable()
 export default class DocumentsRepository {
@@ -20,9 +21,11 @@ export default class DocumentsRepository {
             include: {
                 rent: {
                     select: {
+                        id: true,
                         userId: true,
                         room: {
                             select: {
+                                id: true,
                                 userId: true,
                             },
                         },
@@ -45,17 +48,21 @@ export default class DocumentsRepository {
             roomType: rent.room.roomType.ru,
             area: String(rent.room.square),
         };
+        const xml = documentXMLTemplate(dataForXml);
+        const base64Xml = xmlToBase64(xml);
+
         return this.prisma.document.create({
             data: {
-                id: v4(),
+                xml,
+                base64Xml,
                 createdDate,
+                id: v4(),
                 status: DocumentStatus.CREATED,
                 rent: {
                     connect: {
                         id: rent.id,
                     },
                 },
-                xml: documentXMLTemplate(dataForXml),
             },
         });
     }

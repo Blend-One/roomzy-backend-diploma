@@ -1,6 +1,7 @@
 model Document {
   id String @id
   xml String
+  base64Xml String
   status String
   rentId String @unique
   rent Rent @relation(fields: [rentId], references: [id])

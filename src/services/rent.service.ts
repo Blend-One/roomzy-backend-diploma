@@ -98,13 +98,14 @@ export default class RentService {
         }
 
         const availableStatuses: Record<RentStatus, RentStatus[]> = {
-            [RentStatus.OPENED]: [RentStatus.PENDING, RentStatus.REJECTED],
+            [RentStatus.OPENED]: [RentStatus.IN_SINGING_PROCESS, RentStatus.REJECTED],
             [RentStatus.PAID]: [],
             [RentStatus.REJECTED]: [],
-            [RentStatus.PENDING]: [RentStatus.CLOSED],
+            [RentStatus.PENDING]: [],
             [RentStatus.CLOSED]: [],
             [RentStatus.ISSUES_ON_CHECK]: [],
             [RentStatus.ISSUES_REJECTED]: [],
+            [RentStatus.IN_SINGING_PROCESS]: [RentStatus.CLOSED],
         };
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
@@ -112,9 +113,9 @@ export default class RentService {
         }
 
         let mailContent: { title: string; description: string };
-        if (status === RentStatus.PENDING) {
+        if (status === RentStatus.IN_SINGING_PROCESS) {
             mailContent = rentIsApprovedMail(foundRent.room.title);
-            this.documentsRepository.createDocument(foundRent);
+            await this.documentsRepository.createDocument(foundRent);
         } else {
             mailContent = rentIsRejectedMail(foundRent.room.title);
         }
@@ -138,17 +139,18 @@ export default class RentService {
             [RentStatus.OPENED]: [RentStatus.CLOSED],
             [RentStatus.PAID]: [],
             [RentStatus.REJECTED]: [],
-            [RentStatus.PENDING]: [RentStatus.CLOSED],
+            [RentStatus.PENDING]: [],
             [RentStatus.CLOSED]: [],
             [RentStatus.ISSUES_ON_CHECK]: [],
             [RentStatus.ISSUES_REJECTED]: [],
+            [RentStatus.IN_SINGING_PROCESS]: [RentStatus.CLOSED],
         };
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
 
-        if (foundRent.rentStatus === RentStatus.PENDING) {
+        if (foundRent.rentStatus === RentStatus.IN_SINGING_PROCESS) {
             const { title, description } = rentWasRejectedByRenterForLandlordMail(
                 foundRent.user.email,
                 foundRent.room.title,

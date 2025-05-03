@@ -4,7 +4,6 @@ import { z } from 'zod';
 
 export const DocumentSignRequest = z.object({
     cms: getZodStringValidator(DOCUMENTS_ERRORS.CMS_IS_MISSED),
-    data: getZodStringValidator(DOCUMENTS_ERRORS.DATA_IS_MISSED),
 });
 
 export type DocumentSignRequestDto = z.infer<typeof DocumentSignRequest>;

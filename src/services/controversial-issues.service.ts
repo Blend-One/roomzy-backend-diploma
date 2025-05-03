@@ -119,12 +119,7 @@ export class ControversialIssuesService {
                 }
             });
         } else if (status === RentStatus.PAID) {
-            await this.commonRepository.createTransactionWithCallback(async prisma => {
-                await Promise.all([
-                    this.roomRepository.changeAdStatus(foundRent.roomId, RoomStatus.RENTED, prisma),
-                    this.rentRepository.changeRentStatus({ rentId, status, transactionPrisma: prisma }),
-                ]);
-            });
+            await this.rentRepository.changeRentStatus({ rentId, status });
 
             const { title, description } = controversialIssuesFromRenterMail(
                 foundRent.user.email,

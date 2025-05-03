@@ -3,6 +3,7 @@ import { StripeProvider } from './providers/stripe.providers';
 import { PrismaService } from '../services/prisma.service';
 import { RoomRepository } from '../repositories/room.repository';
 import RentRepository from '../repositories/rent.repository';
+import MailService from '../services/mail.service';
 
 export const PAYMENT_PROVIDER_KEY = 'PAYMENT_PROVIDER';
 
@@ -15,6 +16,7 @@ export const PAYMENT_PROVIDER_KEY = 'PAYMENT_PROVIDER';
         PrismaService,
         RoomRepository,
         RentRepository,
+        MailService,
     ],
     exports: [
         {

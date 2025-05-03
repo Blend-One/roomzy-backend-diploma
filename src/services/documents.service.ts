@@ -5,6 +5,10 @@ import { NcaNodeService } from './nca-node.service';
 import { DOCUMENTS_ERRORS } from '../errors/documents.errors';
 import { AUTH_ERRORS } from '../errors/auth.errors';
 import { DocumentStatus } from '../models/enums/document-status.enum';
+import { RoomStatus } from '../models/enums/room-status.enum';
+import RentRepository from '../repositories/rent.repository';
+import { RoomRepository } from '../repositories/room.repository';
+import { RentStatus } from '../models/enums/rent-status.enum';
 
 type DocumentNewData = [DocumentStatus, DocumentStatus, (iin: string, commonName: string) => any];
 
@@ -13,7 +17,29 @@ export default class DocumentsService {
     constructor(
         private documentsRepository: DocumentsRepository,
         private ncaNodeService: NcaNodeService,
+        private rentRepository: RentRepository,
+        private roomRepository: RoomRepository,
     ) {}
+
+    public async getPDFDocument(documentId: string, userId: string) {
+        const document = await this.documentsRepository.getDocumentById(documentId);
+
+        if (!document || ![document.rent.userId, document.rent.room.userId].includes(userId)) {
+            throw new BadRequestException(DOCUMENTS_ERRORS.DOCUMENT_NOT_FOUND);
+        }
+    }
+
+    public async getDocument(documentId: string, userId: string) {
+        const document = await this.documentsRepository.getDocumentById(documentId);
+
+        if (!document || ![document.rent.userId, document.rent.room.userId].includes(userId)) {
+            throw new BadRequestException(DOCUMENTS_ERRORS.DOCUMENT_NOT_FOUND);
+        }
+
+        const copiedDocument = { ...document };
+        delete copiedDocument['rent'];
+        return copiedDocument;
+    }
 
     public async signDocument(documentId: string, userId: string, cmsBody: DocumentSignRequestDto) {
         const document = await this.documentsRepository.getDocumentById(documentId);
@@ -22,7 +48,7 @@ export default class DocumentsService {
             throw new BadRequestException(DOCUMENTS_ERRORS.DOCUMENT_NOT_FOUND);
         }
 
-        if (document.rent.userId !== userId || document.rent.room.userId !== userId) {
+        if (![document.rent.userId, document.rent.room.userId].includes(userId)) {
             throw new BadRequestException(AUTH_ERRORS.FORBIDDEN);
         }
 
@@ -39,7 +65,7 @@ export default class DocumentsService {
                 document.rent.room.userId === userId,
                 [
                     DocumentStatus.CREATED,
-                    DocumentStatus.SIGNED,
+                    DocumentStatus.SIGNED_BY_LANDLORD,
                     (iin: string, commonName: string) => ({ renterCommonName: commonName, renterIIN: iin }),
                 ],
             ],
@@ -52,7 +78,7 @@ export default class DocumentsService {
         }
 
         const data = await this.ncaNodeService
-            .verifyCms(cmsBody.cms, cmsBody.data)
+            .verifyCms(cmsBody.cms, document.base64Xml)
             .then(data => {
                 return data.blob();
             })
@@ -67,8 +93,21 @@ export default class DocumentsService {
             subject: { commonName, iin },
         } = data.signers[0]?.certificates?.[0] || { subjects: {} };
 
+        if ([document.landlordIIN, document.renterIIN].includes(iin)) {
+            throw new BadRequestException(DOCUMENTS_ERRORS.INVALID_SIGNATURE);
+        }
+
         await this.documentsRepository.changeDataForDocument(documentId, newData[1], newData[2](iin, commonName));
 
+        if (newData[1] === DocumentStatus.SIGNED) {
+            await Promise.all([
+                this.roomRepository.changeAdStatus(document.rent.room.id, RoomStatus.RENTED),
+                this.rentRepository.changeRentStatus({
+                    rentId: document.rent.id,
+                    status: RentStatus.PENDING,
+                }),
+            ]);
+        }
         return data;
     }
 }

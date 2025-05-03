@@ -28,9 +28,15 @@ export default class DocumentsController {
 
     @Get(DOCUMENTS_ROUTES.GET_AS_FILE)
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
-    public async getAsPDF() {}
+    public async getAsPDF(@Param('id') documentId: string, @Req() req: Request) {
+        const user = getUserHeader(req);
+        return this.documentsService.getPDFDocument(documentId, user.id);
+    }
 
     @Get(DOCUMENTS_ROUTES.GET)
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
-    public async getDocument() {}
+    public async getDocument(@Req() req: Request, @Param('id') documentId: string) {
+        const user = getUserHeader(req);
+        return this.documentsService.getDocument(documentId, user.id);
+    }
 }
