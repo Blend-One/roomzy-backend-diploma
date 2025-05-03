@@ -5,7 +5,6 @@ import { PAYMENT_ERRORS } from '../../errors/payment.errors';
 import { RoomRepository } from '../../repositories/room.repository';
 import RentRepository from '../../repositories/rent.repository';
 import { RentStatus } from '../../models/enums/rent-status.enum';
-import { RoomStatus } from '../../models/enums/room-status.enum';
 import MailService from '../../services/mail.service';
 import { rentIsSuccessfulMail } from '../../mail-content/rents.mail-content';
 import { mailTemplate } from '../../templates/mail.templates';
