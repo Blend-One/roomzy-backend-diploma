@@ -53,7 +53,7 @@ export const documentXMLTemplate = (props: DocumentTemplateProps) =>
 ` +
     '</rentalAgreement>';
 
-const documentHTMLTemplate = (data: DocumentTemplateProps) => `
+export const documentHTMLTemplate = (data: DocumentTemplateProps) => `
     <html>
     <head><meta charset="UTF-8"><style>
       body { font-family: Arial; line-height: 1.6; padding: 40px; }
@@ -61,7 +61,7 @@ const documentHTMLTemplate = (data: DocumentTemplateProps) => `
       .section { margin-bottom: 20px; }
     </style></head>
     <body>
-      <h1>Договор аренды №${data.id}</h1>
+      <h1>Договор аренды № ${data.id.slice(0, 6)}</h1>
 
       <div class="section"><strong>Арендодатель:</strong> Ф.И.О (ИИН: 900101450044)</div>
       <div class="section"><strong>Арендатор:</strong> Ф.И.О (ИИН: 800101450044)</div>

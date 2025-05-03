@@ -9,6 +9,11 @@ import { RoomStatus } from '../models/enums/room-status.enum';
 import RentRepository from '../repositories/rent.repository';
 import { RoomRepository } from '../repositories/room.repository';
 import { RentStatus } from '../models/enums/rent-status.enum';
+import { htmlToPdf } from '../utils/html-pdf.utils';
+import { documentHTMLTemplate, DocumentTemplateProps } from '../templates/document.template';
+import * as dayjs from 'dayjs';
+import { Response } from 'express';
+import { Rent, Room } from '@prisma/client';
 
 type DocumentNewData = [DocumentStatus, DocumentStatus, (iin: string, commonName: string) => any];
 
@@ -21,12 +26,37 @@ export default class DocumentsService {
         private roomRepository: RoomRepository,
     ) {}
 
-    public async getPDFDocument(documentId: string, userId: string) {
+    private TEMPLATE_DATE_FORMAT = 'M/D/YYYY h:mm A';
+
+    public createDataForTemplate(rent: Rent & { room: Room & { roomType: { ru: string } } }): DocumentTemplateProps {
+        const createdDate = new Date().toISOString();
+        return {
+            issuedDate: dayjs(rent.issuedDate).format(this.TEMPLATE_DATE_FORMAT),
+            id: rent.id,
+            dueDate: dayjs(rent.dueDate).format(this.TEMPLATE_DATE_FORMAT),
+            createdDate,
+            amount: rent.totalPrice.toNumber(),
+            deposit: rent.room.hasDeposit ? rent.room.price.toNumber() : undefined,
+            address: [rent.room.street, rent.room.building, rent.room.appartment].filter(Boolean).join(' '),
+            roomType: rent.room.roomType.ru,
+            area: String(rent.room.square),
+        };
+    }
+
+    public async getPDFDocument(documentId: string, userId: string, res: Response) {
         const document = await this.documentsRepository.getDocumentById(documentId);
 
         if (!document || ![document.rent.userId, document.rent.room.userId].includes(userId)) {
             throw new BadRequestException(DOCUMENTS_ERRORS.DOCUMENT_NOT_FOUND);
         }
+
+        const rent = await this.rentRepository.getRentById(document.rent.id);
+
+        const dataForTemplate = this.createDataForTemplate(rent);
+
+        const html = documentHTMLTemplate(dataForTemplate);
+
+        return htmlToPdf(html, rent.room.title, res);
     }
 
     public async getDocument(documentId: string, userId: string) {

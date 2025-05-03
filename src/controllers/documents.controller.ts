@@ -8,6 +8,7 @@ import { UserStatus } from '../models/enums/user-status.enum';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { DocumentSignRequest, DocumentSignRequestDto } from '../models/requests-schemas/document.request';
 import { getUserHeader } from '../utils/request.utils';
+import { Response } from 'express';
 
 @Controller({
     path: DOCUMENTS_ROUTES.DEFAULT,
@@ -28,9 +29,9 @@ export default class DocumentsController {
 
     @Get(DOCUMENTS_ROUTES.GET_AS_FILE)
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
-    public async getAsPDF(@Param('id') documentId: string, @Req() req: Request) {
+    public async getAsPDF(@Param('id') documentId: string, @Req() req: Request, @Res() res: Response) {
         const user = getUserHeader(req);
-        return this.documentsService.getPDFDocument(documentId, user.id);
+        return this.documentsService.getPDFDocument(documentId, user.id, res);
     }
 
     @Get(DOCUMENTS_ROUTES.GET)

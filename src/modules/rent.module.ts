@@ -15,6 +15,8 @@ import S3Module from './s3.module';
 import { CommonRepository } from '../repositories/common.repository';
 import { SharpService } from '../services/sharp.service';
 import DocumentsRepository from '../repositories/documents.repository';
+import DocumentsService from '../services/documents.service';
+import { NcaNodeService } from '../services/nca-node.service';
 
 @Module({
     imports: [MailModule, PaymentModule, S3Module],
@@ -29,6 +31,8 @@ import DocumentsRepository from '../repositories/documents.repository';
         RoomRepository,
         CommonRepository,
         RentRepository,
+        DocumentsService,
+        NcaNodeService,
         ControversialIssuesService,
         ControversialIssuesRepository,
     ],
