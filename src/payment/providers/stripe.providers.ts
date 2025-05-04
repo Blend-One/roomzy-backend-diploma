@@ -14,7 +14,6 @@ const COEFFICIENT = 100;
 @Injectable()
 export class StripeProvider implements PaymentProvider {
     constructor(
-        private roomRepository: RoomRepository,
         private rentRepository: RentRepository,
         private mailService: MailService,
     ) {}
@@ -58,7 +57,11 @@ export class StripeProvider implements PaymentProvider {
         if (event.type === 'checkout.session.completed') {
             const rentId = session.client_reference_id;
             const rent = await this.rentRepository.getRentById(rentId);
-            await this.rentRepository.changeRentStatus({ rentId, status: RentStatus.PAID });
+            await this.rentRepository.changeRentStatus({
+                rentId,
+                status: RentStatus.PAID,
+                paymentDate: new Date().toISOString(),
+            });
             const { title, description } = rentIsSuccessfulMail(rent.room.title);
             [rent.user.email, rent.room.userRelation.email].forEach(emailTo => {
                 this.mailService.sendEmail({ emailTo, html: mailTemplate(title, description), subject: title });

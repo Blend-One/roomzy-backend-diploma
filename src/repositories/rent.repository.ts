@@ -151,12 +151,14 @@ export default class RentRepository {
         transactionPrisma,
         rentId,
         status,
-    }: WithTransactionPrisma<{ rentId: string; status: RentStatus }>) {
+        paymentDate,
+    }: WithTransactionPrisma<{ rentId: string; status: RentStatus; paymentDate?: string }>) {
         const prismaInstance = transactionPrisma ?? this.prisma;
         return prismaInstance.rent.update({
             where: { id: rentId },
             data: {
                 rentStatus: status,
+                ...(paymentDate ? { paymentDate } : {}),
             },
         });
     }
