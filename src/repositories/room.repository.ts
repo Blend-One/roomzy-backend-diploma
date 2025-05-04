@@ -92,8 +92,13 @@ export class RoomRepository {
         });
     }
 
-    public async changeAdStatus(roomId: string, status: RoomStatus) {
-        return this.prisma.room.update({
+    public async changeAdStatus(
+        roomId: string,
+        status: RoomStatus,
+        transactionPrisma?: WithTransactionPrisma<object>['transactionPrisma'],
+    ) {
+        const prismaInstance = transactionPrisma ?? this.prisma;
+        return prismaInstance.room.update({
             where: {
                 id: roomId,
             },
@@ -240,6 +245,20 @@ export class RoomRepository {
         });
     }
 
+    public async getActiveAdForRentCreation(roomId: string) {
+        return this.prisma.room.findUnique({
+            where: {
+                id: roomId,
+                status: RoomStatus.OPENED,
+            },
+            include: {
+                userRelation: {
+                    select: { email: true },
+                },
+            },
+        });
+    }
+
     public async getAd(roomId: string, locale: Locale) {
         return this.prisma.room.findUnique({
             where: {
@@ -347,6 +366,8 @@ export class RoomRepository {
                 },
             },
             omit: {
+                physControlInstructions: true,
+                accessInstructions: true,
                 cityId: true,
                 districtId: true,
                 roomTypeId: true,

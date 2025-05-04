@@ -13,6 +13,20 @@ export class AdResponse extends BasicRoomDto {
 
     @ApiProperty({
         type: String,
+        example: null,
+        description: 'Physical control instructions for the room (nullable).',
+    })
+    physControlInstructions: string | null;
+
+    @ApiProperty({
+        type: String,
+        example: null,
+        description: 'Access instructions for the room (nullable).',
+    })
+    accessInstructions: string | null;
+
+    @ApiProperty({
+        type: String,
         example: '2ed078a9-b6ab-4d1a-bf7d-33d93ae19830',
         description: 'Unique identifier of the user who owns the room.',
     })

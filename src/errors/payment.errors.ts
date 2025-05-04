@@ -1,0 +1,3 @@
+export const PAYMENT_ERRORS = {
+    SIGNATURE_ERROR: 'SIGNATURE_ERROR',
+};

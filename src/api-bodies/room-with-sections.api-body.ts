@@ -57,6 +57,20 @@ class RoomSectionDto {
 
 export class RoomWithSectionsDto extends RoomDto {
     @ApiProperty({
+        type: String,
+        example: null,
+        description: 'Physical control instructions for the room (nullable if user is not owner or manager).',
+    })
+    physControlInstructions: string | null;
+
+    @ApiProperty({
+        type: String,
+        example: null,
+        description: 'Access instructions for the room (nullable if user is not owner or manager).',
+    })
+    accessInstructions: string | null;
+
+    @ApiProperty({
         type: [RoomSectionDto],
         description: 'Sections of the room',
     })

@@ -7,4 +7,7 @@ export enum API_TAGS {
     IMAGES = 'Images',
     ROOMS = 'Rooms',
     USERS = 'Users',
+    RENTS = 'Rents',
+    DOCUMENTS = 'Documents',
+    CONTROVERSIAL_ISSUES = 'Controversial issues',
 }

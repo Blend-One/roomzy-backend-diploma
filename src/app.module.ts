@@ -6,6 +6,7 @@ import DetailsModule from 'modules/details.module';
 import RentModule from 'modules/rent.module';
 import { JwtModule } from '@nestjs/jwt';
 import ImageModule from './modules/image.module';
+import DocumentsModule from './modules/documents.module';
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import ImageModule from './modules/image.module';
         DetailsModule,
         RentModule,
         ImageModule,
+        DocumentsModule,
     ],
 })
 export class AppModule {}
