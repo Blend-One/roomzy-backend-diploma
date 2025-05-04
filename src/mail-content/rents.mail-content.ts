@@ -30,6 +30,6 @@ export const controversialIssuesFromRenterMail = (renterEmail: string, roomTitle
 });
 
 export const controversialIssuesRejectedForRenterMail = (roomTitle: string) => ({
-    title: `Спорные моменты по объявлению "${roomTitle}" отклонено модерацией`,
+    title: `Спорные моменты по объявлению "${roomTitle}" отклонены модерацией`,
     description: `Спорные моменты по объявлению "${roomTitle}" были отклонены модерацией из-за неподобающего или неполного содержания. Если вы считаете это ошибкой, обратитесь в службу поддержки.`,
 });

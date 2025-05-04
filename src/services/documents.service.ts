@@ -124,7 +124,7 @@ export default class DocumentsService {
         } = data.signers[0]?.certificates?.[0] || { subjects: {} };
 
         if ([document.landlordIIN, document.renterIIN].includes(iin)) {
-            throw new BadRequestException(DOCUMENTS_ERRORS.INVALID_SIGNATURE);
+            throw new BadRequestException(DOCUMENTS_ERRORS.NOT_POSSIBLE_TO_USE_THE_SAME_SIGNATURE_TWICE);
         }
 
         await this.documentsRepository.changeDataForDocument(documentId, newData[1], newData[2](iin, commonName));

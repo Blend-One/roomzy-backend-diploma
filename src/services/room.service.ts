@@ -139,6 +139,11 @@ export class RoomService {
         if (!room) throw new NotFoundException(ROOM_ERRORS.ROOM_NOT_FOUND);
         if (room.status !== RoomStatus.OPENED && room.userId !== userId && userRole !== Role.MANAGER)
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+
+        if (room.userId !== userId && userRole !== Role.MANAGER) {
+            room.accessInstructions = null;
+            room.physControlInstructions = null;
+        }
         return transformQueryResult(
             {
                 renamedFields: {

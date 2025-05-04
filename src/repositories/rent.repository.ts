@@ -30,6 +30,14 @@ export default class RentRepository {
                     title: true,
                 },
             },
+            user: {
+                select: {
+                    id: true,
+                    email: true,
+                    firstName: true,
+                    secondName: true,
+                },
+            },
         },
     };
 
@@ -43,17 +51,7 @@ export default class RentRepository {
             },
             take,
             skip,
-            include: {
-                ...this.roomPropsForRent.include,
-                user: {
-                    select: {
-                        id: true,
-                        email: true,
-                        firstName: true,
-                        secondName: true,
-                    },
-                },
-            },
+            ...this.roomPropsForRent,
         });
     }
 
@@ -108,7 +106,7 @@ export default class RentRepository {
         });
     }
 
-    public async getRendByIdWithoutControversialIssues(rentId: string) {
+    public async getRentByIdWithoutControversialIssues(rentId: string) {
         return this.prisma.rent.findUnique({
             where: {
                 id: rentId,

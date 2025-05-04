@@ -171,12 +171,19 @@ export default class RentService {
     async getInstructions(rentId: string, userId: string, instructionsType: InstructionsType) {
         const foundRent = await this.rentRepository.getRentById(rentId);
 
+        if (!foundRent) {
+            throw new BadRequestException(RENT_ERRORS.RENT_NOT_FOUND);
+        }
+
         if (foundRent.room.userId !== userId && foundRent.userId !== userId) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
 
         const statusMapper = {
-            [RentStatus.IN_SIGNING_PROCESS]: [InstructionsType.PHYS_CONTROL],
+            [RentStatus.IN_SIGNING_PROCESS]:
+                foundRent.room.userId === userId
+                    ? [InstructionsType.PHYS_CONTROL, InstructionsType.ACCESS]
+                    : [InstructionsType.PHYS_CONTROL],
             [RentStatus.PENDING]: [InstructionsType.PHYS_CONTROL, InstructionsType.ACCESS],
             [RentStatus.PAID]: [InstructionsType.PHYS_CONTROL, InstructionsType.ACCESS],
         };

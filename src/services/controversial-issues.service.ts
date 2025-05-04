@@ -37,7 +37,7 @@ export class ControversialIssuesService {
         userId: string,
         rentId: string,
     ) {
-        const foundRent = await this.rentRepository.getRendByIdWithoutControversialIssues(rentId);
+        const foundRent = await this.rentRepository.getRentByIdWithoutControversialIssues(rentId);
         if (!foundRent || foundRent.userId !== userId) {
             throw new BadRequestException(RENT_ERRORS.RENT_NOT_FOUND);
         }

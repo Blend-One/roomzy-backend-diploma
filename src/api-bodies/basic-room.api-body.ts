@@ -24,20 +24,6 @@ export class BasicRoomDto {
 
     @ApiProperty({
         type: String,
-        example: null,
-        description: 'Physical control instructions for the room (nullable).',
-    })
-    physControlInstructions: string | null;
-
-    @ApiProperty({
-        type: String,
-        example: null,
-        description: 'Access instructions for the room (nullable).',
-    })
-    accessInstructions: string | null;
-
-    @ApiProperty({
-        type: String,
         example: 'someStreet',
         required: false,
         description: 'Street address of the room.',

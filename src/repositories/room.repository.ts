@@ -366,6 +366,8 @@ export class RoomRepository {
                 },
             },
             omit: {
+                physControlInstructions: true,
+                accessInstructions: true,
                 cityId: true,
                 districtId: true,
                 roomTypeId: true,
