@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import DocumentsRepository from '../repositories/documents.repository';
 import { DocumentSignRequestDto } from '../models/requests-schemas/document.request';
 import { NcaNodeService } from './nca-node.service';
@@ -63,7 +63,7 @@ export default class DocumentsService {
         const document = await this.documentsRepository.getDocumentByRentId(rentId);
 
         if (!document || ![document.rent.userId, document.rent.room.userId].includes(userId)) {
-            throw new BadRequestException(DOCUMENTS_ERRORS.DOCUMENT_NOT_FOUND);
+            throw new NotFoundException(DOCUMENTS_ERRORS.DOCUMENT_NOT_FOUND);
         }
 
         const copiedDocument = { ...document };

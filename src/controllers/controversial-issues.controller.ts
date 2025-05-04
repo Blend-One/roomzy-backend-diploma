@@ -27,7 +27,7 @@ import {
 } from '../models/requests-schemas/controversial-issues.request';
 import { ControversialIssuesService } from '../services/controversial-issues.service';
 import { RentStatus } from '../models/enums/rent-status.enum';
-import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 import { MULTIPART_CONTENT_TYPE } from '../constants/response.constants';
 import { CreateControversialIssuesDto } from '../api-bodies/create-controversial-issues.api-body';
@@ -37,6 +37,7 @@ import {
 } from '../api-bodies/controversial-issues-response.api-body';
 import { RentStatusDto } from '../api-bodies/status.api-body';
 
+@ApiBearerAuth()
 @ApiTags(API_TAGS.CONTROVERSIAL_ISSUES)
 @Controller({ path: CONTROVERSIAL_ISSUES_ROUTES.DEFAULT })
 export class ControversialIssuesController {

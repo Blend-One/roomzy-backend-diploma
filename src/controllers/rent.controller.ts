@@ -24,16 +24,25 @@ import { RentStatus } from '../models/enums/rent-status.enum';
 import { InstructionsType } from '../models/enums/instructions-type.enum';
 import { PAYMENT_PROVIDER_KEY } from '../payment/payment.module';
 import { PaymentProvider } from '../payment/interfaces/payment.interfaces';
-import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiParam,
+    ApiQuery,
+    ApiTags,
+} from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
 import { CreateRentDto } from '../api-bodies/create-rent.api-body';
 import { CreateRentResponseDto, RentResponseDto } from '../api-bodies/rent-response.api-body';
 import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params-docs.decorators';
-import { FiltersDocsDto } from '../api-bodies/filter.api-body';
-import { RentStatusDto, StatusDto } from '../api-bodies/status.api-body';
+import { RentStatusDto } from '../api-bodies/status.api-body';
 import { InstructionsDto } from '../api-bodies/instruction.api-body';
 import { CheckoutURLDto } from '../api-bodies/checkout-url.api-body';
 
+@ApiBearerAuth()
 @ApiTags(API_TAGS.RENTS)
 @Controller({ path: RENT_ROUTES.DEFAULT })
 export class RentController {
