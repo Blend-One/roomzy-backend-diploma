@@ -75,7 +75,7 @@ export class ControversialIssuesService {
 
             try {
                 await this.s3Service.bulkUploadTo(S3Bucket.CONFLICTS, compressedImages, imageIds);
-                return { controversialIssues };
+                return controversialIssues;
             } catch (err) {
                 throw new BadRequestException(err?.meta?.cause ?? ROOM_ERRORS.ERROR_WITH_EXTERNAL_RESOURCE);
             }

@@ -27,14 +27,25 @@ import {
 } from '../models/requests-schemas/controversial-issues.request';
 import { ControversialIssuesService } from '../services/controversial-issues.service';
 import { RentStatus } from '../models/enums/rent-status.enum';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { API_TAGS } from '../constants/api-tags.constants';
+import { MULTIPART_CONTENT_TYPE } from '../constants/response.constants';
+import { CreateControversialIssuesDto } from '../api-bodies/create-controversial-issues.api-body';
+import {
+    ControversialIssuesDto,
+    ControversialIssuesForModerationDto,
+} from '../api-bodies/controversial-issues-response.api-body';
+import { RentStatusDto } from '../api-bodies/status.api-body';
 
 @ApiTags(API_TAGS.CONTROVERSIAL_ISSUES)
 @Controller({ path: CONTROVERSIAL_ISSUES_ROUTES.DEFAULT })
 export class ControversialIssuesController {
     constructor(private controversialIssuesService: ControversialIssuesService) {}
 
+    @ApiOperation({ summary: 'Create controversial issues' })
+    @ApiConsumes(MULTIPART_CONTENT_TYPE)
+    @ApiBody({ type: CreateControversialIssuesDto })
+    @ApiOkResponse({ type: [ControversialIssuesDto] })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @UseInterceptors(FilesInterceptor(FILE_PROPERTY_NAME))
     @Post(CONTROVERSIAL_ISSUES_ROUTES.CREATE)
@@ -49,6 +60,8 @@ export class ControversialIssuesController {
         return this.controversialIssuesService.createControversialIssues(body.descriptions, images, user.id, rentId);
     }
 
+    @ApiOperation({ summary: 'Get controversial issues by rentId (for renters)' })
+    @ApiOkResponse({ type: [ControversialIssuesDto] })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @Get(CONTROVERSIAL_ISSUES_ROUTES.GET_BY_RENT_ID)
     public async getIssuesByRentId(@Req() request: Request, @Param('rentId') rentId: string) {
@@ -56,6 +69,8 @@ export class ControversialIssuesController {
         return this.controversialIssuesService.getControversialIssuesByRentId(user.id, rentId);
     }
 
+    @ApiOperation({ summary: 'Get controversial issues by roomId (for landlords)' })
+    @ApiOkResponse({ type: [ControversialIssuesDto] })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @Get(CONTROVERSIAL_ISSUES_ROUTES.GET_BY_ROOM_ID)
     public async getIssuesByRoomId(@Req() request: Request, @Param('roomId') roomId: string) {
@@ -63,12 +78,16 @@ export class ControversialIssuesController {
         return this.controversialIssuesService.getControversialIssuesByRoomId(user.id, roomId);
     }
 
+    @ApiOperation({ summary: 'Get controversial issues for moderation (for managers)' })
+    @ApiOkResponse({ type: [ControversialIssuesForModerationDto] })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Get(CONTROVERSIAL_ISSUES_ROUTES.GET_FOR_MODERATION)
     public async getIssuesForModeration(@Query('page') page?: number, @Query('limit') limit?: number) {
         return this.controversialIssuesService.getControversialIssuesForModeration(page, limit);
     }
 
+    @ApiOperation({ summary: 'Update status of rent where controversial issues on check' })
+    @ApiBody({ type: RentStatusDto })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.MANAGER], UserStatus.ACTIVE))
     @Patch(CONTROVERSIAL_ISSUES_ROUTES.CHANGE_STATUS_FOR_MODERATION)
     public async changeStatusForModeration(@Body() body: { status: RentStatus }, @Param('rentId') rentId: string) {
