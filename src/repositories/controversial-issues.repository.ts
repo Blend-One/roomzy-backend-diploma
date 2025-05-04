@@ -38,13 +38,24 @@ export class ControversialIssuesRepository {
         });
     }
 
-    private getParamsForIssuesQuery = (instanceId: string, userId: string) => ({
+    private getParamsForIssuesQuery = (instanceId: string, userId: string, shouldntBypassAllStatuses?: boolean) => ({
         where: {
             id: instanceId,
             userId,
             controversialIssues: {
                 some: {},
             },
+            ...(shouldntBypassAllStatuses
+                ? {
+                      rent: {
+                          every: {
+                              rentStatus: {
+                                  in: Object.values(RentStatus).filter(status => status !== RentStatus.ISSUES_ON_CHECK),
+                              },
+                          },
+                      },
+                  }
+                : {}),
         },
         include: {
             controversialIssues: true,
@@ -53,12 +64,11 @@ export class ControversialIssuesRepository {
 
     public async getControversialIssuesByRentId(rentId: string, userId: string) {
         const rent = await this.prisma.rent.findUnique(this.getParamsForIssuesQuery(rentId, userId));
-
         return rent?.controversialIssues ?? null;
     }
 
     public async getControversialIssuesByRoomId(roomId: string, userId: string) {
-        const room = await this.prisma.room.findUnique(this.getParamsForIssuesQuery(roomId, userId));
+        const room = await this.prisma.room.findUnique(this.getParamsForIssuesQuery(roomId, userId, true));
         return room?.controversialIssues ?? null;
     }
 

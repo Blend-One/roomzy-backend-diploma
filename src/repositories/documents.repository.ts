@@ -10,25 +10,38 @@ import { xmlToBase64 } from '../utils/document.utils';
 export default class DocumentsRepository {
     constructor(private prisma: PrismaService) {}
 
+    private documentQueryParams = {
+        include: {
+            rent: {
+                select: {
+                    id: true,
+                    userId: true,
+                    room: {
+                        select: {
+                            id: true,
+                            userId: true,
+                        },
+                    },
+                },
+            },
+        },
+    };
+
     public getDocumentById(documentId: string) {
         return this.prisma.document.findUnique({
             where: {
                 id: documentId,
             },
-            include: {
-                rent: {
-                    select: {
-                        id: true,
-                        userId: true,
-                        room: {
-                            select: {
-                                id: true,
-                                userId: true,
-                            },
-                        },
-                    },
-                },
+            ...this.documentQueryParams,
+        });
+    }
+
+    public getDocumentByRentId(rentId: string) {
+        return this.prisma.document.findUnique({
+            where: {
+                rentId,
             },
+            ...this.documentQueryParams,
         });
     }
 

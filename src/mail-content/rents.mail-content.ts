@@ -25,6 +25,11 @@ export const rentWasRejectedByRenterForLandlordMail = (renterEmail: string, room
 });
 
 export const controversialIssuesFromRenterMail = (renterEmail: string, roomTitle: string) => ({
-    title: `Арендатор зафиксировал спорные моменты по объявлению "${roomTitle}"`,
+    title: `Были зафиксированы спорные моменты по объявлению "${roomTitle}"`,
     description: `Арендатор ${renterEmail} сообщил о спорных моментах при заселении в помещение по объявлению "${roomTitle}". Ознакомьтесь с деталями в личном кабинете`,
+});
+
+export const controversialIssuesRejectedForRenterMail = (roomTitle: string) => ({
+    title: `Спорные моменты по объявлению "${roomTitle}" отклонено модерацией`,
+    description: `Спорные моменты по объявлению "${roomTitle}" были отклонены модерацией из-за неподобающего или неполного содержания. Если вы считаете это ошибкой, обратитесь в службу поддержки.`,
 });

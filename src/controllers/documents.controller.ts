@@ -39,8 +39,8 @@ export default class DocumentsController {
 
     @Get(DOCUMENTS_ROUTES.GET)
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
-    public async getDocument(@Req() req: Request, @Param('id') documentId: string) {
+    public async getDocument(@Req() req: Request, @Param('rentId') rentId: string) {
         const user = getUserHeader(req);
-        return this.documentsService.getDocument(documentId, user.id);
+        return this.documentsService.getDocument(rentId, user.id);
     }
 }

@@ -4,7 +4,7 @@ export const rentStatuses = [
     'PAID',
     'REJECTED',
     'CLOSED',
-    'IN_SINGING_PROCESS',
+    'IN_SIGNING_PROCESS',
     'ISSUES_ON_CHECK',
     'ISSUES_REJECTED',
 ];

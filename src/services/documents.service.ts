@@ -59,8 +59,8 @@ export default class DocumentsService {
         return htmlToPdf(html, rent.room.title, res);
     }
 
-    public async getDocument(documentId: string, userId: string) {
-        const document = await this.documentsRepository.getDocumentById(documentId);
+    public async getDocument(rentId: string, userId: string) {
+        const document = await this.documentsRepository.getDocumentByRentId(rentId);
 
         if (!document || ![document.rent.userId, document.rent.room.userId].includes(userId)) {
             throw new BadRequestException(DOCUMENTS_ERRORS.DOCUMENT_NOT_FOUND);

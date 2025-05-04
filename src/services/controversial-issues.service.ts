@@ -12,8 +12,10 @@ import { CommonRepository } from '../repositories/common.repository';
 import { S3Bucket } from '../models/enums/s3-bucket.enum';
 import { ROOM_ERRORS } from '../errors/room.errors';
 import { calculatePaginationData } from '../utils/calculate-pagination-data.utils';
-import { RoomStatus } from '../models/enums/room-status.enum';
-import { controversialIssuesFromRenterMail } from '../mail-content/rents.mail-content';
+import {
+    controversialIssuesFromRenterMail,
+    controversialIssuesRejectedForRenterMail,
+} from '../mail-content/rents.mail-content';
 import { mailTemplate } from '../templates/mail.templates';
 import MailService from './mail.service';
 
@@ -106,7 +108,11 @@ export class ControversialIssuesService {
                         transactionPrisma: prisma,
                         rentId,
                     }),
-                    this.rentRepository.changeRentStatus({ rentId, status, transactionPrisma: prisma }),
+                    this.rentRepository.changeRentStatus({
+                        rentId,
+                        status: RentStatus.PAID,
+                        transactionPrisma: prisma,
+                    }),
                 ]);
 
                 try {
@@ -118,6 +124,13 @@ export class ControversialIssuesService {
                     throw new BadRequestException(err?.meta?.cause ?? ROOM_ERRORS.ERROR_WITH_EXTERNAL_RESOURCE);
                 }
             });
+
+            const { title, description } = controversialIssuesRejectedForRenterMail(foundRent.room.title);
+            this.mailService.sendEmail({
+                subject: title,
+                html: mailTemplate(title, description),
+                emailTo: foundRent.user.email,
+            });
         } else if (status === RentStatus.PAID) {
             await this.rentRepository.changeRentStatus({ rentId, status });
 
@@ -126,10 +139,12 @@ export class ControversialIssuesService {
                 foundRent.room.title,
             );
 
-            this.mailService.sendEmail({
-                subject: title,
-                html: mailTemplate(title, description),
-                emailTo: foundRent.room.userRelation.email,
+            [foundRent.room.userRelation.email, foundRent.user.email].forEach(emailTo => {
+                this.mailService.sendEmail({
+                    subject: title,
+                    html: mailTemplate(title, description),
+                    emailTo,
+                });
             });
         } else {
             throw new BadRequestException(RENT_ERRORS.INVALID_STATUS);

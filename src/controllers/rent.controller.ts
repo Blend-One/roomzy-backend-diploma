@@ -112,7 +112,6 @@ export class RentController {
 
     @Post(RENT_ROUTES.HANDLE_WEBHOOK)
     public async handlePaymentWebhook(@Req() req: RawBodyRequest<Request>) {
-        console.log('AAA');
         await this.paymentProvider.handleWebhook(req);
     }
 }

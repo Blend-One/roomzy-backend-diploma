@@ -100,14 +100,14 @@ export default class RentService {
         }
 
         const availableStatuses: Record<RentStatus, RentStatus[]> = {
-            [RentStatus.OPENED]: [RentStatus.IN_SINGING_PROCESS, RentStatus.REJECTED],
+            [RentStatus.OPENED]: [RentStatus.IN_SIGNING_PROCESS, RentStatus.REJECTED],
             [RentStatus.PAID]: [],
             [RentStatus.REJECTED]: [],
             [RentStatus.PENDING]: [],
             [RentStatus.CLOSED]: [],
             [RentStatus.ISSUES_ON_CHECK]: [],
             [RentStatus.ISSUES_REJECTED]: [],
-            [RentStatus.IN_SINGING_PROCESS]: [RentStatus.CLOSED],
+            [RentStatus.IN_SIGNING_PROCESS]: [RentStatus.CLOSED],
         };
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
@@ -115,7 +115,7 @@ export default class RentService {
         }
 
         let mailContent: { title: string; description: string };
-        if (status === RentStatus.IN_SINGING_PROCESS) {
+        if (status === RentStatus.IN_SIGNING_PROCESS) {
             mailContent = rentIsApprovedMail(foundRent.room.title);
             const dataForTemplate = this.documentsService.createDataForTemplate(foundRent);
             await this.documentsRepository.createDocument(foundRent, dataForTemplate);
@@ -146,14 +146,14 @@ export default class RentService {
             [RentStatus.CLOSED]: [],
             [RentStatus.ISSUES_ON_CHECK]: [],
             [RentStatus.ISSUES_REJECTED]: [],
-            [RentStatus.IN_SINGING_PROCESS]: [RentStatus.CLOSED],
+            [RentStatus.IN_SIGNING_PROCESS]: [RentStatus.CLOSED],
         };
 
         if (!availableStatuses[foundRent.rentStatus as RentStatus].includes(status)) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
 
-        if (foundRent.rentStatus === RentStatus.IN_SINGING_PROCESS) {
+        if (foundRent.rentStatus === RentStatus.IN_SIGNING_PROCESS) {
             const { title, description } = rentWasRejectedByRenterForLandlordMail(
                 foundRent.user.email,
                 foundRent.room.title,
@@ -176,7 +176,7 @@ export default class RentService {
         }
 
         const statusMapper = {
-            [RentStatus.IN_SINGING_PROCESS]: [InstructionsType.PHYS_CONTROL],
+            [RentStatus.IN_SIGNING_PROCESS]: [InstructionsType.PHYS_CONTROL],
             [RentStatus.PENDING]: [InstructionsType.PHYS_CONTROL, InstructionsType.ACCESS],
             [RentStatus.PAID]: [InstructionsType.PHYS_CONTROL, InstructionsType.ACCESS],
         };
