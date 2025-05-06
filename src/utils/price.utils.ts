@@ -20,7 +20,7 @@ export const getTotalPrice = ({ isDeposit, price, dueDate, priceUnit, issuedDate
     const issuedFormattedDate = dayjs(issuedDate);
     const dueFormattedDate = dayjs(dueDate);
 
-    const totalPrice = depositPrice;
     const dateDiff = dueFormattedDate.diff(issuedFormattedDate, priceUnitMapper[priceUnit]);
-    return Number((totalPrice + totalPrice * dateDiff).toFixed(4));
+    const totalPrice = price * dateDiff + depositPrice;
+    return Number(totalPrice.toFixed(4));
 };
