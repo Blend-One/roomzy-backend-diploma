@@ -128,6 +128,17 @@ export class RentController {
     }
 
     @ApiOperation({
+        summary: 'Get rent by ID',
+    })
+    @ApiOkResponse({ type: RentResponseDto })
+    @Get(RENT_ROUTES.GET_RENT_BY_ID)
+    @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
+    public async getRentById(@Req() request: Request, @Param('rentId') rentId: string) {
+        const user = getUserHeader(request);
+        return this.rentService.getRentById(user.id, rentId);
+    }
+
+    @ApiOperation({
         summary: 'Update status of rent (for renters)',
     })
     @ApiBody({ type: RentStatusDto })

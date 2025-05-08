@@ -93,6 +93,17 @@ export default class RentService {
         return this.rentRepository.getRentsByRoomId(roomId, status, take, skip);
     }
 
+    async getRentById(userId: string, rentId: string) {
+        const foundRent = await this.rentRepository.getRentWithAttachedRoomById(rentId);
+        if (![foundRent.userId, foundRent.room.userId].includes(userId)) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+
+        delete foundRent.room.userId;
+
+        return foundRent;
+    }
+
     async changeStatusForLandlord(userId: string, rentId: string, status: RentStatus) {
         const foundRent = await this.rentRepository.getRentById(rentId);
         if (foundRent.room.userId !== userId) {
