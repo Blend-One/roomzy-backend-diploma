@@ -69,6 +69,24 @@ export default class RentRepository {
         });
     }
 
+    public async getRentWithAttachedRoomById(rentId: string) {
+        return this.prisma.rent.findUnique({
+            where: {
+                id: rentId,
+            },
+            ...this.roomPropsForRent,
+            include: {
+                ...this.roomPropsForRent.include,
+                room: {
+                    select: {
+                        ...this.roomPropsForRent.include.room.select,
+                        userId: true,
+                    },
+                },
+            },
+        });
+    }
+
     public async createRent({
         dueDate,
         issuedDate,

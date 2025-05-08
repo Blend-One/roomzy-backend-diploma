@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRentSchemaDto } from '../models/requests-schemas/rent.request';
 import { getTotalPrice } from '../utils/price.utils';
 import { PriceUnit } from '../models/enums/price-unit.enum';
@@ -93,8 +93,29 @@ export default class RentService {
         return this.rentRepository.getRentsByRoomId(roomId, status, take, skip);
     }
 
+    async getRentById(userId: string, rentId: string) {
+        const foundRent = await this.rentRepository.getRentWithAttachedRoomById(rentId);
+
+        if (!foundRent) {
+            throw new NotFoundException(RENT_ERRORS.RENT_NOT_FOUND);
+        }
+
+        if (![foundRent.userId, foundRent.room.userId].includes(userId)) {
+            throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
+        }
+
+        delete foundRent.room.userId;
+
+        return foundRent;
+    }
+
     async changeStatusForLandlord(userId: string, rentId: string, status: RentStatus) {
         const foundRent = await this.rentRepository.getRentById(rentId);
+
+        if (!foundRent) {
+            throw new NotFoundException(RENT_ERRORS.RENT_NOT_FOUND);
+        }
+
         if (foundRent.room.userId !== userId) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
@@ -134,6 +155,11 @@ export default class RentService {
 
     async changeStatusForRenter(userId: string, rentId: string, status: RentStatus) {
         const foundRent = await this.rentRepository.getRentById(rentId);
+
+        if (!foundRent) {
+            throw new NotFoundException(RENT_ERRORS.RENT_NOT_FOUND);
+        }
+
         if (foundRent.userId !== userId) {
             throw new ForbiddenException(AUTH_ERRORS.FORBIDDEN);
         }
