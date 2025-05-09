@@ -5,7 +5,11 @@ import puppeteer from 'puppeteer';
 
 export const htmlToPdf = async (html: string, name: string, res: Response) => {
     try {
-        const browser = await puppeteer.launch({ headless: true });
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
+        });
         const page = await browser.newPage();
         await page.setContent(html);
 
@@ -31,6 +35,7 @@ export const htmlToPdf = async (html: string, name: string, res: Response) => {
 
         res.end(buffer);
     } catch (err) {
+        console.error(err);
         return res.status(500).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
             message: FILE_ERRORS.CANNOT_PROCESSING,
