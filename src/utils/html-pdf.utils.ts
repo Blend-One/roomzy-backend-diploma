@@ -1,25 +1,39 @@
-import { generatePdf } from 'html-pdf-node';
 import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
 import { FILE_ERRORS } from '../errors/file.error';
+import puppeteer from 'puppeteer';
 
-export const htmlToPdf = (html: string, name: string, res: Response) => {
-    const options = { format: 'A4' };
-    const file = { content: html };
+export const htmlToPdf = async (html: string, name: string, res: Response) => {
+    try {
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.setContent(html);
 
-    return generatePdf(file, options, (err, buffer) => {
-        if (err) {
-            return res.status(500).json({
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
-                message: FILE_ERRORS.CANNOT_PROCESSING,
-            });
-        }
+        const buffer = await page.pdf({
+            format: 'A4',
+            printBackground: true,
+            margin: {
+                left: '0px',
+                top: '0px',
+                right: '0px',
+                bottom: '0px',
+            },
+        });
 
         res.set({
             'Content-Type': 'application/pdf',
             'Content-Disposition': `attachment; filename=${name}`,
+            'Content-Length': buffer.length,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            Pragma: 'no-cache',
+            Expires: 0,
         });
 
-        res.send(buffer);
-    });
+        res.end(buffer);
+    } catch (err) {
+        return res.status(500).json({
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: FILE_ERRORS.CANNOT_PROCESSING,
+        });
+    }
 };
