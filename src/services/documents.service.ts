@@ -115,7 +115,8 @@ export default class DocumentsService {
                 return data.blob();
             })
             .then(data => data.text())
-            .then(data => JSON.parse(data));
+            .then(data => JSON.parse(data))
+            .catch(err => console.error(err));
 
         if (data.status !== HttpStatus.OK) {
             throw new BadRequestException(data.message);
