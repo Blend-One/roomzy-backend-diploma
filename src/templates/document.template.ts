@@ -114,6 +114,7 @@ export const documentHTMLTemplate = (data: DocumentTemplateProps) => `
     <div>
       _________________________<br>
       ${data.renterCommonName ?? 'Ф.И.О'}<br>
+      (Арендатор)
     </div>
   </div>
     </body>
