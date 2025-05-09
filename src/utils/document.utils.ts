@@ -5,3 +5,7 @@ export function xmlToBase64(xmlString: string) {
         .join('');
     return btoa(binaryString);
 }
+
+export function base64ToArrayBuffer(base64: string) {
+    return Buffer.from(base64, 'base64');
+}

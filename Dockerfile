@@ -21,8 +21,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
 
-RUN apt-get install chromium-browser
-
 EXPOSE 8080
 
 CMD ["npm", "run", "start:migrate:prod"]

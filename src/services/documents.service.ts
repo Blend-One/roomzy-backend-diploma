@@ -56,7 +56,9 @@ export default class DocumentsService {
 
         const html = documentHTMLTemplate(dataForTemplate);
 
-        return htmlToPdf(html, rent.room.title, res);
+        const base64Html = Buffer.from(html).toString('base64');
+
+        return htmlToPdf(base64Html, rent.room.title, res);
     }
 
     public async getDocument(rentId: string, userId: string) {

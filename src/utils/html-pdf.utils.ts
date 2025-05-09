@@ -1,40 +1,48 @@
 import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
 import { FILE_ERRORS } from '../errors/file.error';
-import puppeteer from 'puppeteer';
+import { base64ToArrayBuffer } from './document.utils';
 
-export const htmlToPdf = async (html: string, name: string, res: Response) => {
-    try {
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            ignoreDefaultArgs: ['--disable-extensions'],
-            ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
-        });
-        const page = await browser.newPage();
-        await page.setContent(html);
-
-        const buffer = await page.pdf({
-            format: 'A4',
-            printBackground: true,
-            margin: {
-                left: '0px',
-                top: '0px',
-                right: '0px',
-                bottom: '0px',
+export const getParamsForPdfFormatting = (name: string, data: string) => ({
+    Parameters: [
+        {
+            Name: 'File',
+            FileValue: {
+                Name: `${name}.html`,
+                Data: data,
             },
-        });
+        },
+        {
+            Name: 'PageSize',
+            Value: 'b3',
+        },
+    ],
+});
+
+export const htmlToPdf = async (base64Html: string, name: string, res: Response) => {
+    try {
+        const paramsData = getParamsForPdfFormatting(name, base64Html);
+        const data = await fetch(process.env.PDF_FORMATTER_URL, {
+            method: 'POST',
+            body: JSON.stringify(paramsData),
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.PDF_FORMATTER_SECRET_KEY}`,
+            },
+        }).then(response => response.json());
+
+        const fileData = base64ToArrayBuffer(data.Files[0].FileData);
 
         res.set({
             'Content-Type': 'application/pdf',
             'Content-Disposition': `attachment; filename=${name}`,
-            'Content-Length': buffer.length,
+            'Content-Length': fileData.byteLength,
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             Pragma: 'no-cache',
             Expires: 0,
         });
 
-        res.end(buffer);
+        res.end(fileData);
     } catch (err) {
         console.error(err);
         return res.status(500).json({
