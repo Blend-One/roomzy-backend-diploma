@@ -21,7 +21,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
 
-RUN apk add chromium
+RUN apk add chromium-browser
 
 EXPOSE 8080
 

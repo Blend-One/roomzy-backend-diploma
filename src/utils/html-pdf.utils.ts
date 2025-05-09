@@ -8,6 +8,7 @@ export const htmlToPdf = async (html: string, name: string, res: Response) => {
         const browser = await puppeteer.launch({
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            ignoreDefaultArgs: ['--disable-extensions'],
             ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
         });
         const page = await browser.newPage();
