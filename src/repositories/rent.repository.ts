@@ -42,7 +42,7 @@ export default class RentRepository {
     };
 
     public async getRentsByRoomId(roomId: string, status: RentStatus, take: number, skip: number) {
-        return this.prisma.rent.findMany({
+        const params = {
             where: {
                 roomId,
                 rentStatus: {
@@ -52,11 +52,13 @@ export default class RentRepository {
             take,
             skip,
             ...this.roomPropsForRent,
-        });
+        };
+
+        return Promise.all([this.prisma.rent.findMany(params), this.prisma.rent.count({ where: params.where })]);
     }
 
     public async getRentsByUserId(userId: string, status: RentStatus, take: number, skip: number) {
-        return this.prisma.rent.findMany({
+        const params = {
             where: {
                 userId,
                 rentStatus: {
@@ -66,7 +68,9 @@ export default class RentRepository {
             take,
             skip,
             ...this.roomPropsForRent,
-        });
+        };
+
+        return Promise.all([this.prisma.rent.findMany(params), this.prisma.rent.count({ where: params.where })]);
     }
 
     public async getRentWithAttachedRoomById(rentId: string) {

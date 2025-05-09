@@ -9,6 +9,7 @@ import {
     Query,
     RawBodyRequest,
     Req,
+    Res,
     UseGuards,
 } from '@nestjs/common';
 import { RENT_ROUTES } from 'routes/rent.routes';
@@ -41,6 +42,8 @@ import { PaginationQueryParamsDocs } from '../decorators/pagination-query-params
 import { RentStatusDto } from '../api-bodies/status.api-body';
 import { InstructionsDto } from '../api-bodies/instruction.api-body';
 import { CheckoutURLDto } from '../api-bodies/checkout-url.api-body';
+import { setXTotalCountHeader } from '../utils/response.utils';
+import { Response } from 'express';
 
 @ApiBearerAuth()
 @ApiTags(API_TAGS.RENTS)
@@ -79,12 +82,15 @@ export class RentController {
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     public async getPersonalRents(
         @Req() request: Request,
+        @Res() response: Response,
         @Query('status') status: RentStatus,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
         const user = getUserHeader(request);
-        return this.rentService.getPersonalRents(user.id, status, page, limit);
+        const [rents, count] = await this.rentService.getPersonalRents(user.id, status, page, limit);
+        setXTotalCountHeader(response, count);
+        return response.json(rents);
     }
 
     @PaginationQueryParamsDocs()
@@ -102,13 +108,16 @@ export class RentController {
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     public async getRentsByRoom(
         @Req() request: Request,
+        @Res() response: Response,
         @Param('roomId') roomId: string,
         @Query('status') status: RentStatus,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
         const user = getUserHeader(request);
-        return this.rentService.getRentsByRoomForLandlord(roomId, status, user.id, page, limit);
+        const [rents, count] = await this.rentService.getRentsByRoomForLandlord(roomId, status, user.id, page, limit);
+        setXTotalCountHeader(response, count);
+        return response.json(rents);
     }
 
     @ApiOperation({
