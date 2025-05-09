@@ -28,7 +28,10 @@ export default class DocumentsService {
 
     private TEMPLATE_DATE_FORMAT = 'M/D/YYYY h:mm A';
 
-    public createDataForTemplate(rent: Rent & { room: Room & { roomType: { ru: string } } }): DocumentTemplateProps {
+    public createDataForTemplate(
+        rent: Rent & { room: Room & { roomType: { ru: string } } },
+        document: any,
+    ): DocumentTemplateProps {
         const createdDate = new Date().toISOString();
         return {
             issuedDate: dayjs(rent.issuedDate).format(this.TEMPLATE_DATE_FORMAT),
@@ -40,6 +43,10 @@ export default class DocumentsService {
             address: [rent.room.street, rent.room.building, rent.room.appartment].filter(Boolean).join(' '),
             roomType: rent.room.roomType.ru,
             area: String(rent.room.square),
+            renterIIN: document.renterIIN ?? undefined,
+            renterCommonName: document.renterCommonName ?? undefined,
+            landlordIIN: document.landlordIIN ?? undefined,
+            landlordCommonName: document.landlordIIN ?? undefined,
         };
     }
 
@@ -52,7 +59,7 @@ export default class DocumentsService {
 
         const rent = await this.rentRepository.getRentById(document.rent.id);
 
-        const dataForTemplate = this.createDataForTemplate(rent);
+        const dataForTemplate = this.createDataForTemplate(rent, document);
 
         const html = documentHTMLTemplate(dataForTemplate);
 

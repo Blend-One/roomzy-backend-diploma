@@ -8,6 +8,10 @@ export interface DocumentTemplateProps {
     amount: number;
     deposit?: number;
     createdDate: string;
+    landlordCommonName?: string;
+    landlordIIN?: string;
+    renterCommonName?: string;
+    renterIIN?: string;
 }
 
 export const documentXMLTemplate = (props: DocumentTemplateProps) =>
@@ -63,8 +67,8 @@ export const documentHTMLTemplate = (data: DocumentTemplateProps) => `
     <body>
       <h1>Договор аренды № ${data.id.slice(0, 6)}</h1>
 
-      <div class="section"><strong>Арендодатель:</strong> Ф.И.О (ИИН: 900101450044)</div>
-      <div class="section"><strong>Арендатор:</strong> Ф.И.О (ИИН: 800101450044)</div>
+      <div class="section"><strong>Арендодатель:</strong> ${data.landlordCommonName ?? 'Ф.И.О'} (ИИН: ${data.landlordIIN ?? '____________'})</div>
+      <div class="section"><strong>Арендатор:</strong> ${data.renterCommonName ?? 'Ф.И.О'} (ИИН: ${data.renterIIN ?? '____________'})</div>
 
     <div>
       <strong>1. Предмет договора</strong><br>
