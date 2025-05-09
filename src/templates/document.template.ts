@@ -108,13 +108,12 @@ export const documentHTMLTemplate = (data: DocumentTemplateProps) => `
   <div class="signature">
     <div>
       _________________________<br>
-      Ф. И. О.<br>
+      ${data.landlordCommonName ?? 'Ф.И.О'}<br>
       (Арендодатель)
     </div>
     <div>
       _________________________<br>
-      Ф. И. О..<br>
-      (Арендатор)
+      ${data.renterCommonName ?? 'Ф.И.О'}<br>
     </div>
   </div>
     </body>
