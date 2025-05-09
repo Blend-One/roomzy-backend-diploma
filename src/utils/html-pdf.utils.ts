@@ -35,7 +35,6 @@ export const htmlToPdf = async (base64Html: string, name: string, res: Response)
 
         res.set({
             'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename=${name}`,
             'Content-Length': fileData.byteLength,
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             Pragma: 'no-cache',
