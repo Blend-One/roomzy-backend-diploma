@@ -46,7 +46,7 @@ export default class DocumentsService {
             renterIIN: document?.renterIIN ?? undefined,
             renterCommonName: document?.renterCommonName ?? undefined,
             landlordIIN: document?.landlordIIN ?? undefined,
-            landlordCommonName: document?.landlordIIN ?? undefined,
+            landlordCommonName: document?.landlordCommonName ?? undefined,
         };
     }
 
