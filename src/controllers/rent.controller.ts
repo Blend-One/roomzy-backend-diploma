@@ -71,24 +71,17 @@ export class RentController {
     @ApiOperation({
         summary: 'Get personal rents (for renters)',
     })
-    @ApiQuery({
-        name: 'status',
-        description: 'Status of acquired rents',
-        required: false,
-        type: String,
-    })
     @ApiOkResponse({ type: [RentResponseDto] })
     @Get(RENT_ROUTES.GET_PERSONAL_RENTS)
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     public async getPersonalRents(
         @Req() request: Request,
         @Res() response: Response,
-        @Query('status') status: RentStatus,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
         const user = getUserHeader(request);
-        const [rents, count] = await this.rentService.getPersonalRents(user.id, status, page, limit);
+        const [rents, count] = await this.rentService.getPersonalRents(user.id, page, limit);
         setXTotalCountHeader(response, count);
         return response.json(rents);
     }
@@ -97,12 +90,6 @@ export class RentController {
     @ApiOperation({
         summary: 'Get rents by roomId (for landlords)',
     })
-    @ApiQuery({
-        name: 'status',
-        description: 'Status of acquired rents',
-        required: false,
-        type: String,
-    })
     @ApiOkResponse({ type: [RentResponseDto] })
     @Get(RENT_ROUTES.GET_RENTS_BY_ROOM)
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
@@ -110,12 +97,11 @@ export class RentController {
         @Req() request: Request,
         @Res() response: Response,
         @Param('roomId') roomId: string,
-        @Query('status') status: RentStatus,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
         const user = getUserHeader(request);
-        const [rents, count] = await this.rentService.getRentsByRoomForLandlord(roomId, status, user.id, page, limit);
+        const [rents, count] = await this.rentService.getRentsByRoomForLandlord(roomId, user.id, page, limit);
         setXTotalCountHeader(response, count);
         return response.json(rents);
     }

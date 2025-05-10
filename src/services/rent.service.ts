@@ -79,18 +79,18 @@ export default class RentService {
         });
     }
 
-    async getPersonalRents(userId: string, status: RentStatus, page: number, limit: number) {
+    async getPersonalRents(userId: string, page: number, limit: number) {
         const { take, skip } = calculatePaginationData(page, limit);
-        return this.rentRepository.getRentsByUserId(userId, status, take, skip);
+        return this.rentRepository.getRentsByUserId(userId, take, skip);
     }
 
-    async getRentsByRoomForLandlord(roomId: string, status: RentStatus, userId: string, page: number, limit: number) {
+    async getRentsByRoomForLandlord(roomId: string, userId: string, page: number, limit: number) {
         const room = await this.roomRepository.getActiveAdForRentCreation(roomId);
         if (!room || room.userId !== userId) {
             throw new BadRequestException(ROOM_ERRORS.ROOM_NOT_FOUND);
         }
         const { take, skip } = calculatePaginationData(page, limit);
-        return this.rentRepository.getRentsByRoomId(roomId, status, take, skip);
+        return this.rentRepository.getRentsByRoomId(roomId, take, skip);
     }
 
     async getRentById(userId: string, rentId: string) {

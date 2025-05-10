@@ -1,1 +1,1 @@
-export const roomStatuses = ['OPENED', 'RESERVED', 'IN_MODERATION', 'REJECTED', 'RENTED', 'ARCHIVED'];
+export const roomStatuses = ['3OPENED', '4RESERVED', '2IN_MODERATION', '1REJECTED', '5RENTED', '0ARCHIVED'];

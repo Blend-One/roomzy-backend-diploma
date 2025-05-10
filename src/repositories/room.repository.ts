@@ -8,6 +8,7 @@ import { Locale } from 'models/enums/locale.enum';
 import { UpdateRoomRequestDto } from 'models/requests-schemas/update-ad.request';
 import { IncludeIdToArray } from 'types/include-id-to-array.types';
 import { InferArrayElement } from 'types/infer-array-element.types';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RoomRepository {
@@ -329,7 +330,7 @@ export class RoomRepository {
 
     public async getAds(
         filters: FiltersDto | null,
-        status: RoomStatus,
+        status: RoomStatus | null,
         take: number,
         skip: number,
         locale: Locale,
@@ -357,7 +358,7 @@ export class RoomRepository {
                 districtId: {
                     in: filters?.districtIds,
                 },
-                status,
+                ...(status ? { status } : {}),
                 cityId: filters?.cityId,
                 isCommercial: filters?.isCommercial ?? {},
                 square: {
@@ -395,6 +396,15 @@ export class RoomRepository {
             },
             skip,
             take,
+            ...(!status
+                ? {
+                    orderBy: [
+                        {
+                            status: 'desc',
+                        },
+                    ] as Prisma.RoomOrderByWithRelationInput,
+                }
+                : {}),
         };
 
         if (!!filters?.sections?.length) {
@@ -417,6 +427,21 @@ export class RoomRepository {
                 },
             };
         }
-        return Promise.all([this.prisma.room.findMany(query), this.prisma.room.count({ where: query.where })]);
+
+        return Promise.all([
+            this.prisma.room.findMany(query),
+            this.prisma.room.count({
+                where: query.where,
+                ...(!status
+                    ? {
+                        orderBy: [
+                            {
+                                status: 'desc',
+                            },
+                        ] as Prisma.RoomOrderByWithRelationInput,
+                    }
+                    : {}),
+            }),
+        ]);
     }
 }

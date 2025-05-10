@@ -106,20 +106,18 @@ export class RoomController {
 
     @ApiOperation({ summary: 'Get personal rooms' })
     @PaginationQueryParamsDocs()
-    @ApiQuery({ name: 'status', required: false, description: 'Room status' })
     @ApiOkResponse({ type: [RoomDto] })
     @UseGuards(AuthCheckerGuard, getStatusCheckerGuard([Role.USER], UserStatus.ACTIVE))
     @Get(ROOM_ROUTES.GET_PERSONAL_ADS)
     public async getPersonalAds(
         @Req() request: Request,
-        @Query('status') status: RoomStatus,
         @Res() response: Response,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
         const locale = Locale[getLanguageHeader(request)] || FALLBACK_LANGUAGE;
         const user = getUserHeader(request);
-        const { ads, count } = await this.roomService.getPersonalAds(status, locale, page, limit, user.id);
+        const { ads, count } = await this.roomService.getPersonalAds(locale, page, limit, user.id);
         setXTotalCountHeader(response, count);
         response.json(ads);
     }

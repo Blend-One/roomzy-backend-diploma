@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { RentStatus } from '../models/enums/rent-status.enum';
 import { WithTransactionPrisma } from '../types/transaction-prisma.types';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export default class RentRepository {
@@ -20,6 +21,11 @@ export default class RentRepository {
     }
 
     private roomPropsForRent = {
+        orderBy: [
+            {
+                rentStatus: 'desc',
+            },
+        ] as Prisma.RentOrderByWithRelationInput,
         include: {
             room: {
                 select: {
@@ -41,29 +47,26 @@ export default class RentRepository {
         },
     };
 
-    public async getRentsByRoomId(roomId: string, status: RentStatus, take: number, skip: number) {
+    public async getRentsByRoomId(roomId: string, take: number, skip: number) {
         const params = {
             where: {
                 roomId,
-                rentStatus: {
-                    in: status ? [status] : Object.values(RentStatus),
-                },
             },
             take,
             skip,
             ...this.roomPropsForRent,
         };
 
-        return Promise.all([this.prisma.rent.findMany(params), this.prisma.rent.count({ where: params.where })]);
+        return Promise.all([
+            this.prisma.rent.findMany(params),
+            this.prisma.rent.count({ where: params.where, orderBy: params.orderBy }),
+        ]);
     }
 
-    public async getRentsByUserId(userId: string, status: RentStatus, take: number, skip: number) {
+    public async getRentsByUserId(userId: string, take: number, skip: number) {
         const params = {
             where: {
                 userId,
-                rentStatus: {
-                    in: status ? [status] : Object.values(RentStatus),
-                },
             },
             take,
             skip,
@@ -78,7 +81,6 @@ export default class RentRepository {
             where: {
                 id: rentId,
             },
-            ...this.roomPropsForRent,
             include: {
                 ...this.roomPropsForRent.include,
                 room: {

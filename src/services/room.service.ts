@@ -119,9 +119,9 @@ export class RoomService {
         };
     }
 
-    public async getPersonalAds(status: RoomStatus, locale: Locale, page: number, limit: number, userId: string) {
+    public async getPersonalAds(locale: Locale, page: number, limit: number, userId: string) {
         const { take, skip } = calculatePaginationData(page, limit);
-        const [ads, count] = await this.roomRepository.getAds(null, status, take, skip, locale, userId);
+        const [ads, count] = await this.roomRepository.getAds(null, null, take, skip, locale, userId);
         return {
             ads: transformQueryResult(
                 {
