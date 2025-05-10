@@ -20,6 +20,8 @@ export class StripeProvider implements PaymentProvider {
 
     private stripe = new Stripe(process.env.PAYMENT_PROVIDER_STRIPE_KEY);
 
+    private RENT_ID = ':rentId';
+
     async createPaymentSession({ amount, rentId, productName }) {
         const session = await this.stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -35,8 +37,8 @@ export class StripeProvider implements PaymentProvider {
             ],
             mode: 'payment',
             client_reference_id: rentId,
-            success_url: process.env.PAYMENT_PROVIDER_SUCCESS_URL,
-            cancel_url: process.env.PAYMENT_PROVIDER_CANCEL_URL,
+            success_url: process.env.PAYMENT_PROVIDER_SUCCESS_URL.replace(this.RENT_ID, rentId),
+            cancel_url: process.env.PAYMENT_PROVIDER_CANCEL_URL.replace(this.RENT_ID, rentId),
         });
 
         return session.url!;
