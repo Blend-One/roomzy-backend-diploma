@@ -97,7 +97,7 @@ export default class DocumentsService {
                 [
                     DocumentStatus.SIGNED_BY_LANDLORD,
                     DocumentStatus.SIGNED,
-                    (iin: string, commonName: string) => ({ landlordCommonName: commonName, landlordIIN: iin }),
+                    (iin: string, commonName: string) => ({ renterCommonName: commonName, renterIIN: iin }),
                 ],
             ],
             [
@@ -105,7 +105,7 @@ export default class DocumentsService {
                 [
                     DocumentStatus.CREATED,
                     DocumentStatus.SIGNED_BY_LANDLORD,
-                    (iin: string, commonName: string) => ({ renterCommonName: commonName, renterIIN: iin }),
+                    (iin: string, commonName: string) => ({ landlordCommonName: commonName, landlordIIN: iin }),
                 ],
             ],
         ]);
