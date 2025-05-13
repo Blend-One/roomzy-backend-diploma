@@ -26,8 +26,7 @@ export class ImageController {
         (file.Body as { pipe: (response: Response) => void }).pipe(response);
     }
 
-    @ApiOperation({ summary: 'Get image from controversial issues bucket by id (authorization is required)' })
-    @UseGuards(AuthCheckerGuard)
+    @ApiOperation({ summary: 'Get image from controversial issues bucket by id' })
     @Get(IMAGE_ROUTES.GET_CONTROVERSIAL_ISSUE_IMAGE)
     public async getControversialIssueImage(@Param('imageId') imageId: string, @Res() response: Response) {
         const file = await this.s3Service.getFile(S3Bucket.CONFLICTS, imageId).catch(_ => {
